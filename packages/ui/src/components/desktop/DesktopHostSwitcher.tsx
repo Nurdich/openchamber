@@ -58,7 +58,7 @@ import {
 
 const LOCAL_HOST_ID = 'local';
 const SSH_CONNECT_TIMEOUT_MS = 90_000;
-const SSH_CONNECT_CANCELLED_ERROR = 'SSH connection cancelled';
+const SSH_CONNECT_CANCELLED_ERROR = 'SSH 连接已取消';
 
 type HostStatus = {
   status: HostProbeResult['status'];
@@ -102,10 +102,10 @@ const statusDotClass = (status: HostProbeResult['status'] | null): string => {
 };
 
 const statusLabel = (status: HostProbeResult['status'] | null): string => {
-  if (status === 'ok') return 'Connected';
-  if (status === 'auth') return 'Auth required';
-  if (status === 'unreachable') return 'Unreachable';
-  return 'Unknown';
+  if (status === 'ok') return '已连接';
+  if (status === 'auth') return '需要认证';
+  if (status === 'unreachable') return '无法访问';
+  return '未知';
 };
 
 const statusIcon = (status: HostProbeResult['status'] | null) => {
@@ -120,31 +120,31 @@ const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve
 const sshPhaseLabel = (phase: DesktopSshInstanceStatus['phase'] | undefined): string => {
   switch (phase) {
     case 'ready':
-      return 'Ready';
+      return '就绪';
     case 'error':
-      return 'Error';
+      return '错误';
     case 'degraded':
-      return 'Reconnecting';
+      return '重新连接中';
     case 'config_resolved':
-      return 'Resolving config';
+      return '解析配置';
     case 'auth_check':
-      return 'Checking auth';
+      return '验证认证';
     case 'master_connecting':
-      return 'Connecting SSH';
+      return '连接 SSH';
     case 'remote_probe':
-      return 'Probing remote';
+      return '探测远程';
     case 'installing':
-      return 'Installing';
+      return '安装中';
     case 'updating':
-      return 'Updating';
+      return '更新中';
     case 'server_detecting':
-      return 'Detecting server';
+      return '检测服务器';
     case 'server_starting':
-      return 'Starting server';
+      return '启动服务器';
     case 'forwarding':
-      return 'Forwarding ports';
+      return '转发端口';
     default:
-      return 'Idle';
+      return '空闲';
   }
 };
 
@@ -186,7 +186,7 @@ const waitForSshReady = async (
         return status;
       }
       if (status.phase === 'error') {
-        throw new Error(status.detail || 'SSH connection failed');
+        throw new Error(status.detail || 'SSH 连接失败');
       }
     }
     await sleep(700);
@@ -196,12 +196,12 @@ const waitForSshReady = async (
     throw new Error(SSH_CONNECT_CANCELLED_ERROR);
   }
 
-  throw new Error('Timed out waiting for SSH connection');
+  throw new Error('等待 SSH 连接超时');
 };
 
 const buildLocalHost = (): DesktopHost => ({
   id: LOCAL_HOST_ID,
-  label: 'Local',
+  label: '本地',
   url: getLocalOrigin(),
 });
 
@@ -212,7 +212,7 @@ const resolveCurrentHost = (hosts: DesktopHost[]) => {
   const normalizedCurrent = normalizeHostUrl(currentHref) || currentHref;
 
   if (currentHref && locationMatchesHost(currentHref, localOrigin)) {
-    return { id: LOCAL_HOST_ID, label: 'Local', url: normalizedLocal };
+    return { id: LOCAL_HOST_ID, label: '本地', url: normalizedLocal };
   }
 
   const match = hosts.find((h) => {
@@ -225,7 +225,7 @@ const resolveCurrentHost = (hosts: DesktopHost[]) => {
 
   return {
     id: 'custom',
-    label: redactSensitiveUrl(normalizedCurrent || 'Instance'),
+    label: redactSensitiveUrl(normalizedCurrent || '实例'),
     url: normalizedCurrent,
   };
 };
@@ -293,7 +293,7 @@ export function DesktopHostSwitcherDialog({
   const current = React.useMemo(() => resolveCurrentHost(allHosts), [allHosts]);
   const currentDefaultLabel = React.useMemo(() => {
     const id = defaultHostId || LOCAL_HOST_ID;
-    return allHosts.find((h) => h.id === id)?.label || 'Local';
+    return allHosts.find((h) => h.id === id)?.label || '本地';
   }, [allHosts, defaultHostId]);
 
   const persist = React.useCallback(async (nextHosts: DesktopHost[], nextDefaultHostId: string | null) => {
@@ -306,7 +306,7 @@ export function DesktopHostSwitcherDialog({
       setConfigHosts(remote);
       setDefaultHostId(nextDefaultHostId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save');
+      setError(err instanceof Error ? err.message : '保存失败');
     } finally {
       setIsSaving(false);
     }
@@ -337,7 +337,7 @@ export function DesktopHostSwitcherDialog({
       setSshHostIds(nextSshHostIds);
       setSshStatusesById(sshStatusMap);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load');
+      setError(err instanceof Error ? err.message : '加载失败');
       setConfigHosts([]);
       setDefaultHostId(null);
       setSshHostIds({});
@@ -493,7 +493,7 @@ export function DesktopHostSwitcherDialog({
           ...prev,
           error: message,
         }));
-        toast.error(`SSH instance "${redactSensitiveUrl(host.label)}" failed to connect`, {
+        toast.error(`SSH 实例 "${redactSensitiveUrl(host.label)}" 连接失败`, {
           description: message,
         });
         return;
@@ -513,7 +513,7 @@ export function DesktopHostSwitcherDialog({
       }));
 
       if (probe.status === 'unreachable') {
-        toast.error(`Instance "${redactSensitiveUrl(host.label)}" is unreachable`);
+        toast.error(`实例 "${redactSensitiveUrl(host.label)}" 无法访问`);
         setSwitchingHostId(null);
         return;
       }
@@ -551,7 +551,7 @@ export function DesktopHostSwitcherDialog({
 
     const url = normalizeHostUrl(editUrl);
     if (!url) {
-      setError('Invalid URL (must be http/https)');
+      setError('无效的 URL（必须为 http/https）');
       return;
     }
 
@@ -564,7 +564,7 @@ export function DesktopHostSwitcherDialog({
   const addHost = React.useCallback(async () => {
     const url = normalizeHostUrl(newUrl);
     if (!url) {
-      setError('Invalid URL (must be http/https)');
+      setError('无效的 URL（必须为 http/https）');
       return;
     }
     const label = (newLabel || redactSensitiveUrl(url)).trim();
@@ -596,7 +596,7 @@ export function DesktopHostSwitcherDialog({
     if (!origin) return;
     const target = toNavigationUrl(origin);
     desktopOpenNewWindowAtUrl(target).catch((err: unknown) => {
-      toast.error('Failed to open new window', {
+      toast.error('打开新窗口失败', {
         description: err instanceof Error ? err.message : String(err),
       });
     });
@@ -658,12 +658,12 @@ export function DesktopHostSwitcherDialog({
         }));
       });
       if (readyStatus.phase === 'ready') {
-        toast.success(`SSH instance "${redactSensitiveUrl(host.label)}" connected`);
+        toast.success(`SSH 实例 "${redactSensitiveUrl(host.label)}" 已连接`);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       if (message !== SSH_CONNECT_CANCELLED_ERROR) {
-        toast.error(`SSH instance "${redactSensitiveUrl(host.label)}" failed to connect`, {
+        toast.error(`SSH 实例 "${redactSensitiveUrl(host.label)}" 连接失败`, {
           description: message,
         });
       }
@@ -684,10 +684,10 @@ export function DesktopHostSwitcherDialog({
         <div className="flex-shrink-0 border-b border-[var(--interactive-border)] px-3 py-2">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex items-baseline gap-1.5 typography-ui-label">
-              <span className="font-medium text-foreground">Current</span>
+              <span className="font-medium text-foreground">当前</span>
               <span className="max-w-[9rem] truncate text-muted-foreground">{redactSensitiveUrl(current.label)}</span>
               <span className="text-muted-foreground/50">•</span>
-              <span className="font-medium text-foreground">Default</span>
+              <span className="font-medium text-foreground">默认</span>
               <span className="max-w-[9rem] truncate text-muted-foreground">{redactSensitiveUrl(currentDefaultLabel)}</span>
             </div>
             <button
@@ -699,7 +699,7 @@ export function DesktopHostSwitcherDialog({
               )}
               onClick={() => void probeAll(allHosts)}
               disabled={!tauriAvailable || isLoading || isProbing}
-              aria-label="Refresh instances"
+aria-label="刷新实例"
             >
               <RiRefreshLine className={cn('h-4 w-4', isProbing && 'animate-spin')} />
             </button>
@@ -709,10 +709,10 @@ export function DesktopHostSwitcherDialog({
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <RiServerLine className="h-5 w-5" />
-            Instance
+            实例
           </DialogTitle>
           <DialogDescription>
-            Switch between Local and remote OpenChamber servers
+            在本地和远程 OpenChamber 服务器之间切换
           </DialogDescription>
         </DialogHeader>
       )}
@@ -720,9 +720,9 @@ export function DesktopHostSwitcherDialog({
       {!embedded && (
         <div className="flex items-center justify-between gap-2 flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="typography-meta text-muted-foreground">Current:</span>
+<span className="typography-meta text-muted-foreground">当前:</span>
             <span className="typography-ui-label text-foreground truncate">{redactSensitiveUrl(current.label)}</span>
-            <span className="typography-meta text-muted-foreground">Current default:</span>
+<span className="typography-meta text-muted-foreground">默认:</span>
             <span className="typography-ui-label text-foreground truncate">{redactSensitiveUrl(currentDefaultLabel)}</span>
           </div>
           <div className="flex items-center gap-1">
@@ -734,7 +734,7 @@ export function DesktopHostSwitcherDialog({
               disabled={!tauriAvailable || isLoading || isProbing}
             >
               <RiRefreshLine className={cn('h-4 w-4', isProbing && 'animate-spin')} />
-              Refresh
+              刷新
             </Button>
           </div>
         </div>
@@ -742,10 +742,10 @@ export function DesktopHostSwitcherDialog({
 
         {tauriAvailable && (
           <div className="flex-shrink-0 flex items-center justify-between gap-2 px-2.5 py-1.5">
-            <span className="typography-micro text-muted-foreground">Need SSH instances?<br />Manage them in Settings.</span>
+            <span className="typography-micro text-muted-foreground">需要 SSH 实例？<br />在设置中管理。</span>
             <Button type="button" variant="ghost" size="sm" onClick={openRemoteInstancesSettings}>
               <RiSettings3Line className="h-4 w-4" />
-              Remote SSH
+              远程 SSH
             </Button>
           </div>
         )}
@@ -753,7 +753,7 @@ export function DesktopHostSwitcherDialog({
         {!tauriAvailable && (
           <div className="flex-shrink-0 rounded-lg border border-border/50 bg-muted/20 p-3">
             <div className="typography-meta text-muted-foreground">
-              Instance switcher is limited on this page. Use Local to recover.
+              实例切换在此页面受限。使用本地实例恢复。
             </div>
           </div>
         )}
@@ -761,7 +761,7 @@ export function DesktopHostSwitcherDialog({
         <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="space-y-1">
             {isLoading ? (
-              <div className="px-2 py-2 text-muted-foreground text-sm">Loading…</div>
+<div className="px-2 py-2 text-muted-foreground text-sm">加载中…</div>
             ) : (
               allHosts.map((host) => {
                 const isLocal = host.id === LOCAL_HOST_ID;
@@ -792,7 +792,7 @@ export function DesktopHostSwitcherDialog({
                       )}
                       onClick={() => void handleSwitch(host)}
                       disabled={switchingHostId === host.id}
-                      aria-label={`Switch to ${displayLabel}`}
+                      aria-label={`切换到 ${displayLabel}`}
                     >
                       <span className={cn('h-2 w-2 rounded-full flex-shrink-0', statusDotClass(statusKind))} />
                       <div className="flex-1 min-w-0">
@@ -806,7 +806,7 @@ export function DesktopHostSwitcherDialog({
                             </span>
                           )}
                           {isActive && (
-                            <span className="typography-micro text-muted-foreground">Current</span>
+<span className="typography-micro text-muted-foreground">当前</span>
                           )}
                           <span className="inline-flex items-center gap-1 typography-micro text-muted-foreground">
                             {statusIcon(statusKind)}
@@ -829,7 +829,7 @@ export function DesktopHostSwitcherDialog({
                             <button
                               type="button"
                               className="h-8 w-8 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-interactive-hover transition-colors"
-                              aria-label="Instance actions"
+                              aria-label="实例操作"
                               disabled={isSaving}
                               onClick={(e) => e.stopPropagation()}
                             >
@@ -845,7 +845,7 @@ export function DesktopHostSwitcherDialog({
                               disabled={isSaving}
                             >
                               <RiPencilLine className="h-4 w-4 mr-1" />
-                              Edit
+                              编辑
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={(e) => {
@@ -856,7 +856,7 @@ export function DesktopHostSwitcherDialog({
                               disabled={isSaving}
                             >
                               <RiDeleteBinLine className="h-4 w-4 mr-1" />
-                              Delete
+                              删除
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -883,7 +883,7 @@ export function DesktopHostSwitcherDialog({
                             }}
                           >
                             {switchingHostId === host.id ? <RiLoader4Line className="h-3.5 w-3.5 animate-spin" /> : <RiPlug2Line className="h-3.5 w-3.5" />}
-                            Connect
+                            连接
                           </Button>
                         ) : (
                           <div
@@ -904,14 +904,14 @@ export function DesktopHostSwitcherDialog({
                                 : 'text-muted-foreground/60 hover:text-primary/80',
                             )}
                             onClick={() => void setDefault(host.id)}
-                            aria-label={isDefault ? 'Default instance' : 'Set as default'}
+                            aria-label={isDefault ? '默认实例' : '设为默认'}
                             disabled={isSaving}
                           >
                             {isDefault ? <RiStarFill className="h-4 w-4" /> : <RiStarLine className="h-4 w-4" />}
                           </button>
                         </TooltipTrigger>
                         <TooltipContent sideOffset={6}>
-                          {isDefault ? 'Default' : 'Set as default'}
+                          {isDefault ? '默认' : '设为默认'}
                         </TooltipContent>
                       </Tooltip>
 
@@ -930,13 +930,13 @@ export function DesktopHostSwitcherDialog({
                               openInNewWindow(host);
                             }}
                             disabled={statusKind === 'unreachable'}
-                            aria-label="Open in new window"
+                            aria-label="在新窗口中打开"
                           >
                             <RiWindowLine className="h-4 w-4" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent sideOffset={6}>
-                          {statusKind === 'unreachable' ? 'Instance unreachable' : 'Open in new window'}
+                          {statusKind === 'unreachable' ? '实例无法访问' : '在新窗口中打开'}
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -950,14 +950,14 @@ export function DesktopHostSwitcherDialog({
         {tauriAvailable && editingId && editingId !== LOCAL_HOST_ID && (
           <div className="flex-shrink-0 rounded-lg border border-border/50 bg-muted/20 p-3">
             <div className="flex items-center justify-between gap-2">
-              <div className="typography-ui-label font-medium text-foreground">Edit instance</div>
+              <div className="typography-ui-label font-medium text-foreground">编辑实例</div>
               <div className="flex items-center gap-2">
                 <Button type="button" variant="outline" size="sm" onClick={cancelEdit} disabled={isSaving}>
-                  Cancel
+                  取消
                 </Button>
                 <Button type="button" size="sm" onClick={() => void commitEdit()} disabled={isSaving}>
                   {isSaving ? <RiLoader4Line className="h-4 w-4 animate-spin" /> : null}
-                  Save
+                  保存
                 </Button>
               </div>
             </div>
@@ -965,13 +965,13 @@ export function DesktopHostSwitcherDialog({
               <Input
                 value={editLabel}
                 onChange={(e) => setEditLabel(e.target.value)}
-                placeholder="Label"
+                placeholder="标签"
                 disabled={isSaving}
               />
               <Input
                 value={editUrl}
                 onChange={(e) => setEditUrl(e.target.value)}
-                placeholder="https://host:port"
+                placeholder="https://主机:端口"
                 disabled={isSaving}
               />
             </div>
@@ -987,7 +987,7 @@ export function DesktopHostSwitcherDialog({
               disabled={!tauriAvailable || isSaving}
             >
               <RiAddLine className="h-4 w-4" />
-              <span className="typography-ui-label">Add instance</span>
+              <span className="typography-ui-label">添加实例</span>
             </button>
           </div>
         ) : (
@@ -998,7 +998,7 @@ export function DesktopHostSwitcherDialog({
               : 'rounded-md border border-[var(--interactive-border)] bg-[var(--surface-elevated)] p-2.5'
           )}>
             <div className="flex items-center justify-between gap-2">
-              <div className="typography-ui-label font-medium text-foreground">Add instance</div>
+              <div className="typography-ui-label font-medium text-foreground">添加实例</div>
               <div className="flex items-center gap-2">
                 {embedded && (
                   <Button
@@ -1008,7 +1008,7 @@ export function DesktopHostSwitcherDialog({
                     onClick={() => setIsAddFormOpen(false)}
                     disabled={isSaving}
                   >
-                    Cancel
+                    取消
                   </Button>
                 )}
                 <Button
@@ -1018,7 +1018,7 @@ export function DesktopHostSwitcherDialog({
                   disabled={!tauriAvailable || isSaving || !newUrl.trim()}
                 >
                   {isSaving ? <RiLoader4Line className="h-4 w-4 animate-spin" /> : null}
-                  Add
+                  添加
                 </Button>
               </div>
             </div>
@@ -1026,13 +1026,13 @@ export function DesktopHostSwitcherDialog({
               <Input
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
-                placeholder="Label (optional)"
+                placeholder="标签（可选）"
                 disabled={!tauriAvailable || isSaving}
               />
               <Input
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
-                placeholder="https://host:port"
+                placeholder="https://主机:端口"
                 disabled={!tauriAvailable || isSaving}
               />
             </div>
@@ -1064,7 +1064,7 @@ export function DesktopHostSwitcherDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <RiLoader4Line className={cn('h-4 w-4', !sshSwitchModal.error && 'animate-spin')} />
-            Connecting to {sshSwitchModal.hostLabel || 'SSH instance'}
+            正在连接 {sshSwitchModal.hostLabel || 'SSH 实例'}
           </DialogTitle>
           <DialogDescription>
             {sshSwitchModal.error
@@ -1080,7 +1080,7 @@ export function DesktopHostSwitcherDialog({
               variant="outline"
               onClick={switchToLocal}
             >
-              Switch to Local
+              切换到本地
             </Button>
             <Button
               type="button"
@@ -1088,7 +1088,7 @@ export function DesktopHostSwitcherDialog({
               onClick={retrySshSwitch}
               disabled={!sshSwitchModal.hostId}
             >
-              Retry
+              重试
             </Button>
           </div>
         ) : null}
@@ -1125,7 +1125,7 @@ type DesktopHostSwitcherButtonProps = {
 
 export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHostSwitcherButtonProps) {
   const [open, setOpen] = React.useState(false);
-  const [label, setLabel] = React.useState('Local');
+  const [label, setLabel] = React.useState('本地');
   const [status, setStatus] = React.useState<HostProbeResult['status'] | null>(null);
   const attemptedDefaultSshConnectRef = React.useRef(false);
   const [startupSshModal, setStartupSshModal] = React.useState<{
@@ -1163,7 +1163,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
       const ready = await waitForSshReady(hostId, 45_000, () => {});
       const localUrl = normalizeHostUrl(ready.localUrl || '');
       if (!localUrl) {
-        throw new Error('Connected but missing forwarded URL');
+        throw new Error('已连接但缺少转发的 URL');
       }
       window.location.assign(toNavigationUrl(localUrl));
       return true;
@@ -1236,7 +1236,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
         }
 
         if (cancelled) return;
-        setLabel(redactSensitiveUrl(current.label || 'Instance'));
+        setLabel(redactSensitiveUrl(current.label || '实例'));
         const normalized = normalizeHostUrl(current.url);
         if (!normalized) {
           setStatus(null);
@@ -1247,7 +1247,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
         setStatus(res.status);
       } catch {
         if (!cancelled) {
-          setLabel('Instance');
+          setLabel('实例');
           setStatus(null);
         }
       }
@@ -1268,14 +1268,9 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
   }
 
   const isCurrentlyLocal = locationMatchesHost(window.location.href, getLocalOrigin());
-
-  const fallbackLabel = typeof window !== 'undefined' && window.location.hostname
-    ? window.location.hostname
-    : 'Instance';
-
   const effectiveLabel = isCurrentlyLocal
-    ? 'Local'
-    : label === 'Local'
+    ? '本地'
+    : label === '本地'
       ? fallbackLabel
       : label;
   const safeEffectiveLabel = redactSensitiveUrl(effectiveLabel);
@@ -1287,7 +1282,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
           <button
             type="button"
             onClick={() => setOpen(true)}
-            aria-label="Switch instance"
+            aria-label="切换实例"
             data-oc-host-switcher
             className={cn(headerIconButtonClass, 'relative w-auto px-3')}
           >
@@ -1300,12 +1295,12 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
                 'pointer-events-none absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full',
                 statusDotClass(status)
               )}
-              aria-label="Instance status"
+              aria-label="实例状态"
             />
           </button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Instance</p>
+          <p>实例</p>
         </TooltipContent>
       </Tooltip>
       <DesktopHostSwitcherDialog open={open} onOpenChange={setOpen} />
@@ -1328,11 +1323,11 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
       >
         <DialogContent className="w-[min(30rem,calc(100vw-2rem))] max-w-none">
           <DialogHeader>
-            <DialogTitle>Default SSH instance unavailable</DialogTitle>
+            <DialogTitle>默认 SSH 实例不可用</DialogTitle>
             <DialogDescription>
               {startupSshModal.connecting
-                ? `Connecting to ${startupSshModal.hostLabel || 'SSH instance'}...`
-                : startupSshModal.error || 'Failed to connect the default SSH instance.'}
+                ? `正在连接 ${startupSshModal.hostLabel || 'SSH 实例'}…`
+                : startupSshModal.error || '无法连接默认 SSH 实例。'}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -1343,7 +1338,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
               onClick={() => void switchStartupToLocal()}
               disabled={startupSshModal.connecting}
             >
-              Switch to Local
+              切换到本地
             </Button>
             <Button
               type="button"
@@ -1352,7 +1347,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
               disabled={startupSshModal.connecting || !startupSshModal.hostId}
             >
               {startupSshModal.connecting ? <RiLoader4Line className="h-4 w-4 animate-spin" /> : null}
-              Retry
+              重试
             </Button>
           </div>
         </DialogContent>
@@ -1379,7 +1374,7 @@ export function DesktopHostSwitcherInline() {
         onClick={() => setOpen(true)}
       >
         <RiServerLine className="h-4 w-4" />
-        Switch instance
+        切换实例
       </Button>
       <DesktopHostSwitcherDialog open={open} onOpenChange={setOpen} />
     </>

@@ -256,7 +256,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file.size > MAX_FILE_SIZE) {
-        toast.error(`File "${file.name}" is too large (max 10MB)`);
+        toast.error(`文件“${file.name}”过大（最大 10MB）`);
         continue;
       }
 
@@ -280,12 +280,12 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
         attachedCount++;
       } catch (error) {
         console.error('File attach failed', error);
-        toast.error(`Failed to attach "${file.name}"`);
+        toast.error(`添加“${file.name}”失败`);
       }
     }
 
     if (attachedCount > 0) {
-      toast.success(`Attached ${attachedCount} file${attachedCount > 1 ? 's' : ''}`);
+      toast.success(`已添加 ${attachedCount} 个文件`);
     }
 
     if (fileInputRef.current) {
@@ -365,7 +365,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
         )}
         style={{ borderColor: 'var(--interactive-border)' }}
       >
-        <h1 className="typography-ui-label font-medium">New Multi-Run</h1>
+        <h1 className="typography-ui-label font-medium">新建并行任务</h1>
         {onCancel && (
           <div className="absolute right-0 flex items-center pr-3">
             <Tooltip delayDuration={500}>
@@ -373,14 +373,14 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 <button
                   type="button"
                   onClick={onCancel}
-                  aria-label="Close (Esc)"
+                  aria-label="关闭（Esc）"
                   className="inline-flex h-9 w-9 items-center justify-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-interactive-hover/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary app-region-no-drag"
                 >
                   <RiCloseLine className="h-5 w-5" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Close (Esc)</p>
+                <p>关闭（Esc）</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -394,27 +394,27 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
             {/* Group name (required) */}
             <div className="space-y-2">
               <label htmlFor="group-name" className="typography-ui-label font-medium text-foreground">
-                Group name <span className="text-destructive">*</span>
+                分组名称 <span className="text-destructive">*</span>
               </label>
               <Input
                 id="group-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. feature-auth, bugfix-login"
+                placeholder="如 feature-auth、bugfix-login"
                 className="typography-body max-w-full sm:max-w-xs"
                 required
               />
               <p className="typography-micro text-muted-foreground">
-                Used for worktree directory and branch names
+                用于 Worktree 目录和分支名称
               </p>
             </div>
 
             {/* Worktree creation */}
             <div className="space-y-3">
               <div className="space-y-1">
-                <p className="typography-ui-label font-medium text-foreground">Worktrees</p>
+                <p className="typography-ui-label font-medium text-foreground">Worktree</p>
                 <p className="typography-micro text-muted-foreground">
-                  Create one worktree per model by creating a new branch from a base branch.
+                  为每个模型创建独立的 worktree，基于选定的分支新建分支。
                 </p>
               </div>
 
@@ -423,7 +423,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                   className="typography-meta font-medium text-foreground"
                   htmlFor="multirun-worktree-base-branch"
                 >
-                  Base branch
+                  基准分支
                 </label>
                 <BranchSelector
                   directory={currentDirectory}
@@ -432,7 +432,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                   id="multirun-worktree-base-branch"
                 />
                 <p className="typography-micro text-muted-foreground">
-                  Creates new branches from{' '}
+                  将从{' '}
                   <code className="font-mono text-xs text-muted-foreground">{worktreeBaseBranch || 'HEAD'}</code>.
                 </p>
               </div>
@@ -441,10 +441,10 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
               <Collapsible open={isSetupCommandsOpen} onOpenChange={setIsSetupCommandsOpen}>
                 <CollapsibleTrigger className="w-full flex items-center justify-between py-1 hover:bg-[var(--interactive-hover)] rounded-md px-1 -mx-1 transition-colors">
                   <p className="typography-ui-label font-medium text-foreground">
-                    Setup commands
+                    初始化命令
                     {setupCommands.filter(cmd => cmd.trim()).length > 0 && (
                       <span className="font-normal text-muted-foreground/70">
-                        {' '}({setupCommands.filter(cmd => cmd.trim()).length} configured)
+                        {' '}（已配置 {setupCommands.filter(cmd => cmd.trim()).length} 个）
                       </span>
                     )}
                   </p>
@@ -456,10 +456,10 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 <CollapsibleContent>
                   <div className="pt-2 space-y-2">
                     <p className="typography-micro text-muted-foreground/70">
-                      Commands run in each new worktree. Use <code className="font-mono text-xs">$ROOT_PROJECT_PATH</code> for project root.
+                      在每个新 worktree 中执行。可用 <code className="font-mono text-xs">$ROOT_PROJECT_PATH</code> 表示项目根目录。
                     </p>
                     {isLoadingSetupCommands ? (
-                      <p className="typography-meta text-muted-foreground/70">Loading...</p>
+                      <p className="typography-meta text-muted-foreground/70">加载中…</p>
                     ) : (
                       <div className="space-y-1.5">
                         {setupCommands.map((command, index) => (
@@ -471,7 +471,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                                 newCommands[index] = e.target.value;
                                 setSetupCommands(newCommands);
                               }}
-                              placeholder="e.g., bun install"
+                              placeholder="如 bun install"
                               className="h-8 flex-1 font-mono text-xs"
                             />
                             <button
@@ -481,7 +481,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                                 setSetupCommands(newCommands);
                               }}
                               className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                              aria-label="Remove command"
+                              aria-label="删除命令"
                             >
                               <RiCloseLine className="h-4 w-4" />
                             </button>
@@ -493,7 +493,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                           className="flex items-center gap-1.5 typography-meta text-muted-foreground hover:text-foreground transition-colors"
                         >
                           <RiAddLine className="h-3.5 w-3.5" />
-                          Add command
+                          添加命令
                         </button>
                       </div>
                     )}
@@ -508,7 +508,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 className="typography-ui-label font-medium text-foreground"
                 htmlFor="multirun-agent"
               >
-                Agent
+                智能体
               </label>
               <AgentSelector
                 value={selectedAgent}
@@ -516,20 +516,20 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 id="multirun-agent"
               />
               <p className="typography-micro text-muted-foreground">
-                Defaults to your configured default agent.
+                默认使用已配置的默认智能体。
               </p>
             </div>
 
             {/* Prompt */}
             <div className="space-y-2">
               <label htmlFor="prompt" className="typography-ui-label font-medium text-foreground">
-                Prompt <span className="text-destructive">*</span>
+                提示词 <span className="text-destructive">*</span>
               </label>
               <Textarea
                 id="prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Enter the prompt to send to all models..."
+                placeholder="输入发送给所有模型的提示词…"
                 className="typography-body min-h-[120px] max-h-[400px] resize-none overflow-y-auto field-sizing-content"
                 required
               />
@@ -539,9 +539,9 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <label className="typography-ui-label font-medium text-foreground">
-                  Attachments
+                  附件
                 </label>
-                <span className="typography-micro text-muted-foreground">(optional, same files for all runs)</span>
+                <span className="typography-micro text-muted-foreground">（可选，所有运行共用同一组文件）</span>
               </div>
               
               <input
@@ -562,7 +562,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <RiAttachment2 className="h-3.5 w-3.5 mr-1.5" />
-                  Attach files
+                  添加附件
                 </Button>
                 
                 {attachedFiles.map((file) => (
@@ -596,7 +596,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
             {/* Model selection */}
             <div className="space-y-2">
               <label className="typography-ui-label font-medium text-foreground">
-                Models <span className="text-destructive">*</span>
+                模型 <span className="text-destructive">*</span>
               </label>
               <ModelMultiSelect
                 selectedModels={selectedModels}
@@ -622,17 +622,17 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 variant="outline"
                 onClick={onCancel}
               >
-                Cancel
+                取消
               </Button>
               <Button
                 type="submit"
                 disabled={!isValid || isSubmitting}
               >
                 {isSubmitting ? (
-                  'Creating...'
+                  '建立中…'
                 ) : (
                   <>
-                    Start ({selectedModels.length} models)
+                    开始（共 {selectedModels.length} 个模型）
                   </>
                 )}
               </Button>

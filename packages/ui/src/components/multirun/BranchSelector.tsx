@@ -57,7 +57,7 @@ const parseTrackingRemote = (tracking: string | null | undefined): string | null
 // eslint-disable-next-line react-refresh/only-export-components -- Hook is tightly coupled with BranchSelector
 export function useBranchOptions(directory: string | null): BranchSelectorState {
   const [branches, setBranches] = React.useState<WorktreeBaseOption[]>([
-    { value: 'HEAD', label: 'Current (HEAD)', group: 'special' },
+    { value: 'HEAD', label: '当前（HEAD）', group: 'special' },
   ]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isGitRepository, setIsGitRepository] = React.useState<boolean | null>(null);
@@ -68,7 +68,7 @@ export function useBranchOptions(directory: string | null): BranchSelectorState 
     if (!directory) {
       setIsGitRepository(null);
       setIsLoading(false);
-      setBranches([{ value: 'HEAD', label: 'Current (HEAD)', group: 'special' }]);
+      setBranches([{ value: 'HEAD', label: '当前（HEAD）', group: 'special' }]);
       return;
     }
 
@@ -83,7 +83,7 @@ export function useBranchOptions(directory: string | null): BranchSelectorState 
         setIsGitRepository(isGit);
 
         if (!isGit) {
-          setBranches([{ value: 'HEAD', label: 'Current (HEAD)', group: 'special' }]);
+          setBranches([{ value: 'HEAD', label: '当前（HEAD）', group: 'special' }]);
           return;
         }
 
@@ -94,7 +94,7 @@ export function useBranchOptions(directory: string | null): BranchSelectorState 
         if (cancelled) return;
 
         const worktreeBaseOptions: WorktreeBaseOption[] = [];
-        const headLabel = branchData?.current ? `Current (HEAD: ${branchData.current})` : 'Current (HEAD)';
+        const headLabel = branchData?.current ? `当前（HEAD: ${branchData.current}）` : '当前（HEAD）';
         worktreeBaseOptions.push({ value: 'HEAD', label: headLabel, group: 'special' });
 
         if (branchData) {
@@ -192,12 +192,12 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
           {selectedLabel ? (
             <SelectValue>{selectedLabel}</SelectValue>
           ) : (
-            <SelectValue placeholder={isLoading ? 'Loading branches…' : 'Select a branch'} />
+            <SelectValue placeholder={isLoading ? '加载分支中…' : '选择分支'} />
           )}
         </SelectTrigger>
         <SelectContent fitContent>
           <SelectGroup>
-            <SelectLabel>Default</SelectLabel>
+            <SelectLabel>默认</SelectLabel>
             {branches
               .filter((option) => option.group === 'special')
               .map((option) => (
@@ -211,7 +211,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
             <>
               <SelectSeparator />
               <SelectGroup>
-                <SelectLabel>Local branches</SelectLabel>
+                <SelectLabel>本地分支</SelectLabel>
                 {branches
                   .filter((option) => option.group === 'local')
                   .map((option) => (
@@ -227,7 +227,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
             <>
               <SelectSeparator />
               <SelectGroup>
-                <SelectLabel>Remote branches</SelectLabel>
+                <SelectLabel>远程分支</SelectLabel>
                 {branches
                   .filter((option) => option.group === 'remote')
                   .map((option) => (
@@ -242,7 +242,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
       </Select>
       
       {isGitRepository === false && (
-        <p className="typography-micro text-muted-foreground/70">Not in a git repository.</p>
+        <p className="typography-micro text-muted-foreground/70">当前目录不是 Git 仓库。</p>
       )}
     </div>
   );

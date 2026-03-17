@@ -87,7 +87,7 @@ export const AgentSelector: React.FC<AgentSelectorProps> = ({
         size="lg"
         className={className ?? 'max-w-full typography-meta text-foreground'}
       >
-        <SelectValue placeholder="Select an agent" />
+        <SelectValue placeholder="选择智能体" />
       </SelectTrigger>
       <SelectContent fitContent>
         {selectableAgents.length > 0 && (

@@ -125,7 +125,7 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
     if (!result.ok) {
       return;
     }
-    toast.success('Path copied to clipboard');
+    toast.success('路径已复制');
   };
 
   return (
@@ -143,7 +143,7 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
           'inline-flex h-full items-center gap-2 px-3 typography-ui-label font-medium',
           'text-foreground hover:bg-interactive-hover transition-colors'
         )}
-        aria-label={`Open in ${selectedApp.label}`}
+        aria-label={`在 ${selectedApp.label} 中打开`}
       >
         <AppIcon
           label={selectedApp.label}
@@ -151,7 +151,7 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
           fallbackIconDataUrl={selectedApp.fallbackIconDataUrl}
         />
         <span className={cn('header-open-label', isScanning ? 'animate-pulse text-muted-foreground' : undefined)}>
-          Open
+          打开
         </span>
       </button>
       <DropdownMenu>
@@ -163,7 +163,7 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
               'border-l border-[var(--interactive-border)] text-muted-foreground',
               'hover:bg-interactive-hover hover:text-foreground transition-colors'
             )}
-            aria-label="Choose app to open"
+            aria-label="选择打开方式"
           >
             <RiArrowDownSLine className="h-4 w-4" />
           </button>
@@ -175,7 +175,7 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
         >
           <DropdownMenuItem className="flex items-center gap-2" onClick={() => void handleCopyPath()}>
             <RiFileCopyLine className="h-4 w-4" />
-            <span className="typography-ui-label text-foreground">Copy Path</span>
+            <span className="typography-ui-label text-foreground">复制路径</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           {availableApps.map((app) => {
@@ -204,7 +204,7 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
               onClick={() => void loadInstalledApps(true)}
             >
               <RiRefreshLine className="h-4 w-4" />
-              <span className="typography-ui-label text-foreground">Refresh Apps</span>
+              <span className="typography-ui-label text-foreground">刷新应用列表</span>
             </DropdownMenuItem>
           ) : null}
         </DropdownMenuContent>
