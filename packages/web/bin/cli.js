@@ -2896,11 +2896,7 @@ const commands = {
         ...process.env,
         OPENCHAMBER_PORT: String(targetPort),
         OPENCODE_BINARY: opencodeBinary,
-<<<<<<< HEAD
         OPENCHAMBER_DIST_DIR: distDirForServer,
-=======
-        ...(effectiveHost ? { OPENCHAMBER_HOST: effectiveHost } : {}),
->>>>>>> 9aadda2ec45f174b58c36fbb9f760cb821943622
         ...(effectiveUiPassword ? { OPENCHAMBER_UI_PASSWORD: effectiveUiPassword } : {}),
         ...(process.env.OPENCODE_SKIP_START ? { OPENCHAMBER_SKIP_OPENCODE_START: process.env.OPENCODE_SKIP_START } : {}),
       },

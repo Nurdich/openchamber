@@ -5823,12 +5823,7 @@ function parseArgs(argv = process.argv.slice(2)) {
   const envTunnelHostname = process.env.OPENCHAMBER_TUNNEL_HOSTNAME || undefined;
 
   const options = {
-<<<<<<< HEAD
     port: generateRandomPort(), // No default - always use random port unless explicitly specified
-=======
-    port: DEFAULT_PORT,
-    host: undefined,
->>>>>>> 9aadda2ec45f174b58c36fbb9f760cb821943622
     uiPassword: envPassword,
     tryCfTunnel: envCfTunnel,
     tunnelProvider: envTunnelProvider,
@@ -14426,16 +14421,12 @@ async function main(options = {}) {
       resolve();
     };
 
-<<<<<<< HEAD
     server.once('error', onError);
     if (bindHost) {
       server.listen(port, bindHost, onListening);
     } else {
       server.listen(port, onListening);
     }
-=======
-    server.listen(port, bindHost, onListening);
->>>>>>> 9aadda2ec45f174b58c36fbb9f760cb821943622
   });
 
   if (attachSignals && !signalsAttached) {
