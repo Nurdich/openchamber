@@ -9,8 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { checkIsGitRepository, getGitBranches } from '@/lib/gitApi';
-import { resolveRootTrackingRemote } from '@/lib/worktrees/worktreeCreate';
+import { useGitStore, useGitBranches } from '@/stores/useGitStore';
+import { useRuntimeAPIs } from '@/hooks/useRuntimeAPIs';
+import { getRootBranch } from '@/lib/worktrees/worktreeStatus';
+
+/** localStorage key matching NewWorktreeDialog */
+const LAST_SOURCE_BRANCH_KEY = 'oc:lastWorktreeSourceBranch';
 
 export type WorktreeBaseOption = {
   value: string;
@@ -34,25 +38,15 @@ export interface BranchSelectorProps {
 }
 
 export interface BranchSelectorState {
-  branches: WorktreeBaseOption[];
+  localBranches: string[];
+  remoteBranches: string[];
   isLoading: boolean;
   isGitRepository: boolean | null;
 }
 
-const parseTrackingRemote = (tracking: string | null | undefined): string | null => {
-  const value = String(tracking || '').trim().replace(/^remotes\//, '');
-  if (!value) {
-    return null;
-  }
-  const slashIndex = value.indexOf('/');
-  if (slashIndex <= 0) {
-    return null;
-  }
-  return value.slice(0, slashIndex);
-};
-
 /**
  * Hook to load available git branches for a directory.
+ * Uses the shared useGitStore (same as NewWorktreeDialog).
  */
 // eslint-disable-next-line react-refresh/only-export-components -- Hook is tightly coupled with BranchSelector
 export function useBranchOptions(directory: string | null): BranchSelectorState {
@@ -62,8 +56,12 @@ export function useBranchOptions(directory: string | null): BranchSelectorState 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isGitRepository, setIsGitRepository] = React.useState<boolean | null>(null);
 
+  // Fetch branches if not cached
   React.useEffect(() => {
-    let cancelled = false;
+    if (!directory || !git) return;
+    if (branches?.all) return; // Already cached
+    void fetchBranches(directory, git);
+  }, [directory, git, branches?.all, fetchBranches]);
 
     if (!directory) {
       setIsGitRepository(null);
@@ -72,13 +70,21 @@ export function useBranchOptions(directory: string | null): BranchSelectorState 
       return;
     }
 
-    setIsLoading(true);
-    setIsGitRepository(null);
+  const remoteBranches = React.useMemo(() => {
+    if (!branches?.all) return [];
+    return branches.all
+      .filter((branchName: string) => branchName.startsWith('remotes/'))
+      .map((branchName: string) => branchName.replace(/^remotes\//, ''))
+      .sort();
+  }, [branches]);
 
-    (async () => {
-      try {
-        const isGit = await checkIsGitRepository(directory);
-        if (cancelled) return;
+  // isGitRepository: true if we got branches, false if fetch returned empty, null if not yet loaded
+  const isGitRepository = React.useMemo<boolean | null>(() => {
+    if (!directory) return null;
+    if (isLoading) return null;
+    if (!branches) return null;
+    return Boolean(branches.all);
+  }, [directory, isLoading, branches]);
 
         setIsGitRepository(isGit);
 
@@ -152,7 +158,8 @@ export function useBranchOptions(directory: string | null): BranchSelectorState 
 }
 
 /**
- * Branch selector dropdown for selecting a base branch for worktree creation.
+ * Branch selector dropdown for selecting a source branch for worktree creation.
+ * Matches the NewWorktreeDialog source branch selector exactly.
  */
 export const BranchSelector: React.FC<BranchSelectorProps> = ({
   directory,
@@ -162,23 +169,46 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
   disabled,
   id,
 }) => {
-  const { branches, isLoading, isGitRepository } = useBranchOptions(directory);
-  const selectedLabel = React.useMemo(() => {
-    return branches.find((option) => option.value === value)?.label ?? null;
-  }, [branches, value]);
+  const { localBranches, remoteBranches, isLoading, isGitRepository } = useBranchOptions(directory);
+  const allBranches = React.useMemo(
+    () => [...localBranches, ...remoteBranches.map(b => `remotes/${b}`)],
+    [localBranches, remoteBranches],
+  );
 
-  // Update value if it's no longer valid
+  // Resolve default source branch (same priority as NewWorktreeDialog)
   React.useEffect(() => {
-    const isValid = branches.some((option) => option.value === value);
-    if (!isValid && branches.length > 0) {
-      onChange('HEAD');
-    }
-  }, [branches, value, onChange]);
+    if (disabled || isLoading || allBranches.length === 0) return;
+    // If current value is valid, keep it
+    if (value && allBranches.includes(value)) return;
+
+    const resolve = async () => {
+      try {
+        const rootBranch = directory ? await getRootBranch(directory).catch(() => null) : null;
+        const saved = localStorage.getItem(LAST_SOURCE_BRANCH_KEY);
+
+        if (saved && allBranches.includes(saved)) {
+          onChange(saved);
+        } else if (rootBranch && allBranches.includes(rootBranch)) {
+          onChange(rootBranch);
+        } else if (allBranches.includes('main')) {
+          onChange('main');
+        } else if (allBranches.includes('master')) {
+          onChange('master');
+        } else if (allBranches[0]) {
+          onChange(allBranches[0]);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    void resolve();
+  }, [allBranches, directory, disabled, isLoading, onChange, value]);
 
   const isDisabled = disabled || !isGitRepository || isLoading;
 
   return (
-    <div className="space-y-2">
+    <div>
       <Select
         value={value}
         onValueChange={onChange}
@@ -187,7 +217,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
         <SelectTrigger
           id={id}
           size="lg"
-          className={className ?? 'max-w-full typography-meta text-foreground'}
+          className={className ?? 'w-fit typography-meta text-foreground'}
         >
           {selectedLabel ? (
             <SelectValue>{selectedLabel}</SelectValue>
@@ -235,12 +265,13 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
                       {option.label}
                     </SelectItem>
                   ))}
-              </SelectGroup>
+                </SelectGroup>
+              )}
             </>
-          ) : null}
+          )}
         </SelectContent>
       </Select>
-      
+
       {isGitRepository === false && (
         <p className="typography-micro text-muted-foreground/70">当前目录不是 Git 仓库。</p>
       )}

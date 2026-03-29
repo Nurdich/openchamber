@@ -20,24 +20,21 @@ export const FileAttachmentButton = memo(() => {
   const iconSizeClass = isMobile ? 'h-5 w-5' : 'h-[18px] w-[18px]';
 
   const attachFiles = async (files: FileList | File[]) => {
-    let attachedCount = 0;
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const sizeBefore = useSessionStore.getState().attachedFiles.length;
       try {
         await addAttachedFile(file);
-        const sizeAfter = useSessionStore.getState().attachedFiles.length;
-        if (sizeAfter > sizeBefore) {
-          attachedCount++;
-        }
       } catch (error) {
         console.error('File attach failed', error);
         toast.error(error instanceof Error ? error.message : '附件添加失败');
       }
     }
+<<<<<<< HEAD
     if (attachedCount > 0) {
         toast.success(`已添加 ${attachedCount} 个文件`);
     }
+=======
+>>>>>>> 9aadda2ec45f174b58c36fbb9f760cb821943622
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,13 +344,13 @@ export const MessageFilesDisplay = memo(({ files, onShowPopup, compact = false }
     return filename || path;
   };
 
-  const resolveDisplayName = (file: FilePart): string => {
+  const resolveDisplayName = React.useCallback((file: FilePart): string => {
     const isGitHubLink = getGitHubLinkKind(file) !== null;
     if (isGitHubLink && typeof file.filename === 'string' && file.filename.trim().length > 0) {
       return file.filename.trim();
     }
     return extractFilename(file.filename || file.url);
-  };
+  }, []);
 
   const formatFileSize = (bytes?: number) => {
     if (!bytes || !Number.isFinite(bytes) || bytes <= 0) return '';
@@ -377,7 +374,7 @@ export const MessageFilesDisplay = memo(({ files, onShowPopup, compact = false }
           size: file.size,
         }];
       }),
-    [imageFiles]
+    [imageFiles, resolveDisplayName]
   );
 
   const handleImageClick = React.useCallback((index: number) => {

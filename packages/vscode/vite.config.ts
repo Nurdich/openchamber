@@ -42,6 +42,20 @@ export default defineConfig({
     '__OPENCHAMBER_WEBVIEW_BUILD_TIME__': JSON.stringify(new Date().toISOString()),
   },
   envPrefix: ['VITE_'],
+  server: {
+    host: 'localhost',
+    port: 5173,
+    strictPort: true,
+    cors: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+    hmr: {
+      host: 'localhost',
+      protocol: 'ws',
+      port: 5173,
+    },
+  },
   optimizeDeps: {
     include: ['@opencode-ai/sdk/v2'],
   },
@@ -123,4 +137,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

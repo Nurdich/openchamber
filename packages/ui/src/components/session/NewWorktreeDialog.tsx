@@ -871,12 +871,8 @@ Nice-to-have:
         description: `${metadata.branch || metadata.name}${sourceLabel ? ` from ${sourceLabel}` : ''}`,
       });
 
-      try {
-        await loadSessions();
-      } catch {
-        // best effort
-      }
-      
+      void loadSessions().catch(() => undefined);
+
       onOpenChange(false);
 
       if (createdSessionId) {

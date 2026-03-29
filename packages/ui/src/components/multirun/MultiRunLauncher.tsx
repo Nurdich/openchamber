@@ -1,12 +1,14 @@
 import React from 'react';
-import { RiAddLine, RiArrowDownSLine, RiAttachment2, RiCloseLine, RiFileImageLine, RiFileLine } from '@remixicon/react';
+import { RiAddLine, RiArrowDownSLine, RiAttachment2, RiCloseLine, RiFileImageLine, RiFileLine, RiFolderLine, RiInformationLine, RiTerminalLine } from '@remixicon/react';
 import { toast } from '@/components/ui';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollShadow } from '@/components/ui/ScrollShadow';
+import { cn, formatDirectoryName } from '@/lib/utils';
 import { useDirectoryStore } from '@/stores/useDirectoryStore';
 import { useMultiRunStore } from '@/stores/useMultiRunStore';
 import { useSessionStore } from '@/stores/useSessionStore';
@@ -18,6 +20,9 @@ import { ModelMultiSelect, generateInstanceId, type ModelSelectionWithId } from 
 import { BranchSelector, useBranchOptions } from './BranchSelector';
 import { AgentSelector } from './AgentSelector';
 import { isDesktopShell } from '@/lib/desktop';
+import { useThemeSystem } from '@/contexts/useThemeSystem';
+import { PROJECT_ICON_MAP, PROJECT_COLOR_MAP, getProjectIconImageUrl } from '@/lib/projectMeta';
+import type { ProjectEntry } from '@/lib/api/types';
 
 /** Max file size in bytes (10MB) */
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -41,16 +46,49 @@ interface MultiRunLauncherProps {
   onCreated?: () => void;
   /** Called when user cancels */
   onCancel?: () => void;
+  /** Rendered inside dialog window with no local header */
+  isWindowed?: boolean;
 }
+
+/** Info tooltip - small icon that shows helper text on hover */
+const InfoTip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Tooltip delayDuration={200}>
+    <TooltipTrigger asChild>
+      <button type="button" tabIndex={-1} className="inline-flex items-center justify-center text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+        <RiInformationLine className="h-3.5 w-3.5" />
+      </button>
+    </TooltipTrigger>
+    <TooltipContent side="top" className="max-w-[240px]">
+      {children}
+    </TooltipContent>
+  </Tooltip>
+);
+
+/** Compact field label */
+const FieldLabel: React.FC<{
+  htmlFor?: string;
+  required?: boolean;
+  children: React.ReactNode;
+  info?: React.ReactNode;
+}> = ({ htmlFor, required, children, info }) => (
+  <div className="flex items-center gap-1.5">
+    <label htmlFor={htmlFor} className="typography-meta font-medium text-foreground">
+      {children}
+      {required && <span className="text-destructive ml-0.5">*</span>}
+    </label>
+    {info && info}
+  </div>
+);
 
 /**
  * Launcher form for creating a new Multi-Run group.
- * Replaces the main content area (tabs) with a form.
+ * Compact, centered card layout with adaptive grid.
  */
 export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
   initialPrompt,
   onCreated,
   onCancel,
+  isWindowed = false,
 }) => {
   const [name, setName] = React.useState('');
   const [prompt, setPrompt] = React.useState(() => initialPrompt ?? '');
@@ -64,6 +102,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const currentDirectory = useDirectoryStore((state) => state.currentDirectory ?? null);
+  const homeDirectory = useDirectoryStore((state) => state.homeDirectory ?? null);
   
   const vscodeWorkspaceFolder = React.useMemo(() => {
     if (typeof window === 'undefined') {
@@ -75,13 +114,72 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
 
   // Get project directory for setup commands
   const activeProjectId = useProjectsStore((state) => state.activeProjectId);
+  const setActiveProjectIdOnly = useProjectsStore((state) => state.setActiveProjectIdOnly);
   const projects = useProjectsStore((state) => state.projects);
-  const projectRef = React.useMemo<ProjectRef | null>(() => {
+  const [selectedProjectId, setSelectedProjectId] = React.useState<string | null>(() => activeProjectId ?? null);
+
+  React.useEffect(() => {
     if (activeProjectId) {
-      const project = projects.find((p) => p.id === activeProjectId);
-      if (project?.path) {
-        return { id: project.id, path: project.path };
-      }
+      setSelectedProjectId(activeProjectId);
+      return;
+    }
+    if (!selectedProjectId && projects.length > 0) {
+      setSelectedProjectId(projects[0].id);
+    }
+  }, [activeProjectId, projects, selectedProjectId]);
+
+  const selectedProject = React.useMemo(() => {
+    if (!selectedProjectId) {
+      return null;
+    }
+    return projects.find((project) => project.id === selectedProjectId) ?? null;
+  }, [projects, selectedProjectId]);
+
+  const selectedProjectDirectory = selectedProject?.path ?? currentDirectory;
+
+  const handleProjectChange = React.useCallback((projectId: string) => {
+    setSelectedProjectId(projectId);
+    if (projectId !== activeProjectId) {
+      setActiveProjectIdOnly(projectId);
+    }
+  }, [activeProjectId, setActiveProjectIdOnly]);
+
+  const { currentTheme } = useThemeSystem();
+
+  const renderProjectLabel = React.useCallback((project: ProjectEntry) => {
+    const displayLabel = project.label?.trim() || formatDirectoryName(project.path, homeDirectory);
+    const imageUrl = getProjectIconImageUrl(
+      { id: project.id, iconImage: project.iconImage ?? null },
+      {
+        themeVariant: currentTheme.metadata.variant,
+        iconColor: currentTheme.colors.surface.foreground,
+      },
+    );
+    const ProjectIcon = project.icon ? PROJECT_ICON_MAP[project.icon] : null;
+    const iconColor = project.color ? PROJECT_COLOR_MAP[project.color] : undefined;
+
+    return (
+      <span className="inline-flex min-w-0 items-center gap-1.5">
+        {imageUrl ? (
+          <span
+            className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center overflow-hidden rounded-[3px]"
+            style={project.iconBackground ? { backgroundColor: project.iconBackground } : undefined}
+          >
+            <img src={imageUrl} alt="" className="h-full w-full object-contain" draggable={false} />
+          </span>
+        ) : ProjectIcon ? (
+          <ProjectIcon className="h-3.5 w-3.5 shrink-0" style={iconColor ? { color: iconColor } : undefined} />
+        ) : (
+          <RiFolderLine className="h-3.5 w-3.5 shrink-0 text-muted-foreground/80" style={iconColor ? { color: iconColor } : undefined} />
+        )}
+        <span className="truncate">{displayLabel}</span>
+      </span>
+    );
+  }, [homeDirectory, currentTheme.metadata.variant, currentTheme.colors.surface.foreground]);
+
+  const projectRef = React.useMemo<ProjectRef | null>(() => {
+    if (selectedProject?.path) {
+      return { id: selectedProject.id, path: selectedProject.path };
     }
 
     const base = currentDirectory ?? vscodeWorkspaceFolder;
@@ -90,7 +188,7 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
     }
 
     return { id: `path:${base}`, path: base };
-  }, [activeProjectId, projects, currentDirectory, vscodeWorkspaceFolder]);
+  }, [selectedProject, currentDirectory, vscodeWorkspaceFolder]);
 
   const [isDesktopApp, setIsDesktopApp] = React.useState<boolean>(() => {
     if (typeof window === 'undefined') {
@@ -193,8 +291,8 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
   }, [onCancel]);
 
   // Use the BranchSelector hook for branch state management
-  const [worktreeBaseBranch, setWorktreeBaseBranch] = React.useState<string>('HEAD');
-  const { isLoading: isLoadingWorktreeBaseBranches, isGitRepository } = useBranchOptions(currentDirectory);
+  const [worktreeBaseBranch, setWorktreeBaseBranch] = React.useState<string>('');
+  const { isLoading: isLoadingWorktreeBaseBranches, isGitRepository } = useBranchOptions(selectedProjectDirectory);
 
   const createMultiRun = useMultiRunStore((state) => state.createMultiRun);
   const error = useMultiRunStore((state) => state.error);
@@ -311,6 +409,10 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
     clearError();
 
     try {
+      if (selectedProjectId && selectedProjectId !== activeProjectId) {
+        setActiveProjectIdOnly(selectedProjectId);
+      }
+
       // Strip instanceId before passing to store (UI-only field)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const modelsForStore: MultiRunModelSelection[] = selectedModels.map(({ instanceId: _instanceId, ...rest }) => rest);
@@ -355,8 +457,10 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
   };
 
   const isValid = Boolean(
-    name.trim() && prompt.trim() && selectedModels.length >= 2 && isGitRepository && !isLoadingWorktreeBaseBranches
+    name.trim() && prompt.trim() && selectedModels.length >= 2 && worktreeBaseBranch && isGitRepository && !isLoadingWorktreeBaseBranches
   );
+
+  const configuredSetupCount = setupCommands.filter(cmd => cmd.trim()).length;
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -413,6 +517,9 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 用于 Worktree 目录和分支名称
               </p>
             </div>
+          )}
+        </header>
+      ) : null}
 
             {/* Worktree creation */}
             <div className="space-y-3">
@@ -423,15 +530,35 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <label
-                  className="typography-meta font-medium text-foreground"
+              {/* Group name */}
+              <div className="flex flex-col gap-1">
+                <FieldLabel
+                  htmlFor="group-name"
+                  required
+                  info={<InfoTip>Used for worktree directory and branch names</InfoTip>}
+                >
+                  Group name
+                </FieldLabel>
+                <Input
+                  id="group-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="feature-auth, bugfix-login"
+                  className="typography-meta w-full"
+                  required
+                />
+              </div>
+
+              {/* Base branch */}
+              <div className="flex flex-col gap-1">
+                <FieldLabel
                   htmlFor="multirun-worktree-base-branch"
+                  info={<InfoTip>New branch created from this base per model</InfoTip>}
                 >
                   基准分支
                 </label>
                 <BranchSelector
-                  directory={currentDirectory}
+                  directory={selectedProjectDirectory}
                   value={worktreeBaseBranch}
                   onChange={setWorktreeBaseBranch}
                   id="multirun-worktree-base-branch"
@@ -538,7 +665,6 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 className="typography-body min-h-[120px] max-h-[400px] resize-none overflow-y-auto field-sizing-content"
                 required
               />
-            </div>
 
             {/* File attachments */}
             <div className="space-y-2">
@@ -573,25 +699,26 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
                 {attachedFiles.map((file) => (
                   <div
                     key={file.id}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 bg-muted/30 border border-border/30 rounded-md typography-meta"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md typography-micro border"
+                    style={{
+                      backgroundColor: 'var(--surface-elevated)',
+                      borderColor: 'var(--interactive-border)',
+                    }}
                   >
                     {file.mimeType.startsWith('image/') ? (
-                      <RiFileImageLine className="h-3.5 w-3.5 text-muted-foreground" />
+                      <RiFileImageLine className="h-3 w-3 text-muted-foreground" />
                     ) : (
-                      <RiFileLine className="h-3.5 w-3.5 text-muted-foreground" />
+                      <RiFileLine className="h-3 w-3 text-muted-foreground" />
                     )}
-                    <span className="truncate max-w-[120px]" title={file.filename}>
+                    <span className="truncate max-w-[100px]" title={file.filename}>
                       {file.filename}
-                    </span>
-                    <span className="text-muted-foreground text-xs">
-                      ({file.size < 1024 ? `${file.size}B` : file.size < 1024 * 1024 ? `${(file.size / 1024).toFixed(1)}KB` : `${(file.size / (1024 * 1024)).toFixed(1)}MB`})
                     </span>
                     <button
                       type="button"
                       onClick={() => handleRemoveFile(file.id)}
-                      className="text-muted-foreground hover:text-destructive ml-0.5"
+                      className="text-muted-foreground hover:text-destructive"
                     >
-                      <RiCloseLine className="h-3.5 w-3.5" />
+                      <RiCloseLine className="h-3 w-3" />
                     </button>
                   </div>
                 ))}
@@ -613,12 +740,23 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
               />
             </div>
 
-            {/* Error message */}
+            {/* ── Error ── */}
             {error && (
-              <div className="px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive typography-body">
+              <div
+                className="px-3 py-2 rounded-lg typography-meta"
+                style={{
+                  backgroundColor: 'var(--status-error-background)',
+                  color: 'var(--status-error)',
+                  borderWidth: 1,
+                  borderColor: 'var(--status-error-border)',
+                }}
+              >
                 {error}
               </div>
             )}
+          </div>
+        </div>
+      </ScrollShadow>
 
             {/* Action buttons */}
             <div className="flex items-center justify-end gap-3 pt-4">
@@ -645,6 +783,6 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
           </form>
         </div>
       </div>
-    </div>
+    </form>
   );
 };
