@@ -108,9 +108,16 @@ export const OpenInAppButton = ({ directory, activeFilePath, className }: OpenIn
   }
 
   const handleOpen = async (app: OpenInAppOption) => {
+    if (!directory) {
+      toast.error('没有打开的项目目录');
+      return;
+    }
     const opened = await openDesktopProjectInApp(directory, app.id, app.appName, activeFilePath);
     if (!opened) {
-      await openDesktopPath(directory, app.appName);
+      const fallback = await openDesktopPath(directory, app.appName);
+      if (!fallback) {
+        toast.error(`无法打开 ${app.label}，请检查是否已安装`);
+      }
     }
   };
 

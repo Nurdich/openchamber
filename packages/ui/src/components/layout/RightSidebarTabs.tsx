@@ -20,7 +20,7 @@ export const RightSidebarTabs: React.FC = () => {
     },
     {
       id: 'files',
-      label: 'Files',
+      label: '文件',
       icon: <RiFolder3Line className="h-3.5 w-3.5" />,
     },
   ], []);

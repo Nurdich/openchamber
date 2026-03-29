@@ -449,7 +449,7 @@ export const PlanView: React.FC = () => {
       <div className="flex-1 min-h-0 min-w-0 relative">
         <ScrollableOverlay outerClassName="h-full min-w-0" className="h-full min-w-0">
           {loading ? (
-            <div className="p-3 typography-ui text-muted-foreground">Loading…</div>
+<div className="p-3 typography-ui text-muted-foreground">加载中…</div>
           ) : (
             <div className="relative h-full">
               <div className="h-full oc-plan-editor">
@@ -458,9 +458,9 @@ export const PlanView: React.FC = () => {
                     <ErrorBoundary
                       fallback={
                         <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2">
-                          <div className="mb-1 font-medium text-destructive">Preview unavailable</div>
+<div className="mb-1 font-medium text-destructive">预览不可用</div>
                           <div className="text-sm text-muted-foreground">
-                            Switch to edit mode to fix the issue.
+切换到编辑模式以修复问题。
                           </div>
                         </div>
                       }

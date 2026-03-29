@@ -44,7 +44,7 @@ import webPush from 'web-push';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DEFAULT_PORT = 3000;
+const DEFAULT_PORT = undefined; // No default - always use explicit or random port
 const DESKTOP_NOTIFY_PREFIX = '[OpenChamberDesktopNotify] ';
 const uiNotificationClients = new Set();
 const HEALTH_CHECK_INTERVAL = 15000;
@@ -1231,10 +1231,21 @@ const buildTemplateVariables = async (payload, sessionId) => {
   if (worktreeDir) {
     try {
       const { simpleGit } = await import('simple-git');
+      let gitBinary = resolveGitBinaryForSpawn();
+      const gitEnv = { ...process.env };
+      // Avoid simple-git's path-validation warning on Windows paths containing
+      // spaces (e.g. "C:\Program Files\Git\...").  Prepend the git directory to
+      // PATH so the short name "git.exe" resolves to the correct binary.
+      if (process.platform === 'win32' && typeof gitBinary === 'string' && gitBinary !== 'git' && gitBinary !== 'git.exe') {
+        const gitDir = path.dirname(gitBinary);
+        gitEnv.PATH = gitDir + path.delimiter + (process.env.PATH || '');
+        gitBinary = 'git.exe';
+      }
       const git = simpleGit({
         baseDir: worktreeDir,
         spawnOptions: { windowsHide: true },
-        binary: resolveGitBinaryForSpawn(),
+        binary: gitBinary,
+        env: gitEnv,
       });
       branch = await Promise.race([
         git.revparse(['--abbrev-ref', 'HEAD']),
@@ -4338,7 +4349,14 @@ function resolveOpencodeCliPath() {
     const localAppData = process.env.LOCALAPPDATA || '';
     const programData = process.env.ProgramData || 'C:\\ProgramData';
 
+    // When running as a Desktop sidecar the bundled opencode.exe is a sibling of
+    // this process's executable (both live in the same sidecars directory placed by
+    // Tauri).  Check there first so the bundled binary takes precedence over any
+    // system-wide installation.
+    const execDir = path.dirname(process.execPath);
+
     return [
+      path.join(execDir, 'opencode.exe'),
       path.join(userProfile, '.opencode', 'bin', 'opencode.exe'),
       path.join(userProfile, '.opencode', 'bin', 'opencode.cmd'),
       path.join(appData, 'npm', 'opencode.cmd'),
@@ -5765,6 +5783,9 @@ function scheduleOpenCodeApiDetection() {
   return;
 }
 
+// Generate a random port in the dynamic port range (49152-65535)
+const generateRandomPort = () => Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
+
 function parseArgs(argv = process.argv.slice(2)) {
   const args = Array.isArray(argv) ? [...argv] : [];
   const envPassword =
@@ -5782,7 +5803,7 @@ function parseArgs(argv = process.argv.slice(2)) {
   const envTunnelHostname = process.env.OPENCHAMBER_TUNNEL_HOSTNAME || undefined;
 
   const options = {
-    port: DEFAULT_PORT,
+    port: generateRandomPort(), // No default - always use random port unless explicitly specified
     uiPassword: envPassword,
     tryCfTunnel: envCfTunnel,
     tunnelProvider: envTunnelProvider,
@@ -5817,7 +5838,7 @@ function parseArgs(argv = process.argv.slice(2)) {
       const { value, nextIndex } = consumeValue(i, inlineValue);
       i = nextIndex;
       const parsedPort = parseInt(value ?? '', 10);
-      options.port = Number.isFinite(parsedPort) ? parsedPort : DEFAULT_PORT;
+      options.port = Number.isFinite(parsedPort) ? parsedPort : generateRandomPort();
       continue;
     }
 
@@ -7294,11 +7315,25 @@ async function main(options = {}) {
     }
   });
 
+  // Desktop local secret validation: when OPENCHAMBER_SECRET is set (Desktop mode),
+  // all local requests must include the matching X-OpenChamber-Secret header.
+  const desktopSecret = process.env.OPENCHAMBER_SECRET;
+  const isDesktopRuntime = process.env.OPENCHAMBER_RUNTIME === 'desktop';
+
   app.use('/api', async (req, res, next) => {
     try {
       const requestScope = tunnelAuthController.classifyRequestScope(req);
       if (requestScope === 'tunnel' || requestScope === 'unknown-public') {
         return tunnelAuthController.requireTunnelSession(req, res, next);
+      }
+      // Desktop local: validate secret header when OPENCHAMBER_SECRET is configured.
+      if (isDesktopRuntime && desktopSecret) {
+        const receivedSecret = typeof req.headers['x-openchamber-secret'] === 'string'
+          ? req.headers['x-openchamber-secret']
+          : null;
+        if (receivedSecret !== desktopSecret) {
+          return res.status(401).json({ error: 'Desktop secret required', unauthorized: true });
+        }
       }
       await uiAuthController.requireAuth(req, res, next);
     } catch (err) {
@@ -13938,7 +13973,23 @@ async function main(options = {}) {
     if (env) {
       return path.resolve(env);
     }
-    return path.join(__dirname, '..', 'dist');
+    // When running as a compiled Bun sidecar (Desktop), process.argv[1] points to an
+    // internal Bun runtime path (e.g. B:\~BUN\... on Windows) rather than the actual
+    // script location. Use process.execPath (the sidecar exe itself) as the anchor instead.
+    // Layout: <release>/openchamber-server.exe  →  <release>/resources/web-dist
+    const execDir = path.dirname(process.execPath);
+    const candidates = [
+      path.join(execDir, 'resources', 'web-dist'),
+      path.join(execDir, 'web-dist'),
+      // Legacy fallback for non-compiled (dev) mode where argv[1] is a real script path.
+      path.join(path.dirname(path.resolve(process.argv[1] || __filename)), '..', 'dist'),
+    ];
+    for (const candidate of candidates) {
+      if (fs.existsSync(path.join(candidate, 'index.html'))) {
+        return candidate;
+      }
+    }
+    return candidates[0];
   })();
 
     if (fs.existsSync(distPath)) {
@@ -14195,15 +14246,35 @@ async function main(options = {}) {
     : null;
 
   await new Promise((resolve, reject) => {
+    let currentPort = port;
+    let retryCount = 0;
+    const MAX_PORT_RETRIES = 10;
+
     const onError = (error) => {
+      // EADDRINUSE: close server and retry with random port
+      if (error.code === 'EADDRINUSE' && retryCount < MAX_PORT_RETRIES) {
+        retryCount++;
+        server.close();
+        // Dynamic port range 49152-65535
+        currentPort = Math.floor(Math.random() * (65535 - 49152 + 1)) + 49152;
+        console.warn(`Port ${port} in use, retrying with random port ${currentPort} (attempt ${retryCount}/${MAX_PORT_RETRIES})`);
+        server.once('error', onError);
+        if (bindHost) {
+          server.listen(currentPort, bindHost, onListening);
+        } else {
+          server.listen(currentPort, onListening);
+        }
+        return;
+      }
+
       server.off('error', onError);
       reject(error);
     };
-    server.once('error', onError);
+
     const onListening = async () => {
       server.off('error', onError);
       const addressInfo = server.address();
-      activePort = typeof addressInfo === 'object' && addressInfo ? addressInfo.port : port;
+      activePort = typeof addressInfo === 'object' && addressInfo ? addressInfo.port : currentPort;
 
       try {
         process.send?.({ type: 'openchamber:ready', port: activePort });
@@ -14263,6 +14334,7 @@ async function main(options = {}) {
       resolve();
     };
 
+    server.once('error', onError);
     if (bindHost) {
       server.listen(port, bindHost, onListening);
     } else {
@@ -14303,7 +14375,12 @@ async function main(options = {}) {
   };
 }
 
-const isCliExecution = process.argv[1] === __filename;
+// In normal Node/Bun script invocation: argv[1] is the script path === __filename.
+// In bun --compile standalone exe: argv[0] is the exe path === __filename,
+// and argv[1] is the first user argument (e.g. '--port'), so argv[1] !== __filename.
+// import.meta.main is true in both bun script and bun compiled exe when the
+// module is the direct entry point, making it the reliable cross-mode check.
+const isCliExecution = import.meta.main || process.argv[1] === __filename;
 
 if (isCliExecution) {
   const cliOptions = parseArgs();

@@ -9,10 +9,10 @@ interface SidebarContextSummaryProps {
 
 const formatSessionTitle = (title?: string | null) => {
     if (!title) {
-        return 'Untitled Session';
+        return '未命名会话';
     }
     const trimmed = title.trim();
-    return trimmed.length > 0 ? trimmed : 'Untitled Session';
+    return trimmed.length > 0 ? trimmed : '未命名会话';
 };
 
 const formatDirectoryPath = (path?: string) => {
@@ -29,10 +29,10 @@ export const SidebarContextSummary: React.FC<SidebarContextSummaryProps> = ({ cl
 
     const activeSessionTitle = React.useMemo(() => {
         if (!currentSessionId) {
-            return 'No active session';
+            return '无活动会话';
         }
         const session = sessions.find((item) => item.id === currentSessionId);
-        return session ? formatSessionTitle(session.title) : 'No active session';
+        return session ? formatSessionTitle(session.title) : '无活动会话';
     }, [currentSessionId, sessions]);
 
     const directoryFull = React.useMemo(() => {

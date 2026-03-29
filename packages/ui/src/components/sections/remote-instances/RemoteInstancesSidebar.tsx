@@ -31,23 +31,23 @@ const isPortInUseError = (error: unknown): boolean => {
 const phaseLabel = (phase?: string): string => {
   switch (phase) {
     case 'ready':
-      return 'Ready';
+      return '就绪';
     case 'error':
-      return 'Error';
+      return '错误';
     case 'degraded':
-      return 'Reconnect';
+      return '重连';
     case 'installing':
-      return 'Installing';
+      return '安装中';
     case 'updating':
-      return 'Updating';
+      return '更新中';
     case 'forwarding':
-      return 'Forwarding';
+      return '转发中';
     case 'server_starting':
-      return 'Starting';
+      return '启动中';
     case 'master_connecting':
-      return 'Connecting';
+      return '连接中';
     default:
-      return 'Idle';
+      return '空闲';
   }
 };
 
@@ -89,11 +89,11 @@ export const RemoteInstancesSidebar: React.FC<RemoteInstancesSidebarProps> = ({ 
   const handleAdd = React.useCallback(async () => {
     const id = makeId();
     try {
-      await createFromCommand(id, 'ssh user@example.com', 'New SSH Instance');
+      await createFromCommand(id, 'ssh user@example.com', '新建 SSH 实例');
       setSelectedId(id);
       onItemSelect?.();
     } catch (error) {
-      toast.error('Failed to create SSH instance', {
+      toast.error('创建 SSH 实例失败', {
         description: error instanceof Error ? error.message : String(error),
       });
     }
@@ -108,7 +108,7 @@ export const RemoteInstancesSidebar: React.FC<RemoteInstancesSidebarProps> = ({ 
         throw error;
       }
 
-      const allow = window.confirm('Local port is already in use. Pick a random free local port and retry?');
+      const allow = window.confirm('本地端口已被占用。是否选择随机可用端口重试？');
       if (!allow) {
         throw error;
       }
@@ -123,7 +123,7 @@ export const RemoteInstancesSidebar: React.FC<RemoteInstancesSidebarProps> = ({ 
 
       await upsertInstance(nextInstance);
       await connect(nextInstance.id);
-      toast.success('Retried with a random local port');
+      toast.success('已使用随机本地端口重试');
     }
   }, [connect, upsertInstance]);
 
@@ -132,16 +132,16 @@ export const RemoteInstancesSidebar: React.FC<RemoteInstancesSidebarProps> = ({ 
       variant="background"
       header={
         <div className="border-b px-3 pt-4 pb-3">
-          <h2 className="text-base font-semibold text-foreground mb-3">Remote Instances</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3">远程实例</h2>
           <div className="flex items-center justify-between gap-2">
-            <span className="typography-meta text-muted-foreground">Total {instances.length}</span>
+            <span className="typography-meta text-muted-foreground">共 {instances.length} 个</span>
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="h-7 w-7 -my-1 text-muted-foreground"
               onClick={() => void handleAdd()}
-              aria-label="Add SSH instance"
+              aria-label="添加 SSH 实例"
             >
               <RiAddLine className="size-4" />
             </Button>
@@ -169,31 +169,31 @@ export const RemoteInstancesSidebar: React.FC<RemoteInstancesSidebarProps> = ({ 
             }}
             actions={[
               {
-                label: isReady ? 'Disconnect' : 'Connect',
+                label: isReady ? '断开连接' : '连接',
                 icon: isReady ? RiStopLine : RiPlug2Line,
                 onClick: () => {
                   const op = isReady ? disconnect(instance.id) : connectWithPortRecovery(instance);
                   void op.catch((error) => {
-                    toast.error(`Failed to ${isReady ? 'disconnect' : 'connect'} instance`, {
+                    toast.error(`实例${isReady ? '断开连接' : '连接'}失败`, {
                       description: error instanceof Error ? error.message : String(error),
                     });
                   });
                 },
               },
               {
-                label: 'Retry',
+                label: '重试',
                 icon: RiRefreshLine,
                 onClick: () => {
                   if (!canRetry) return;
                   void retry(instance.id).catch((error) => {
-                    toast.error('Failed to retry connection', {
+                    toast.error('重试连接失败', {
                       description: error instanceof Error ? error.message : String(error),
                     });
                   });
                 },
               },
               {
-                label: 'Remove',
+                label: '删除',
                 icon: RiDeleteBinLine,
                 destructive: true,
                 onClick: () => {
@@ -203,7 +203,7 @@ export const RemoteInstancesSidebar: React.FC<RemoteInstancesSidebarProps> = ({ 
                       setSelectedId(next?.id || null);
                     }
                   }).catch((error) => {
-                    toast.error('Failed to remove instance', {
+                    toast.error('删除实例失败', {
                       description: error instanceof Error ? error.message : String(error),
                     });
                   });

@@ -1271,7 +1271,7 @@ export function DesktopHostSwitcherButton({ headerIconButtonClass }: DesktopHost
   const effectiveLabel = isCurrentlyLocal
     ? '本地'
     : label === '本地'
-      ? fallbackLabel
+      ? '远程'
       : label;
   const safeEffectiveLabel = redactSensitiveUrl(effectiveLabel);
 

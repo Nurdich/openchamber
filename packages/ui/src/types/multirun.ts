@@ -45,4 +45,6 @@ export interface CreateMultiRunResult {
   sessionIds: string[];
   /** First successfully created session ID, if any */
   firstSessionId: string | null;
+  /** Models that failed to create a worktree or session, with reasons */
+  failures?: Array<{ providerID: string; modelID: string; reason: string }>;
 }

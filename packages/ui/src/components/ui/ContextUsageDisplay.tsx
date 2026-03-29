@@ -103,7 +103,7 @@ export const ContextUsageDisplay: React.FC<ContextUsageDisplayProps> = ({
     <button
       type="button"
       className={sharedClassName}
-      aria-label="Context usage"
+      aria-label="上下文使用情况"
       aria-pressed={pressed}
       onClick={onClick}
     >
@@ -112,7 +112,7 @@ export const ContextUsageDisplay: React.FC<ContextUsageDisplayProps> = ({
   ) : (
     <div
       className={sharedClassName}
-      aria-label="Context usage"
+      aria-label="上下文使用情况"
       onClick={isMobile ? () => setMobileTooltipOpen(true) : undefined}
     >
       {contextContent}
@@ -126,24 +126,24 @@ export const ContextUsageDisplay: React.FC<ContextUsageDisplayProps> = ({
         <MobileOverlayPanel
           open={mobileTooltipOpen}
           onClose={() => setMobileTooltipOpen(false)}
-          title="Context Usage"
+          title="上下文使用情况"
         >
           <div className="flex flex-col gap-1.5">
             <div className="rounded-xl border border-border/40 bg-sidebar/30 px-3 py-2 space-y-1">
               <div className="flex justify-between items-center">
-                <span className="typography-meta text-muted-foreground">Used tokens</span>
+                <span className="typography-meta text-muted-foreground">已使用 Token</span>
                 <span className="typography-meta text-foreground font-medium">{formatTokens(totalTokens)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="typography-meta text-muted-foreground">Context limit</span>
+                <span className="typography-meta text-muted-foreground">上下文限制</span>
                 <span className="typography-meta text-foreground font-medium">{formatTokens(contextLimit)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="typography-meta text-muted-foreground">Output limit</span>
+                <span className="typography-meta text-muted-foreground">输出限制</span>
                 <span className="typography-meta text-foreground font-medium">{formatTokens(safeOutputLimit)}</span>
               </div>
               <div className="flex justify-between items-center pt-1 border-t border-border/40">
-                <span className="typography-meta text-muted-foreground">Usage</span>
+                <span className="typography-meta text-muted-foreground">使用率</span>
                 <span className={cn('typography-meta font-semibold', getPercentageColor(colorPct))}>
                   {Math.min(percentage, 999).toFixed(1)}%
                 </span>

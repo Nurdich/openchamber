@@ -120,11 +120,11 @@ export const useSessionActions = (args: Args) => {
   const handleShareSession = React.useCallback(async (session: Session) => {
     const result = await args.shareSession(session.id);
     if (result && result.share?.url) {
-      toast.success('Session shared', {
+      toast.success('会话已共享', {
         description: 'You can copy the link from the menu.',
       });
     } else {
-      toast.error('Unable to share session');
+      toast.error('无法共享会话');
     }
   }, [args]);
 
@@ -132,7 +132,7 @@ export const useSessionActions = (args: Args) => {
     void copyTextToClipboard(url)
       .then((result) => {
         if (!result.ok) {
-          toast.error('Failed to copy URL');
+          toast.error('复制 URL 失败');
           return;
         }
         setCopiedSessionId(sessionId);
@@ -145,16 +145,16 @@ export const useSessionActions = (args: Args) => {
         }, 2000);
       })
       .catch(() => {
-        toast.error('Failed to copy URL');
+        toast.error('复制 URL 失败');
       });
   }, []);
 
   const handleUnshareSession = React.useCallback(async (sessionId: string) => {
     const result = await args.unshareSession(sessionId);
     if (result) {
-      toast.success('Session unshared');
+      toast.success('会话已取消共享');
     } else {
-      toast.error('Unable to unshare session');
+      toast.error('无法取消共享会话');
     }
   }, [args]);
 
@@ -180,9 +180,9 @@ export const useSessionActions = (args: Args) => {
           ? await args.deleteSession(session.id)
           : await args.archiveSession(session.id);
         if (success) {
-          toast.success(shouldHardDelete ? 'Session deleted' : 'Session archived');
+          toast.success(shouldHardDelete ? '会话已删除' : '会话已归档');
         } else {
-          toast.error(shouldHardDelete ? 'Failed to delete session' : 'Failed to archive session');
+          toast.error(shouldHardDelete ? '删除会话失败' : '归档会话失败');
         }
         return;
       }

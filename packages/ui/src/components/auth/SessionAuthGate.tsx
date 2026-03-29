@@ -77,16 +77,16 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ onRetry, errorType = 'network
       <div className="flex flex-col items-center gap-6 text-center">
         <div className="space-y-2">
           <h1 className="typography-ui-header font-semibold text-destructive">
-            {isRateLimit ? 'Too many attempts' : 'Unable to reach server'}
+            {isRateLimit ? '尝试次数过多' : '无法连接服务器'}
           </h1>
           <p className="typography-meta text-muted-foreground max-w-xs">
             {isRateLimit
-              ? `Please wait ${minutes} minute${minutes > 1 ? 's' : ''} before trying again.`
-              : "We couldn't verify the UI session. Check that the service is running and try again."}
+              ? `请等待 ${minutes} 分钟后再试。`
+              : "无法验证UI会话。请检查服务是否正在运行，然后重试。"};
           </p>
         </div>
         <Button type="button" onClick={onRetry} className="w-full max-w-xs">
-          Retry
+          重试
         </Button>
       </div>
     </AuthShell>
@@ -248,7 +248,7 @@ export const SessionAuthGate: React.FC<SessionAuthGateProps> = ({ children }) =>
 
       if (response.status === 401) {
         console.warn('[Frontend Auth] Login failed: Invalid password');
-        setErrorMessage('Incorrect password. Try again.');
+        setErrorMessage('密码错误，请重试。');
         setIsTunnelLocked(false);
         setState('locked');
         return;
@@ -264,12 +264,12 @@ export const SessionAuthGate: React.FC<SessionAuthGateProps> = ({ children }) =>
       }
 
       console.error('[Frontend Auth] Login failed: Unexpected response', response.status);
-      setErrorMessage('Unexpected response from server.');
+        setErrorMessage('服务器响应异常。');
       setIsTunnelLocked(false);
       setState('error');
     } catch (error) {
       console.warn('Failed to submit UI password:', error);
-      setErrorMessage('Network error. Check connection and retry.');
+        setErrorMessage('网络错误，请检查连接后重试。');
       setIsTunnelLocked(false);
       setState('error');
     } finally {
@@ -295,12 +295,12 @@ export const SessionAuthGate: React.FC<SessionAuthGateProps> = ({ children }) =>
         <div className="flex flex-col items-center gap-6 w-full max-w-xs">
           <div className="flex flex-col items-center gap-1 text-center">
             <h1 className="text-xl font-semibold text-foreground">
-              {isTunnelLocked ? 'Tunnel access required' : 'Unlock OpenChamber'}
+              {isTunnelLocked ? '需要访问隧道' : '解锁 OpenChamber'}
             </h1>
             <p className="typography-meta text-muted-foreground">
               {isTunnelLocked
-                ? 'Open this tunnel using the one-time connect link from the desktop app.'
-                : 'This session is password-protected.'}
+                ? '请使用桌面应用的一次性连接链接打开此隧道。'
+                : '此会话受密码保护。'}
             </p>
           </div>
 
@@ -332,7 +332,7 @@ export const SessionAuthGate: React.FC<SessionAuthGateProps> = ({ children }) =>
                   type="submit"
                   size="icon"
                   disabled={!password || isSubmitting}
-                  aria-label={isSubmitting ? 'Unlocking' : 'Unlock'}
+                  aria-label={isSubmitting ? '解锁中' : '解锁'}
                 >
                   {isSubmitting ? (
                     <RiLoader4Line className="h-4 w-4 animate-spin" />

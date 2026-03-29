@@ -24,19 +24,19 @@ export const OpenCodeStatusDialog: React.FC = () => {
 
     const result = await copyTextToClipboard(openCodeStatusText);
     if (result.ok) {
-      toast.success('Copied', { description: 'OpenCode status copied to clipboard.' });
+      toast.success('已复制', { description: 'OpenCode 状态已复制到剪贴板。' });
       return;
     }
-    toast.error('Copy failed');
+    toast.error('复制失败');
   }, [openCodeStatusText]);
 
   return (
     <Dialog open={isOpenCodeStatusDialogOpen} onOpenChange={setOpenCodeStatusDialogOpen}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>OpenCode Status</DialogTitle>
+          <DialogTitle>OpenCode 状态</DialogTitle>
           <DialogDescription>
-            Diagnostic snapshot for support and debugging.
+            用于技术支持与调试的诊断快照。
           </DialogDescription>
         </DialogHeader>
 
@@ -46,12 +46,12 @@ export const OpenCodeStatusDialog: React.FC = () => {
             onClick={handleCopy}
             className="app-region-no-drag inline-flex h-9 items-center justify-center rounded-md px-3 typography-ui-label font-medium text-muted-foreground transition-colors hover:bg-interactive-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            Copy
+            复制
           </button>
         </div>
 
         <pre className="max-h-[60vh] overflow-auto rounded-lg bg-surface-muted p-4 typography-code text-foreground whitespace-pre-wrap">
-          {openCodeStatusText || 'No data.'}
+          {openCodeStatusText || '无数据。'}
         </pre>
       </DialogContent>
     </Dialog>

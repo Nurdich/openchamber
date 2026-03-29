@@ -117,7 +117,7 @@ const toTodoStatusKey = (value: unknown): 'pending' | 'in_progress' | 'completed
 
 const formatTodoSummary = (todos: unknown[]): string | null => {
     if (todos.length === 0) {
-        return '0 tasks';
+        return '0 个任务';
     }
 
     let pending = 0;
@@ -136,10 +136,10 @@ const formatTodoSummary = (todos: unknown[]): string | null => {
 
     const activeCount = pending + inProgress;
     if (activeCount === 0) {
-        return '0 tasks';
+        return '0 个任务';
     }
 
-    return `${activeCount} ${activeCount === 1 ? 'task' : 'tasks'}`;
+    return `${activeCount} ${activeCount === 1 ? '任务' : '个任务'}`;
 };
 
 const getTodoSummaryFromActivity = (activity: TurnActivityPart): string | null => {

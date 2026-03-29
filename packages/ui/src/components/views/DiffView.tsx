@@ -51,9 +51,7 @@ type DiffData = { original: string; modified: string; isBinary?: boolean };
 
 const BinaryDiffPlaceholder = React.memo(() => {
     return (
-        <div className="rounded-lg border border-border/60 bg-background px-3 py-2">
-            <div className="typography-meta text-muted-foreground">Content of this file cannot be viewed.</div>
-        </div>
+      <div className="typography-meta text-muted-foreground">无法查看此文件内容。</div>
     );
 });
 
@@ -66,12 +64,12 @@ type ChangeDescriptor = {
 };
 
 const CHANGE_DESCRIPTORS: Record<string, ChangeDescriptor> = {
-    '?': { code: '?', color: 'var(--status-info)', description: 'Untracked file' },
-    A: { code: 'A', color: 'var(--status-success)', description: 'New file' },
-    D: { code: 'D', color: 'var(--status-error)', description: 'Deleted file' },
-    R: { code: 'R', color: 'var(--status-info)', description: 'Renamed file' },
-    C: { code: 'C', color: 'var(--status-info)', description: 'Copied file' },
-    M: { code: 'M', color: 'var(--status-warning)', description: 'Modified file' },
+'\?': { code: '?', color: 'var(--status-info)', description: '未跟踪的文件' },
+A: { code: 'A', color: 'var(--status-success)', description: '新文件' },
+D: { code: 'D', color: 'var(--status-error)', description: '已删除的文件' },
+R: { code: 'R', color: 'var(--status-info)', description: '重命名的文件' },
+C: { code: 'C', color: 'var(--status-info)', description: '复制的文件' },
+M: { code: 'M', color: 'var(--status-warning)', description: '修改的文件' },
 };
 
 const DEFAULT_CHANGE_DESCRIPTOR = CHANGE_DESCRIPTORS.M;
@@ -83,13 +81,13 @@ const DIFF_VIEW_MODE_OPTIONS: Array<{
 }> = [
     {
         value: 'single',
-        label: 'Single file',
-        description: 'Show one file at a time',
+label: '单个文件',
+description: '一次显示一个文件',
     },
     {
         value: 'stacked',
-        label: 'All files',
-        description: 'Stack all modified files together',
+label: '全部文件',
+description: '堆叠显示所有修改的文件',
     },
 ];
 
@@ -221,7 +219,7 @@ const FileSelector = React.memo<FileSelectorProps>(({
                             {formatDiffTotals(selectedFileEntry.insertions, selectedFileEntry.deletions)}
                         </div>
                     ) : (
-                        <span className="text-muted-foreground">Select file</span>
+<span className="text-muted-foreground">选择文件</span>
                     )}
                     <RiArrowDownSLine className="size-4 opacity-50" />
                 </button>
@@ -229,9 +227,7 @@ const FileSelector = React.memo<FileSelectorProps>(({
             <DropdownMenuContent className="max-h-[70vh] min-w-[320px] overflow-y-auto">
                 {showModeSelector && mode && onModeChange ? (
                     <>
-                        <DropdownMenuLabel className="typography-meta text-muted-foreground">
-                            View mode
-                        </DropdownMenuLabel>
+                      <DropdownMenuLabel>查看模式</DropdownMenuLabel>
                         <DropdownMenuRadioGroup
                             value={mode}
                             onValueChange={(value) => onModeChange(value as DiffTabViewMode)}
@@ -418,11 +414,11 @@ const ImageDiffViewer = React.memo<ImageDiffViewerProps>(({
                 {hasModified && (
                     <div className={imageContainerClass}>
                         <span className="typography-meta text-muted-foreground font-medium">
-                            {hasOriginal ? 'Modified' : 'New'}
+{hasOriginal ? '已修改' : '新增'}
                         </span>
                         <img
                             src={diff.modified}
-                            alt={`Modified: ${filePath}`}
+alt={`已修改: ${filePath}`}
                             className={renderSideBySide ? "max-w-full max-h-[calc(100%-2rem)] object-contain" : "max-w-full object-contain"}
                             style={{ imageRendering: 'auto' }}
                         />
@@ -472,11 +468,11 @@ const InlineImageDiffViewer = React.memo<InlineImageDiffViewerProps>(({
                 {hasModified && (
                     <div className={imageContainerClass}>
                         <span className="typography-meta text-muted-foreground font-medium">
-                            {hasOriginal ? 'Modified' : 'New'}
+{hasOriginal ? '已修改' : '新增'}
                         </span>
                         <img
                             src={diff.modified}
-                            alt={`Modified: ${filePath}`}
+alt={`已修改: ${filePath}`}
                             className={renderSideBySide ? "max-w-full max-h-[70vh] object-contain" : "max-w-full object-contain"}
                             style={{ imageRendering: 'auto' }}
                         />

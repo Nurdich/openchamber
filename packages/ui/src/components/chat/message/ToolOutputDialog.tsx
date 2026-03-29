@@ -342,7 +342,7 @@ const ImagePreviewDialog: React.FC<{
     }, [gallery, popup.image?.index, popup.image?.url, popup.open]);
 
     const currentImage = gallery[currentIndex] ?? gallery[0] ?? popup.image;
-    const imageTitle = currentImage?.filename || popup.title || 'Image preview';
+    const imageTitle = currentImage?.filename || popup.title || '图片预览';
     const hasMultipleImages = gallery.length > 1;
 
     const showPrevious = React.useCallback(() => {
@@ -432,7 +432,7 @@ const ImagePreviewDialog: React.FC<{
                         onMouseDown={(event) => event.stopPropagation()}
                         onClick={showPrevious}
                         className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 flex items-center justify-center rounded-full bg-black/25 text-foreground/90 backdrop-blur-sm hover:bg-black/35 focus:outline-none focus:ring-2 focus:ring-primary/60"
-                        aria-label="Previous image"
+                        aria-label="上一张图片"
                     >
                         <RiArrowLeftSLine className="h-6 w-6" />
                     </button>
@@ -441,7 +441,7 @@ const ImagePreviewDialog: React.FC<{
                         onMouseDown={(event) => event.stopPropagation()}
                         onClick={showNext}
                         className="absolute right-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 flex items-center justify-center rounded-full bg-black/25 text-foreground/90 backdrop-blur-sm hover:bg-black/35 focus:outline-none focus:ring-2 focus:ring-primary/60"
-                        aria-label="Next image"
+                        aria-label="下一张图片"
                     >
                         <RiArrowRightSLine className="h-6 w-6" />
                     </button>

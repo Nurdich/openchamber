@@ -24,7 +24,7 @@
  *         selected={selectedId === item.id}
  *         onSelect={() => setSelectedId(item.id)}
  *         actions={[
- *           { label: 'Delete', onClick: () => handleDelete(item.id), destructive: true }
+ *           { label: '删除', onClick: () => handleDelete(item.id), destructive: true }
  *         ]}
  *       />
  *     ))}
@@ -38,10 +38,10 @@
  *
  * export const MyPage = () => (
  *   <SettingsPageLayout>
- *     <SettingsSection title="General Settings">
+ *     <SettingsSection title="通用设置">
  *       <MySettingsForm />
  *     </SettingsSection>
- *     <SettingsSection title="Advanced" divider>
+ *     <SettingsSection title="高级" divider>
  *       <AdvancedSettingsForm />
  *     </SettingsSection>
  *   </SettingsPageLayout>

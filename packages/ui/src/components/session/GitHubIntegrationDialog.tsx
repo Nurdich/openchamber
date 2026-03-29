@@ -101,7 +101,7 @@ export function GitHubIntegrationDialog({
       if (activeTab === 'issues' && github.issuesList) {
         const result = await github.issuesList(projectDirectory, { page: 1 });
         if (result.connected === false) {
-          setError('GitHub not connected');
+          setError('GitHub 未连接');
           setIssues([]);
         } else {
           setIssues(result.issues ?? []);
@@ -111,7 +111,7 @@ export function GitHubIntegrationDialog({
       } else if (activeTab === 'prs' && github.prsList) {
         const result = await github.prsList(projectDirectory, { page: 1 });
         if (result.connected === false) {
-          setError('GitHub not connected');
+          setError('GitHub 未连接');
           setPrs([]);
         } else {
           setPrs(result.prs ?? []);
@@ -120,7 +120,7 @@ export function GitHubIntegrationDialog({
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(err instanceof Error ? err.message : '加载数据失败');
     } finally {
       setLoading(false);
     }
@@ -199,12 +199,12 @@ export function GitHubIntegrationDialog({
       
       setValidations(prev => new Map(prev).set(branchName, {
         isValid: !isBlocked,
-        error: isBlocked ? 'Branch is already checked out in a worktree' : null,
+        error: isBlocked ? '分支已在工作树中检出' : null,
       }));
     } catch {
       setValidations(prev => new Map(prev).set(branchName, {
         isValid: false,
-        error: 'Validation failed',
+        error: '验证失败',
       }));
     }
   }, [projectRef, validations]);
@@ -297,12 +297,12 @@ export function GitHubIntegrationDialog({
         <div className="flex-1 flex flex-col items-center justify-center p-8 gap-4">
           <RiGithubLine className="h-12 w-12 text-muted-foreground" />
           <div className="text-center">
-            <p className="typography-ui-label text-foreground">Connect to GitHub</p>
+            <p className="typography-ui-label text-foreground">连接到 GitHub</p>
             <p className="typography-small text-muted-foreground mt-1">
               Link issues or pull requests to auto-fill worktree details
             </p>
           </div>
-          <Button onClick={openGitHubSettings} size="sm">Connect GitHub</Button>
+          <Button onClick={openGitHubSettings} size="sm">连接 GitHub</Button>
         </div>
       ) : (
         <>
@@ -312,7 +312,7 @@ export function GitHubIntegrationDialog({
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={activeTab === 'issues' ? "Search issues or enter #123..." : "Search PRs or enter #456..."}
+              placeholder={activeTab === "issues" ? "搜索问题或输入 #123..." : "搜索 PR 或输入 #456..."}
               className="h-8 pl-9"
             />
           </div>
@@ -490,7 +490,7 @@ export function GitHubIntegrationDialog({
             <Checkbox
               checked={includeDiff}
               onChange={(checked) => setIncludeDiff(checked)}
-              ariaLabel="Include PR diff in session context"
+              ariaLabel="在会话上下文中包含 PR 差异"
             />
             <span className="typography-small text-foreground">
               Include PR diff
@@ -529,7 +529,7 @@ export function GitHubIntegrationDialog({
       {isMobile ? (
         <MobileOverlayPanel
           open={open}
-          title="Select from GitHub"
+          title="从 GitHub 选择"
           onClose={() => onOpenChange(false)}
           footer={!isGitHubConnected ? undefined : footerContent}
           renderHeader={(closeButton) => (
@@ -542,8 +542,8 @@ export function GitHubIntegrationDialog({
               <div className="w-full">
                 <SortableTabsStrip
                   items={[
-                    { id: 'issues', label: 'Issues', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
-                    { id: 'prs', label: 'Pull Requests', icon: <RiGitPullRequestLine className="h-3.5 w-3.5" /> },
+                    { id: 'issues', label: '问题', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
+                    { id: 'prs', label: '拉取请求', icon: <RiGitPullRequestLine className="h-3.5 w-3.5" /> },
                   ]}
                   activeId={activeTab}
                   onSelect={(id) => {
@@ -589,8 +589,8 @@ export function GitHubIntegrationDialog({
                 <div className="w-[220px]">
                   <SortableTabsStrip
                     items={[
-                      { id: 'issues', label: 'Issues', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
-                      { id: 'prs', label: 'Pull Requests', icon: <RiGitPullRequestLine className="h-3.5 w-3.5" /> },
+                      { id: 'issues', label: '问题', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
+                      { id: 'prs', label: '拉取请求', icon: <RiGitPullRequestLine className="h-3.5 w-3.5" /> },
                     ]}
                     activeId={activeTab}
                     onSelect={(id) => {

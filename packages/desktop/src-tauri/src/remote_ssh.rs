@@ -17,6 +17,7 @@ const LOCAL_HOST_ID: &str = "local";
 const SSH_STATUS_EVENT: &str = "openchamber:ssh-instance-status";
 const DEFAULT_CONNECTION_TIMEOUT_SEC: u16 = 60;
 const DEFAULT_LOCAL_BIND_HOST: &str = "127.0.0.1";
+#[cfg(not(windows))]
 const DEFAULT_CONTROL_PERSIST_SEC: u16 = 300;
 const DEFAULT_READY_TIMEOUT_SEC: u64 = 30;
 const DEFAULT_RECONNECT_MAX_ATTEMPTS: u32 = 5;
@@ -874,7 +875,11 @@ fn build_ssh_command(
     pre_destination_args: &[String],
     remote_command: Option<&str>,
 ) -> Command {
-    let mut command = Command::new("ssh");
+    #[cfg(windows)]
+    let ssh_bin = "ssh.exe";
+    #[cfg(not(windows))]
+    let ssh_bin = "ssh";
+    let mut command = Command::new(ssh_bin);
     command
         .args(&parsed.args)
         .args(pre_destination_args)
@@ -986,40 +991,71 @@ fn write_askpass_script(path: &Path) -> Result<()> {
 
 fn spawn_master_process(
     parsed: &DesktopSshParsedCommand,
-    control_path: &Path,
-    askpass_path: &Path,
-    ssh_password: Option<&str>,
+    _control_path: &Path,
+    _askpass_path: &Path,
+    _ssh_password: Option<&str>,
 ) -> Result<Child> {
-    let args = vec![
-        "-o".to_string(),
-        "ControlMaster=yes".to_string(),
-        "-o".to_string(),
-        format!("ControlPath={}", control_path.display()),
-        "-o".to_string(),
-        format!("ControlPersist={DEFAULT_CONTROL_PERSIST_SEC}"),
-        "-N".to_string(),
-    ];
-    let mut command = build_ssh_command(parsed, &args, None);
-    command
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .env("SSH_ASKPASS_REQUIRE", "force")
-        .env("SSH_ASKPASS", askpass_path)
-        .env("DISPLAY", "1");
-
-    if let Some(secret) = ssh_password.filter(|value| !value.trim().is_empty()) {
-        command.env("OPENCHAMBER_SSH_ASKPASS_VALUE", secret.trim());
+    #[cfg(windows)]
+    {
+        // Windows: No ControlMaster support. Just spawn ssh to keep connection alive.
+        let mut command = build_ssh_command(parsed, &["-N".to_string()], None);
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        command.spawn().with_context(|| {
+            format!(
+                "failed to start SSH process for {}",
+                parsed.destination
+            )
+        })
     }
+    #[cfg(not(windows))]
+    {
+        let args = vec![
+            "-o".to_string(),
+            "ControlMaster=yes".to_string(),
+            "-o".to_string(),
+            format!("ControlPath={}", control_path.display()),
+            "-o".to_string(),
+            format!("ControlPersist={DEFAULT_CONTROL_PERSIST_SEC}"),
+            "-N".to_string(),
+        ];
+        let mut command = build_ssh_command(parsed, &args, None);
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .env("SSH_ASKPASS_REQUIRE", "force")
+            .env("SSH_ASKPASS", askpass_path)
+            .env("DISPLAY", "1");
 
-    command.spawn().with_context(|| {
-        format!(
-            "failed to start SSH ControlMaster for {}",
-            parsed.destination
-        )
-    })
+        if let Some(secret) = ssh_password.filter(|value| !value.trim().is_empty()) {
+            command.env("OPENCHAMBER_SSH_ASKPASS_VALUE", secret.trim());
+        }
+
+        command.spawn().with_context(|| {
+            format!(
+                "failed to start SSH ControlMaster for {}",
+                parsed.destination
+            )
+        })
+    }
 }
 
+#[cfg(windows)]
+fn wait_for_master_ready(
+    _parsed: &DesktopSshParsedCommand,
+    _control_path: &Path,
+    _timeout_sec: u16,
+    _master: &mut Child,
+) -> Result<()> {
+    // Windows: No ControlMaster. Just wait a bit for the ssh process to stabilize.
+    std::thread::sleep(Duration::from_secs(2));
+    Ok(())
+}
+
+#[cfg(not(windows))]
 fn wait_for_master_ready(
     parsed: &DesktopSshParsedCommand,
     control_path: &Path,
@@ -1062,6 +1098,7 @@ fn wait_for_master_ready(
     Err(anyhow!("SSH ControlMaster connection timed out"))
 }
 
+#[cfg(not(windows))]
 fn control_master_operation(
     parsed: &DesktopSshParsedCommand,
     control_path: &Path,
@@ -1083,41 +1120,76 @@ fn control_master_operation(
     run_output(&mut command)
 }
 
+#[cfg(windows)]
+fn is_control_master_alive(_parsed: &DesktopSshParsedCommand, _control_path: &Path) -> bool {
+    // Windows: No ControlMaster. We rely on main_forward process check instead.
+    true
+}
+
+#[cfg(not(windows))]
 fn is_control_master_alive(parsed: &DesktopSshParsedCommand, control_path: &Path) -> bool {
     control_master_operation(parsed, control_path, "check")
         .map(|(code, _, _)| code == 0)
         .unwrap_or(false)
 }
 
+#[cfg(windows)]
+fn stop_control_master_best_effort(_parsed: &DesktopSshParsedCommand, _control_path: &Path) {
+    // Windows: No ControlMaster to stop. Processes are killed individually.
+}
+
+#[cfg(not(windows))]
 fn stop_control_master_best_effort(parsed: &DesktopSshParsedCommand, control_path: &Path) {
     let _ = control_master_operation(parsed, control_path, "exit");
 }
 
 fn run_remote_command(
     parsed: &DesktopSshParsedCommand,
-    control_path: &Path,
+    _control_path: &Path,
     script: &str,
     timeout_sec: u16,
 ) -> Result<String> {
-    let args = vec![
-        "-o".to_string(),
-        "ControlMaster=no".to_string(),
-        "-o".to_string(),
-        format!("ControlPath={}", control_path.display()),
-        "-o".to_string(),
-        format!("ConnectTimeout={timeout_sec}"),
-        "-T".to_string(),
-    ];
-    let remote = format!("sh -lc {}", shell_quote(script));
-    let mut command = build_ssh_command(parsed, &args, Some(&remote));
-    let (code, stdout, stderr) = run_output(&mut command)?;
-    if code != 0 {
-        if stderr.trim().is_empty() {
-            return Err(anyhow!("Remote command failed"));
+    #[cfg(windows)]
+    {
+        // Windows: No ControlMaster. Just run ssh directly.
+        let args = vec![
+            "-o".to_string(),
+            format!("ConnectTimeout={timeout_sec}"),
+            "-T".to_string(),
+        ];
+        let remote = format!("sh -lc {}", shell_quote(script));
+        let mut command = build_ssh_command(parsed, &args, Some(&remote));
+        let (code, stdout, stderr) = run_output(&mut command)?;
+        if code != 0 {
+            if stderr.trim().is_empty() {
+                return Err(anyhow!("Remote command failed"));
+            }
+            return Err(anyhow!(stderr.trim().to_string()));
         }
-        return Err(anyhow!(stderr.trim().to_string()));
+        Ok(stdout)
     }
-    Ok(stdout)
+    #[cfg(not(windows))]
+    {
+        let args = vec![
+            "-o".to_string(),
+            "ControlMaster=no".to_string(),
+            "-o".to_string(),
+            format!("ControlPath={}", control_path.display()),
+            "-o".to_string(),
+            format!("ConnectTimeout={timeout_sec}"),
+            "-T".to_string(),
+        ];
+        let remote = format!("sh -lc {}", shell_quote(script));
+        let mut command = build_ssh_command(parsed, &args, Some(&remote));
+        let (code, stdout, stderr) = run_output(&mut command)?;
+        if code != 0 {
+            if stderr.trim().is_empty() {
+                return Err(anyhow!("Remote command failed"));
+            }
+            return Err(anyhow!(stderr.trim().to_string()));
+        }
+        Ok(stdout)
+    }
 }
 
 fn remote_command_exists(
@@ -1183,6 +1255,35 @@ fn install_openchamber_managed(
 
     let mut commands = Vec::new();
 
+    // Install opencode-ai first (required by openchamber serve)
+    match preferred {
+        DesktopSshInstallMethod::Bun => {
+            if has_bun {
+                commands.push("bun add -g opencode-ai".to_string());
+            }
+            if has_npm {
+                commands.push("npm install -g opencode-ai".to_string());
+            }
+        }
+        DesktopSshInstallMethod::Npm => {
+            if has_npm {
+                commands.push("npm install -g opencode-ai".to_string());
+            }
+            if has_bun {
+                commands.push("bun add -g opencode-ai".to_string());
+            }
+        }
+        DesktopSshInstallMethod::DownloadRelease | DesktopSshInstallMethod::UploadBundle => {
+            if has_bun {
+                commands.push("bun add -g opencode-ai".to_string());
+            }
+            if has_npm {
+                commands.push("npm install -g opencode-ai".to_string());
+            }
+        }
+    }
+
+    // Then install openchamber
     match preferred {
         DesktopSshInstallMethod::Bun => {
             if has_bun {
@@ -1230,6 +1331,71 @@ fn install_openchamber_managed(
     }
 
     Err(last_error.unwrap_or_else(|| anyhow!("Failed to install OpenChamber on remote host")))
+}
+
+fn ensure_opencode_installed(
+    parsed: &DesktopSshParsedCommand,
+    control_path: &Path,
+    preferred: &DesktopSshInstallMethod,
+) -> Result<()> {
+    // Check if opencode is already installed
+    let opencode_exists = remote_command_exists(parsed, control_path, "opencode");
+    if opencode_exists {
+        return Ok(());
+    }
+
+    let has_bun = remote_command_exists(parsed, control_path, "bun");
+    let has_npm = remote_command_exists(parsed, control_path, "npm");
+
+    let mut commands = Vec::new();
+
+    match preferred {
+        DesktopSshInstallMethod::Bun => {
+            if has_bun {
+                commands.push("bun add -g opencode-ai".to_string());
+            }
+            if has_npm {
+                commands.push("npm install -g opencode-ai".to_string());
+            }
+        }
+        DesktopSshInstallMethod::Npm => {
+            if has_npm {
+                commands.push("npm install -g opencode-ai".to_string());
+            }
+            if has_bun {
+                commands.push("bun add -g opencode-ai".to_string());
+            }
+        }
+        DesktopSshInstallMethod::DownloadRelease | DesktopSshInstallMethod::UploadBundle => {
+            if has_bun {
+                commands.push("bun add -g opencode-ai".to_string());
+            }
+            if has_npm {
+                commands.push("npm install -g opencode-ai".to_string());
+            }
+        }
+    }
+
+    if commands.is_empty() {
+        return Err(anyhow!("Remote host has neither bun nor npm available"));
+    }
+
+    let mut last_error: Option<anyhow::Error> = None;
+    for command in commands {
+        match run_remote_command(
+            parsed,
+            control_path,
+            &command,
+            DEFAULT_CONNECTION_TIMEOUT_SEC,
+        ) {
+            Ok(_) => return Ok(()),
+            Err(err) => {
+                last_error = Some(err);
+            }
+        }
+    }
+
+    Err(last_error.unwrap_or_else(|| anyhow!("Failed to install opencode on remote host")))
 }
 
 fn parse_probe_status_line(line: Option<&str>, prefix: &str) -> Option<u16> {
@@ -1380,7 +1546,7 @@ fn start_remote_server_managed(
         env_prefix.push_str(&shell_quote(&secret));
     }
     let script = format!(
-        "{env_prefix} openchamber serve --daemon --hostname 127.0.0.1 --port {desired_port}"
+        "{env_prefix} openchamber serve --hostname 127.0.0.1 --port {desired_port}"
     );
     let output = run_remote_command(
         parsed,
@@ -1416,122 +1582,222 @@ fn stop_remote_server_best_effort(
 
 fn spawn_main_forward(
     parsed: &DesktopSshParsedCommand,
-    control_path: &Path,
+    _control_path: &Path,
     bind_host: &str,
     local_port: u16,
     remote_port: u16,
 ) -> Result<Child> {
-    let args = vec![
-        "-o".to_string(),
-        "ControlMaster=no".to_string(),
-        "-o".to_string(),
-        format!("ControlPath={}", control_path.display()),
-        "-N".to_string(),
-        "-L".to_string(),
-        format!("{bind_host}:{local_port}:127.0.0.1:{remote_port}"),
-    ];
-    let mut command = build_ssh_command(parsed, &args, None);
-    command
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped())
-        .spawn()
-        .with_context(|| format!("Failed to start main SSH forward on local port {local_port}"))
+    #[cfg(windows)]
+    {
+        // Windows: No ControlMaster. Just use ssh -L directly.
+        let args = vec![
+            "-N".to_string(),
+            "-L".to_string(),
+            format!("{bind_host}:{local_port}:127.0.0.1:{remote_port}"),
+        ];
+        let mut command = build_ssh_command(parsed, &args, None);
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped())
+            .spawn()
+            .with_context(|| format!("Failed to start main SSH forward on local port {local_port}"))
+    }
+    #[cfg(not(windows))]
+    {
+        let args = vec![
+            "-o".to_string(),
+            "ControlMaster=no".to_string(),
+            "-o".to_string(),
+            format!("ControlPath={}", control_path.display()),
+            "-N".to_string(),
+            "-L".to_string(),
+            format!("{bind_host}:{local_port}:127.0.0.1:{remote_port}"),
+        ];
+        let mut command = build_ssh_command(parsed, &args, None);
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped())
+            .spawn()
+            .with_context(|| format!("Failed to start main SSH forward on local port {local_port}"))
+    }
 }
 
 fn spawn_extra_forward(
     parsed: &DesktopSshParsedCommand,
-    control_path: &Path,
+    _control_path: &Path,
     forward: &DesktopSshPortForward,
-) -> Result<()> {
-    let mut args = vec![
-        "-o".to_string(),
-        "ControlMaster=no".to_string(),
-        "-o".to_string(),
-        format!("ControlPath={}", control_path.display()),
-        "-O".to_string(),
-        "forward".to_string(),
-    ];
+) -> Result<Option<Child>> {
+    #[cfg(windows)]
+    {
+        // Windows: No ControlMaster. Spawn separate ssh process for each forward.
+        let mut args = Vec::new();
 
-    match forward.forward_type {
-        DesktopSshPortForwardType::Local => {
-            let local_host = forward
-                .local_host
-                .as_deref()
-                .filter(|v| !v.trim().is_empty())
-                .unwrap_or("127.0.0.1");
-            let local_port = forward
-                .local_port
-                .ok_or_else(|| anyhow!("Missing local port"))?;
-            let remote_host = forward
-                .remote_host
-                .as_deref()
-                .filter(|v| !v.trim().is_empty())
-                .unwrap_or("127.0.0.1");
-            let remote_port = forward
-                .remote_port
-                .ok_or_else(|| anyhow!("Missing remote port"))?;
-            args.push("-L".to_string());
-            args.push(format!(
-                "{local_host}:{local_port}:{remote_host}:{remote_port}"
-            ));
-        }
-        DesktopSshPortForwardType::Remote => {
-            let remote_host = forward
-                .remote_host
-                .as_deref()
-                .filter(|v| !v.trim().is_empty())
-                .unwrap_or("127.0.0.1");
-            let remote_port = forward
-                .remote_port
-                .ok_or_else(|| anyhow!("Missing remote port"))?;
-            let local_host = forward
-                .local_host
-                .as_deref()
-                .filter(|v| !v.trim().is_empty())
-                .unwrap_or("127.0.0.1");
-            let local_port = forward
-                .local_port
-                .ok_or_else(|| anyhow!("Missing local port"))?;
-            args.push("-R".to_string());
-            args.push(format!(
-                "{remote_host}:{remote_port}:{local_host}:{local_port}"
-            ));
-        }
-        DesktopSshPortForwardType::Dynamic => {
-            let local_host = forward
-                .local_host
-                .as_deref()
-                .filter(|v| !v.trim().is_empty())
-                .unwrap_or("127.0.0.1");
-            let local_port = forward
-                .local_port
-                .ok_or_else(|| anyhow!("Missing local port"))?;
-            args.push("-D".to_string());
-            args.push(format!("{local_host}:{local_port}"));
-        }
-    }
-
-    let mut command = build_ssh_command(parsed, &args, None);
-    let (code, stdout, stderr) = run_output(&mut command)
-        .with_context(|| format!("Failed to configure extra SSH forward {}", forward.id))?;
-    if code != 0 {
-        let detail = if stderr.trim().is_empty() {
-            stdout.trim()
-        } else {
-            stderr.trim()
-        };
-        return Err(anyhow!(format!(
-            "Failed to configure extra SSH forward {}: {}",
-            forward.id,
-            if detail.is_empty() {
-                "unknown error"
-            } else {
-                detail
+        match forward.forward_type {
+            DesktopSshPortForwardType::Local => {
+                let local_host = forward
+                    .local_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let local_port = forward
+                    .local_port
+                    .ok_or_else(|| anyhow!("Missing local port"))?;
+                let remote_host = forward
+                    .remote_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let remote_port = forward
+                    .remote_port
+                    .ok_or_else(|| anyhow!("Missing remote port"))?;
+                args.push("-N".to_string());
+                args.push("-L".to_string());
+                args.push(format!(
+                    "{local_host}:{local_port}:{remote_host}:{remote_port}"
+                ));
             }
-        )));
+            DesktopSshPortForwardType::Remote => {
+                let remote_host = forward
+                    .remote_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let remote_port = forward
+                    .remote_port
+                    .ok_or_else(|| anyhow!("Missing remote port"))?;
+                let local_host = forward
+                    .local_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let local_port = forward
+                    .local_port
+                    .ok_or_else(|| anyhow!("Missing local port"))?;
+                args.push("-N".to_string());
+                args.push("-R".to_string());
+                args.push(format!(
+                    "{remote_host}:{remote_port}:{local_host}:{local_port}"
+                ));
+            }
+            DesktopSshPortForwardType::Dynamic => {
+                let local_host = forward
+                    .local_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let local_port = forward
+                    .local_port
+                    .ok_or_else(|| anyhow!("Missing local port"))?;
+                args.push("-N".to_string());
+                args.push("-D".to_string());
+                args.push(format!("{local_host}:{local_port}"));
+            }
+        }
+
+        let mut command = build_ssh_command(parsed, &args, None);
+        command
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped());
+        let child = command.spawn().with_context(|| {
+            format!("Failed to spawn extra SSH forward {}", forward.id)
+        })?;
+        Ok(Some(child))
     }
-    Ok(())
+    #[cfg(not(windows))]
+    {
+        // Unix: Use ControlMaster -O forward to add to existing session.
+        let mut args = vec![
+            "-o".to_string(),
+            "ControlMaster=no".to_string(),
+            "-o".to_string(),
+            format!("ControlPath={}", _control_path.display()),
+            "-O".to_string(),
+            "forward".to_string(),
+        ];
+
+        match forward.forward_type {
+            DesktopSshPortForwardType::Local => {
+                let local_host = forward
+                    .local_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let local_port = forward
+                    .local_port
+                    .ok_or_else(|| anyhow!("Missing local port"))?;
+                let remote_host = forward
+                    .remote_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let remote_port = forward
+                    .remote_port
+                    .ok_or_else(|| anyhow!("Missing remote port"))?;
+                args.push("-L".to_string());
+                args.push(format!(
+                    "{local_host}:{local_port}:{remote_host}:{remote_port}"
+                ));
+            }
+            DesktopSshPortForwardType::Remote => {
+                let remote_host = forward
+                    .remote_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let remote_port = forward
+                    .remote_port
+                    .ok_or_else(|| anyhow!("Missing remote port"))?;
+                let local_host = forward
+                    .local_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let local_port = forward
+                    .local_port
+                    .ok_or_else(|| anyhow!("Missing local port"))?;
+                args.push("-R".to_string());
+                args.push(format!(
+                    "{remote_host}:{remote_port}:{local_host}:{local_port}"
+                ));
+            }
+            DesktopSshPortForwardType::Dynamic => {
+                let local_host = forward
+                    .local_host
+                    .as_deref()
+                    .filter(|v| !v.trim().is_empty())
+                    .unwrap_or("127.0.0.1");
+                let local_port = forward
+                    .local_port
+                    .ok_or_else(|| anyhow!("Missing local port"))?;
+                args.push("-D".to_string());
+                args.push(format!("{local_host}:{local_port}"));
+            }
+        }
+
+        let mut command = build_ssh_command(parsed, &args, None);
+        let (code, stdout, stderr) = run_output(&mut command)
+            .with_context(|| format!("Failed to configure extra SSH forward {}", forward.id))?;
+        if code != 0 {
+            let detail = if stderr.trim().is_empty() {
+                stdout.trim()
+            } else {
+                stderr.trim()
+            };
+            return Err(anyhow!(format!(
+                "Failed to configure extra SSH forward {}: {}",
+                forward.id,
+                if detail.is_empty() {
+                    "unknown error"
+                } else {
+                    detail
+                }
+            )));
+        }
+        Ok(None)
+    }
 }
 
 fn is_local_port_available(bind_host: &str, port: u16) -> bool {
@@ -2023,6 +2289,13 @@ impl DesktopSshManagerInner {
                     )?;
                 }
 
+                // Ensure opencode is installed even if openchamber is already present
+                ensure_opencode_installed(
+                    parsed,
+                    control_path,
+                    &instance.remote_openchamber.install_method,
+                )?;
+
                 self.set_status(
                     app,
                     &instance.id,
@@ -2139,11 +2412,15 @@ impl DesktopSshManagerInner {
         let askpass_path = session_dir.join("askpass.sh");
         write_askpass_script(&askpass_path)?;
 
+        #[cfg(windows)]
+        let connecting_msg = "Establishing SSH connection (Windows)";
+        #[cfg(not(windows))]
+        let connecting_msg = "Establishing SSH ControlMaster";
         self.set_status(
             app,
             &id,
             DesktopSshPhase::MasterConnecting,
-            Some("Establishing SSH ControlMaster".to_string()),
+            Some(connecting_msg.to_string()),
             None,
             None,
             None,
@@ -2272,7 +2549,23 @@ impl DesktopSshManagerInner {
             .filter(|forward| forward.enabled)
         {
             match spawn_extra_forward(&parsed, &control_path, forward) {
-                Ok(()) => {
+                Ok(Some(child)) => {
+                    // Windows: spawned process, track it
+                    extra_forwards.push(child);
+                    if matches!(forward.forward_type, DesktopSshPortForwardType::Local) {
+                        if let Some(local_port) = forward.local_port {
+                            std::thread::sleep(Duration::from_millis(100));
+                            if !is_local_tunnel_reachable(local_port) {
+                                extra_errors.push(format!(
+                                    "{}: local listener 127.0.0.1:{} is not reachable",
+                                    forward.id, local_port
+                                ));
+                            }
+                        }
+                    }
+                }
+                Ok(None) => {
+                    // Unix: -O forward succeeded, no child to track
                     if matches!(forward.forward_type, DesktopSshPortForwardType::Local) {
                         if let Some(local_port) = forward.local_port {
                             std::thread::sleep(Duration::from_millis(100));

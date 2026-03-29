@@ -279,7 +279,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
     if (sections.length === 0) {
       return {
         kind: 'raw',
-        title: "What's new",
+        title: "更新内容",
         content: processChangelogMentions(body),
       };
     }
@@ -287,7 +287,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
     const sorted = [...sections].sort((a, b) => compareSemverDesc(a.version, b.version));
     return {
       kind: 'sections',
-      title: "What's new",
+      title: "更新内容",
       sections: sorted.map((section) => ({
         version: section.version,
         dateLabel: formatIsoDateForUI(section.date),
@@ -306,8 +306,8 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
             <RiDownloadCloudLine className="h-5 w-5 text-[var(--primary-base)]" />
             <span className="text-lg font-semibold text-foreground">
               {webUpdateState === 'restarting' || webUpdateState === 'reconnecting'
-                ? 'Updating OpenChamber...'
-                : 'Update Available'}
+                ? '正在更新 OpenChamber...'
+                : '有可用更新'}
             </span>
           </DialogTitle>
 
@@ -336,13 +336,13 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
               <div className="flex items-center gap-3">
                 <RiLoaderLine className="h-5 w-5 animate-spin text-[var(--primary-base)]" />
                 <div className="typography-ui-label text-foreground">
-                  {webUpdateState === 'updating' && 'Installing update...'}
-                  {webUpdateState === 'restarting' && 'Server restarting...'}
-                  {webUpdateState === 'reconnecting' && 'Waiting for server...'}
+                  {webUpdateState === 'updating' && '正在安装更新...'}
+                  {webUpdateState === 'restarting' && '服务器重启中...'}
+                  {webUpdateState === 'reconnecting' && '等待服务器...'}
                 </div>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                The page will reload automatically when the update is complete.
+                更新完成后页面将自动刷新。
               </p>
             </div>
           )}
@@ -408,7 +408,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
             <div className="space-y-2 mt-4">
               <div className="flex items-center gap-2 typography-meta text-muted-foreground">
                 <RiTerminalLine className="h-4 w-4" />
-                <span>Or update via terminal:</span>
+                <span>或通过终端更新：</span>
               </div>
               <div className="flex items-center gap-2 p-1 pl-3 bg-[var(--surface-elevated)]/50 rounded-md border border-[var(--surface-subtle)]">
                 <code className="flex-1 font-mono text-sm text-foreground overflow-x-auto whitespace-nowrap">
@@ -422,7 +422,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                     'transition-colors',
                     copied && 'text-[var(--status-success)]'
                   )}
-                  title={copied ? 'Copied!' : 'Copy command'}
+                  title={copied ? '已复制！' : '复制命令'}
                 >
                   {copied ? (
                     <RiCheckLine className="h-4 w-4" />
@@ -438,7 +438,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
           {!isWebRuntime && downloading && (
             <div className="space-y-2 mt-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Downloading update payload...</span>
+                <span className="text-muted-foreground">正在下载更新...</span>
                 <span className="font-mono text-foreground">{progressPercent}%</span>
               </div>
               <div className="h-1.5 bg-[var(--surface-subtle)] rounded-full overflow-hidden">
@@ -478,7 +478,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                 className="flex items-center justify-center gap-2 px-5 py-2 rounded-md text-sm font-medium bg-[var(--primary-base)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
               >
                 <RiDownloadLine className="h-4 w-4" />
-                Download Update
+                下载更新
               </button>
             )}
 
@@ -488,7 +488,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                 className="flex items-center justify-center gap-2 px-5 py-2 rounded-md text-sm font-medium bg-[var(--primary-base)]/50 text-[var(--primary-foreground)] cursor-not-allowed"
               >
                 <RiLoaderLine className="h-4 w-4 animate-spin" />
-                Downloading...
+                下载中...
               </button>
             )}
 
@@ -498,7 +498,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                 className="flex items-center justify-center gap-2 px-5 py-2 rounded-md text-sm font-medium bg-[var(--status-success)] text-white hover:opacity-90 transition-opacity"
               >
                 <RiRestartLine className="h-4 w-4" />
-                Restart to Update
+                重启以更新
               </button>
             )}
 
@@ -509,7 +509,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                 className="flex items-center justify-center gap-2 px-5 py-2 rounded-md text-sm font-medium bg-[var(--primary-base)] text-[var(--primary-foreground)] hover:opacity-90 transition-opacity"
               >
                 <RiDownloadLine className="h-4 w-4" />
-                Update Now
+                立即更新
               </button>
             )}
 
@@ -519,7 +519,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                 className="flex items-center justify-center gap-2 px-5 py-2 rounded-md text-sm font-medium bg-[var(--primary-base)]/50 text-[var(--primary-foreground)] cursor-not-allowed"
               >
                 <RiLoaderLine className="h-4 w-4 animate-spin" />
-                Updating...
+                更新中...
               </button>
             )}
           </div>

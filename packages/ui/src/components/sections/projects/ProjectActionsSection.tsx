@@ -126,7 +126,7 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
       return entry.name.trim().length === 0 || entry.command.trim().length === 0;
     });
     if (hasIncomplete) {
-      return 'Fill action name and command before saving.';
+      return '请填写操作名称和命令后再保存。';
     }
     return null;
   }, [actions]);
@@ -172,7 +172,7 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
         primaryActionId: null,
       });
       if (!ok) {
-        toast.error('Failed to save actions');
+        toast.error('保存操作失败');
         return;
       }
       setInitialSnapshot(JSON.stringify({ actions }));
@@ -181,9 +181,9 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
           detail: { projectId: projectRef.id },
         }));
       }
-      toast.success('Project actions saved');
+      toast.success('项目操作已保存');
     } catch {
-      toast.error('Failed to save actions');
+      toast.error('保存操作失败');
     } finally {
       setIsSaving(false);
     }
@@ -195,21 +195,21 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
     <div className="mb-8">
       <div className="mb-1 flex items-start justify-between gap-2">
         <div>
-          <h3 className="typography-ui-header font-medium text-foreground">Actions</h3>
-          <p className="typography-meta text-muted-foreground">Per-project commands shown in header next to project name.</p>
+          <h3 className="typography-ui-header font-medium text-foreground">操作</h3>
+          <p className="typography-meta text-muted-foreground">显示在项目名称旁边的项目命令。</p>
         </div>
         <Button type="button" variant="outline" size="xs" className="!font-normal" onClick={handleAddAction}>
           <RiAddLine className="h-3.5 w-3.5" />
-          Add action
+          添加操作
         </Button>
       </div>
 
       <section className="pb-2 pt-0 space-y-2">
         {isLoading ? (
-          <p className="typography-meta text-muted-foreground">Loading...</p>
+          <p className="typography-meta text-muted-foreground">加载中...</p>
         ) : actions.length === 0 ? (
           <div className="py-2">
-            <p className="typography-meta text-muted-foreground">No actions configured yet.</p>
+            <p className="typography-meta text-muted-foreground">暂未配置操作。</p>
           </div>
         ) : (
           <div className="space-y-0 max-w-[30rem]">
@@ -217,7 +217,7 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
               const selectedIconKey = (action.icon as keyof typeof PROJECT_ACTION_ICON_MAP) || 'play';
               const SelectedIcon = PROJECT_ACTION_ICON_MAP[selectedIconKey] || RiPlayLine;
               const isOpen = expandedActions[action.id] ?? false;
-              const title = action.name.trim() || 'Untitled action';
+              const title = action.name.trim() || '未命名操作';
 
               return (
                 <Collapsible
@@ -267,7 +267,7 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
                               <button
                                 type="button"
                                 className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[var(--interactive-border)] text-foreground hover:bg-[var(--interactive-hover)]"
-                                aria-label="Select icon"
+                                aria-label="选择图标"
                               >
                                 <SelectedIcon className="h-4 w-4" />
                               </button>
@@ -299,24 +299,24 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
                           <Input
                             value={action.name}
                             onChange={(event) => updateAction(action.id, (current) => ({ ...current, name: event.target.value }))}
-                            placeholder="Action name"
+                            placeholder="操作名称"
                             className="h-7 max-w-[14rem]"
                           />
                       </div>
 
                       <div className="py-1">
-                        <p className="typography-meta mb-0.5 text-muted-foreground">Command</p>
+                        <p className="typography-meta mb-0.5 text-muted-foreground">命令</p>
                         <Textarea
                           value={action.command}
                           onChange={(event) => updateAction(action.id, (current) => ({ ...current, command: event.target.value }))}
-                          placeholder="e.g. bun run lint"
+                          placeholder="例如：bun run lint"
                           className="min-h-[88px] max-w-[30rem] font-mono text-xs"
                         />
                       </div>
 
                       <div className="py-1">
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <span className="typography-ui-label text-foreground">Auto-open URL</span>
+                          <span className="typography-ui-label text-foreground">自动打开 URL</span>
                           <div
                             className="group flex cursor-pointer items-center gap-2"
                             role="button"
@@ -342,9 +342,9 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
                                 ...current,
                                 ...(checked ? { autoOpenUrl: true } : { autoOpenUrl: undefined }),
                               }))}
-                              ariaLabel={`Auto-open URL for ${title}`}
+                              ariaLabel={`自动打开 URL：${title}`}
                             />
-                            <span className="typography-ui-label font-normal text-foreground/80">Open URL from output or custom URL below</span>
+                            <span className="typography-ui-label font-normal text-foreground/80">从输出中打开 URL 或使用下方的自定义 URL</span>
                           </div>
                         </div>
 
@@ -357,7 +357,7 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
                                   ...current,
                                   openUrl: event.target.value,
                                 }))}
-                                placeholder="Override URL (optional)"
+                                placeholder="覆盖 URL（可选）"
                                 className="h-7 w-full max-w-[24rem]"
                               />
                               <Tooltip delayDuration={1000}>
@@ -365,14 +365,14 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
                                   <RiInformationLine className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60 cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent sideOffset={8} className="max-w-xs">
-                                  If this field is filled, custom URL is used. If empty, app opens best URL from output.
+                                  如果填写了此字段，则使用自定义 URL。留空则从输出中打开最佳 URL。
                                 </TooltipContent>
                               </Tooltip>
                             </div>
 
                             {isDesktopShellApp ? (
                               <div className="mt-2">
-                                <p className="typography-meta mb-0.5 text-muted-foreground">Desktop SSH forward</p>
+                                <p className="typography-meta mb-0.5 text-muted-foreground">桌面 SSH 转发</p>
                                 {desktopForwardOptions.length > 0 ? (
                                   <Select
                                     value={
@@ -388,17 +388,17 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
                                     }}
                                   >
                                     <SelectTrigger className="h-7 w-full max-w-[30rem]">
-                                      <SelectValue placeholder="Use output/manual URL" />
+                                      <SelectValue placeholder="使用输出/手动 URL" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="__none__">Use output/manual URL</SelectItem>
+                                      <SelectItem value="__none__">使用输出/手动 URL</SelectItem>
                                       {desktopForwardOptions.map((entry) => (
                                         <SelectItem key={entry.id} value={entry.id}>{entry.label}</SelectItem>
                                       ))}
                                     </SelectContent>
                                   </Select>
                                 ) : (
-                                  <p className="typography-meta text-muted-foreground">No enabled local SSH forwards available.</p>
+                                  <p className="typography-meta text-muted-foreground">暂无可用的本地 SSH 转发。</p>
                                 )}
                               </div>
                             ) : null}
@@ -425,7 +425,7 @@ export const ProjectActionsSection: React.FC<ProjectActionsSectionProps> = ({ pr
             onClick={handleSave}
             disabled={!canSave}
           >
-            {isSaving ? 'Saving...' : 'Save Actions'}
+            {isSaving ? '保存中...' : '保存操作'}
           </Button>
         </div>
       </section>

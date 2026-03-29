@@ -44,16 +44,16 @@ const priorityIcon: Record<TodoPriority, React.ReactNode> = {
 };
 
 const statusLabel: Record<TodoStatus, string> = {
-  in_progress: "In progress",
-  pending: "Pending",
-  completed: "Completed",
-  cancelled: "Cancelled",
+  in_progress: "进行中",
+  pending: "待处理",
+  completed: "已完成",
+  cancelled: "已取消",
 };
 
 const priorityLabel: Record<TodoPriority, string> = {
-  high: "High priority",
-  medium: "Medium priority",
-  low: "Low priority",
+  high: "高优先级",
+  medium: "中优先级",
+  low: "低优先级",
 };
 
 interface TodoItemRowProps {
@@ -224,7 +224,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
       type="button"
       onClick={onAbort}
       className="flex items-center justify-center h-[1.2rem] w-[1.2rem] text-[var(--status-error)] transition-opacity hover:opacity-80 focus-visible:outline-none flex-shrink-0"
-      aria-label="Stop generating"
+      aria-label="停止生成"
     >
       <RiCloseCircleLine size={18} aria-hidden="true" />
     </button>
@@ -243,10 +243,10 @@ export const StatusRow: React.FC<StatusRowProps> = ({
           {activeTodo.content}
         </span>
       ) : (
-        <span className="typography-ui-label">Tasks</span>
+        <span className="typography-ui-label">任务</span>
       )}
       <span className="typography-meta">
-        {statusSummary.active} active · {statusSummary.left} left
+        {statusSummary.active} 进行中 · {statusSummary.left} 剩余
       </span>
       {isExpanded ? (
         <RiArrowUpSLine className="h-3.5 w-3.5" />
@@ -270,7 +270,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
             <div className="flex h-full items-center text-[var(--status-error)] pl-0.5">
               <span className="flex items-center gap-1.5 typography-ui-label">
                 <RiCloseCircleLine size={16} aria-hidden="true" />
-                Aborted
+                已中断
               </span>
             </div>
           ) : showAssistantStatus && shouldRenderPlaceholder ? (

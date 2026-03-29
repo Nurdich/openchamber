@@ -147,6 +147,13 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       initialSessionId: ${initialSessionId ? `"${initialSessionId.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : 'null'},
     };
     window.__OPENCHAMBER_HOME__ = "${workspaceFolder.replace(/\\/g, '\\\\')}";
+    window.__OPENCHAMBER_RUNTIME_APIS__ = {
+      runtime: {
+        isVSCode: true,
+        isDesktop: false,
+        platform: 'vscode',
+      },
+    };
     
     // Handle connection status updates to update loading screen
     window.addEventListener('message', function(event) {

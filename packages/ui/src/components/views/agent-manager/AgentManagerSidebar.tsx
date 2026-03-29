@@ -36,10 +36,10 @@ const formatRelativeTime = (timestamp: number): string => {
   const hours = Math.floor(diff / (60 * 60 * 1000));
   const days = Math.floor(diff / (24 * 60 * 60 * 1000));
   
-  if (minutes < 1) return 'now';
-  if (minutes < 60) return `${minutes}m`;
-  if (hours < 24) return `${hours}h`;
-  return `${days}d`;
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes}分钟`;
+  if (hours < 24) return `${hours}小时`;
+  return `${days}天`;
 };
 
 interface AgentGroupItemProps {
@@ -57,13 +57,13 @@ const AgentGroupItem: React.FC<AgentGroupItemProps> = ({ group, isSelected, onSe
   const handleDeleteGroup = React.useCallback(async () => {
     if (isDeleting) return;
     setIsDeleting(true);
-    toast.info(`Deleting "${group.name}"...`);
+    toast.info(`正在删除 "${group.name}"...`);
     const ok = await deleteGroup(group.name);
     if (ok) {
-      toast.success(`Deleted "${group.name}"`);
+      toast.success(`已删除 "${group.name}"`);
     } else {
       const error = useAgentGroupsStore.getState().error;
-      toast.error(error || `Failed to delete "${group.name}"`);
+      toast.error(error || `删除 "${group.name}" 失败`);
     }
     setIsDeleting(false);
     setConfirmOpen(false);
@@ -107,7 +107,7 @@ const AgentGroupItem: React.FC<AgentGroupItemProps> = ({ group, isSelected, onSe
                     'opacity-0 group-hover:opacity-100',
                     menuOpen && 'opacity-100',
                   )}
-                  aria-label="Group menu"
+                  aria-label="分组菜单"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <RiMore2Line className="h-3.5 w-3.5" />
@@ -122,7 +122,7 @@ const AgentGroupItem: React.FC<AgentGroupItemProps> = ({ group, isSelected, onSe
                     setConfirmOpen(true);
                   }}
                 >
-                  Delete
+                  删除
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -133,17 +133,17 @@ const AgentGroupItem: React.FC<AgentGroupItemProps> = ({ group, isSelected, onSe
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="max-w-md" keyboardAvoid>
           <DialogHeader>
-            <DialogTitle>Delete agent group</DialogTitle>
+            <DialogTitle>删除智能体组</DialogTitle>
             <DialogDescription>
-              Delete <span className="text-foreground font-medium">{group.name}</span>? This removes all worktrees and sessions in this group.
+              删除 <span className="text-foreground font-medium">{group.name}</span>？这将移除该分组中的所有工作树和会话。
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={isDeleting}>
-              Cancel
+              取消
             </Button>
             <Button variant="destructive" onClick={() => void handleDeleteGroup()} disabled={isDeleting}>
-              {isDeleting ? 'Deleting…' : 'Delete'}
+              {isDeleting ? '正在删除…' : '删除'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -200,7 +200,7 @@ export const AgentManagerSidebar: React.FC<AgentManagerSidebarProps> = ({
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Agent Groups..."
+            placeholder="搜索智能体组..."
             className="pl-8 h-8 rounded-lg border-border/40 bg-background/50 typography-meta"
           />
         </div>
@@ -214,7 +214,7 @@ export const AgentManagerSidebar: React.FC<AgentManagerSidebarProps> = ({
           onClick={onNewAgent}
         >
           <RiAddLine className="h-4 w-4" />
-          <span className="typography-ui-label">New Agent Group</span>
+          <span className="typography-ui-label">新建智能体组</span>
         </Button>
       </div>
       
@@ -222,11 +222,11 @@ export const AgentManagerSidebar: React.FC<AgentManagerSidebarProps> = ({
       <div className="px-2.5 py-1.5 flex items-center gap-1">
         <RiArrowDownSLine className="h-4 w-4 text-muted-foreground" />
         <span className="typography-micro font-medium text-muted-foreground uppercase tracking-wider">
-          Agent Groups
+          智能体组
         </span>
         {isLoading && (
           <span className="typography-micro text-muted-foreground/50 ml-auto">
-            Loading...
+            加载中...
           </span>
         )}
       </div>
@@ -252,7 +252,7 @@ export const AgentManagerSidebar: React.FC<AgentManagerSidebarProps> = ({
             onClick={() => setShowAll(true)}
             className="mt-1 flex items-center justify-start rounded-md px-1.5 py-0.5 text-left typography-micro text-muted-foreground/70 hover:text-foreground hover:underline"
           >
-            ... More ({remainingCount})
+            更多 ({remainingCount})
           </button>
         )}
         
@@ -263,7 +263,7 @@ export const AgentManagerSidebar: React.FC<AgentManagerSidebarProps> = ({
             onClick={() => setShowAll(false)}
             className="mt-1 flex items-center justify-start rounded-md px-1.5 py-0.5 text-left typography-micro text-muted-foreground/70 hover:text-foreground hover:underline"
           >
-            Show less
+            显示更少
           </button>
         )}
         
@@ -271,11 +271,11 @@ export const AgentManagerSidebar: React.FC<AgentManagerSidebarProps> = ({
         {!isLoading && filteredGroups.length === 0 && (
           <div className="py-4 text-center">
             <p className="typography-meta text-muted-foreground">
-              {searchQuery.trim() ? 'No groups found' : 'No agent groups yet'}
+              {searchQuery.trim() ? '未找到分组' : '暂无智能体组'}
             </p>
             {!searchQuery.trim() && (
-              <p className="typography-micro text-muted-foreground/60 mt-1">
-                Create a new agent group to get started
+              <p className="typography-meta text-muted-foreground mt-1">
+                创建新的智能体组以开始使用
               </p>
             )}
           </div>

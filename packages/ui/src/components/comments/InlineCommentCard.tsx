@@ -56,7 +56,7 @@ export function InlineCommentCard({
               {draft.fileLabel}
             </span>
             <span>•</span>
-            <span>Lines {draft.startLine}-{draft.endLine}</span>
+            <span>行 {draft.startLine}-{draft.endLine}</span>
             {draft.side && <span>({draft.side})</span>}
           </div>
           
@@ -75,12 +75,12 @@ export function InlineCommentCard({
                   {isOpen ? (
                     <>
                       <RiArrowUpSLine className="size-3 mr-1" />
-                      Show less
+                      收起
                     </>
                   ) : (
                     <>
                       <RiArrowDownSLine className="size-3 mr-1" />
-                      Show more
+                      展开
                     </>
                   )}
                 </Button>
@@ -106,11 +106,11 @@ export function InlineCommentCard({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEdit}>
               <RiEditLine className="size-4 mr-2" />
-              Edit comment
+              编辑评论
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onDelete} className="text-destructive">
               <RiDeleteBinLine className="size-4 mr-2" />
-              Delete comment
+              删除评论
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

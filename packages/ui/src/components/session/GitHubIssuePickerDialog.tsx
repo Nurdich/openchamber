@@ -99,7 +99,7 @@ export function GitHubIssuePickerDialog({
   const refresh = React.useCallback(async () => {
     if (!projectDirectory) {
       setResult(null);
-      setError('No active project');
+      setError('无活动项目');
       return;
     }
     if (githubAuthChecked && githubAuthStatus?.connected === false) {
@@ -112,7 +112,7 @@ export function GitHubIssuePickerDialog({
     }
     if (!github?.issuesList) {
       setResult(null);
-      setError('GitHub runtime API unavailable');
+      setError('GitHub 运行时 API 不可用');
       return;
     }
 
@@ -150,7 +150,7 @@ export function GitHubIssuePickerDialog({
       setHasMore(Boolean(next.hasMore));
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to load more issues', { description: message });
+      toast.error('加载更多问题失败', { description: message });
     } finally {
       setIsLoadingMore(false);
     }
@@ -268,11 +268,11 @@ export function GitHubIssuePickerDialog({
     if (mode === 'select') {
       // In select mode, fetch full issue details and return via onSelect
       if (!projectDirectory) {
-        toast.error('No active project');
+        toast.error('无活动项目');
         return;
       }
       if (!github?.issueGet || !github?.issueComments) {
-        toast.error('GitHub runtime API unavailable');
+        toast.error('GitHub 运行时 API 不可用');
         return;
       }
       if (startingIssueNumber) return;
@@ -280,24 +280,24 @@ export function GitHubIssuePickerDialog({
       try {
         const issueRes = await github.issueGet(projectDirectory, issueNumber);
         if (issueRes.connected === false) {
-          toast.error('GitHub not connected');
+          toast.error('GitHub 未连接');
           return;
         }
         if (!issueRes.repo) {
-          toast.error('Repo not resolvable', {
-            description: 'origin remote must be a GitHub URL',
+          toast.error('无法解析仓库', {
+            description: 'origin 远程必须是 GitHub URL',
           });
           return;
         }
         const issue = issueRes.issue;
         if (!issue) {
-          toast.error('Issue not found');
+          toast.error('问题未找到');
           return;
         }
 
         const commentsRes = await github.issueComments(projectDirectory, issueNumber);
         if (commentsRes.connected === false) {
-          toast.error('GitHub not connected');
+          toast.error('GitHub 未连接');
           return;
         }
         const comments = commentsRes.comments ?? [];
@@ -320,7 +320,7 @@ export function GitHubIssuePickerDialog({
         onOpenChange(false);
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
-        toast.error('Failed to load issue details', { description: message });
+        toast.error('加载问题详情失败', { description: message });
       } finally {
         setStartingIssueNumber(null);
       }
@@ -328,11 +328,11 @@ export function GitHubIssuePickerDialog({
     }
 
     if (!projectDirectory) {
-      toast.error('No active project');
+      toast.error('无活动项目');
       return;
     }
     if (!github?.issueGet || !github?.issueComments) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     if (startingIssueNumber) return;
@@ -340,24 +340,24 @@ export function GitHubIssuePickerDialog({
     try {
       const issueRes = await github.issueGet(projectDirectory, issueNumber);
       if (issueRes.connected === false) {
-        toast.error('GitHub not connected');
+        toast.error('GitHub 未连接');
         return;
       }
       if (!issueRes.repo) {
-        toast.error('Repo not resolvable', {
-          description: 'origin remote must be a GitHub URL',
+        toast.error('无法解析仓库', {
+          description: 'origin 远程必须是 GitHub URL',
         });
         return;
       }
       const issue = issueRes.issue;
       if (!issue) {
-        toast.error('Issue not found');
+        toast.error('问题未找到');
         return;
       }
 
       const commentsRes = await github.issueComments(projectDirectory, issueNumber);
       if (commentsRes.connected === false) {
-        toast.error('GitHub not connected');
+        toast.error('GitHub 未连接');
         return;
       }
       const comments = commentsRes.comments ?? [];
@@ -372,14 +372,14 @@ export function GitHubIssuePickerDialog({
             preferred
           );
           if (!created?.id) {
-            throw new Error('Failed to create worktree session');
+            throw new Error('创建工作树会话失败');
           }
           return created.id;
         }
 
         const session = await useSessionStore.getState().createSession(sessionTitle, projectDirectory, null);
         if (!session?.id) {
-          throw new Error('Failed to create session');
+          throw new Error('创建会话失败');
         }
         return session.id;
       })();
@@ -404,7 +404,7 @@ export function GitHubIssuePickerDialog({
       const modelID = defaultModel?.modelID || configState.currentModelId || lastUsedProvider?.modelID;
       const agentName = resolveDefaultAgentName() || configState.currentAgentName || undefined;
       if (!providerID || !modelID) {
-        toast.error('No model selected');
+        toast.error('未选择模型');
         return;
       }
 
@@ -500,31 +500,31 @@ Do not implement changes until I confirm; end with: “Next actions: <1 sentence
         ],
       }).catch((e) => {
         const message = e instanceof Error ? e.message : String(e);
-        toast.error('Failed to send issue context', {
+        toast.error('发送问题上下文失败', {
           description: message,
         });
       });
 
-      toast.success('Session created from issue');
+      toast.success('从问题创建了会话');
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to start session', { description: message });
+      toast.error('启动会话失败', { description: message });
     } finally {
       setStartingIssueNumber(null);
     }
   }, [createInWorktree, github, mode, onOpenChange, onSelect, projectDirectory, resolveDefaultAgentName, resolveDefaultModelSelection, resolveDefaultVariant, startingIssueNumber]);
 
-  const title = mode === 'select' ? 'Link GitHub Issue' : 'New Session From GitHub Issue';
+  const title = mode === 'select' ? '关联 GitHub 问题' : '从 GitHub 问题新建会话';
   const description = mode === 'select'
-    ? 'Select an issue to link to this session.'
-    : 'Seeds a new session with hidden issue context (title/body/labels/comments).';
+    ? '选择要关联到此会话的问题。'
+    : '使用隐藏的问题上下文（标题/正文/标签/评论）创建新会话。';
 
   const content = (
     <>
       <div className="relative mt-2">
         <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search by title or #123, or paste issue URL"
+          placeholder="按标题搜索或输入 #123，或粘贴问题 URL"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-9 w-full"
@@ -533,11 +533,11 @@ Do not implement changes until I confirm; end with: “Next actions: <1 sentence
 
       <div className={cn(isMobile ? 'min-h-0 mt-2' : 'flex-1 overflow-y-auto mt-2')}>
           {!projectDirectory ? (
-            <div className="text-center text-muted-foreground py-8">No active project selected.</div>
+            <div className="text-center text-muted-foreground py-8">未选择活动项目。</div>
           ) : null}
 
           {!github ? (
-            <div className="text-center text-muted-foreground py-8">GitHub runtime API unavailable.</div>
+            <div className="text-center text-muted-foreground py-8">GitHub 运行时 API 不可用。</div>
           ) : null}
 
           {isLoading ? (
@@ -583,7 +583,7 @@ Do not implement changes until I confirm; end with: “Next actions: <1 sentence
           ) : null}
 
           {filtered.length === 0 && !isLoading && connected && github && projectDirectory ? (
-            <div className="text-center text-muted-foreground py-8">{query ? 'No issues found' : 'No open issues found'}</div>
+            <div className="text-center text-muted-foreground py-8">{query ? '未找到问题' : '未找到开放问题'}</div>
           ) : null}
 
           {filtered.map((issue) => (
@@ -612,7 +612,7 @@ Do not implement changes until I confirm; end with: “Next actions: <1 sentence
                     rel="noopener noreferrer"
                     className="hidden group-hover:flex h-5 w-5 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                     onClick={(e) => e.stopPropagation()}
-                    aria-label="Open in GitHub"
+                    aria-label="在 GitHub 中打开"
                   >
                     <RiExternalLinkLine className="h-4 w-4" />
                   </a>
@@ -638,7 +638,7 @@ Do not implement changes until I confirm; end with: “Next actions: <1 sentence
                     Loading...
                   </span>
                 ) : (
-                  'Load more'
+                  '加载更多'
                 )}
               </button>
             </div>
@@ -669,7 +669,7 @@ Do not implement changes until I confirm; end with: “Next actions: <1 sentence
                   e.stopPropagation();
                   setCreateInWorktree((v) => !v);
                 }}
-                aria-label="Toggle worktree"
+                aria-label="切换工作树"
                 className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 {createInWorktree ? (

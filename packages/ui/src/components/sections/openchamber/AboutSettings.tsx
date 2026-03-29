@@ -32,7 +32,7 @@ export const AboutSettings: React.FC = () => {
         setShowChecking(false);
         // Show toast if check completed with no update available
         if (didInitiateCheck.current && !updateStore.available && !updateStore.error) {
-          toast.success('You are on the latest version');
+          toast.success('您已是最新版本');
           didInitiateCheck.current = false;
         }
       }, MIN_CHECKING_DURATION);
@@ -61,7 +61,7 @@ export const AboutSettings: React.FC = () => {
                 isChecking && 'animate-pulse [animation-duration:1s]'
               )}
             >
-              Check updates
+              检查更新
             </button>
           )}
 
@@ -71,7 +71,7 @@ export const AboutSettings: React.FC = () => {
               className="flex items-center gap-1 typography-meta text-[var(--primary-base)] hover:underline"
             >
               <RiDownloadLine className="h-3.5 w-3.5" />
-              Update
+              更新
             </button>
           )}
         </div>
@@ -135,14 +135,14 @@ export const AboutSettings: React.FC = () => {
     <div className="mb-8">
       <div className="mb-3 px-1">
         <h3 className="typography-ui-header font-semibold text-foreground">
-          About OpenChamber
+          关于 OpenChamber
         </h3>
       </div>
 
       <div className="rounded-lg bg-[var(--surface-elevated)]/70 overflow-hidden flex flex-col">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 py-3 border-b border-[var(--surface-subtle)]">
           <div className="flex min-w-0 flex-col">
-            <span className="typography-ui-label text-foreground">Version</span>
+            <span className="typography-ui-label text-foreground">版本</span>
             <span className="typography-meta text-muted-foreground font-mono">{currentVersion}</span>
           </div>
           
@@ -150,7 +150,7 @@ export const AboutSettings: React.FC = () => {
             {updateStore.checking && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <RiLoaderLine className="h-4 w-4 animate-spin" />
-                <span className="typography-meta">Checking...</span>
+                <span className="typography-meta">检查中...</span>
               </div>
             )}
 
@@ -160,12 +160,12 @@ export const AboutSettings: React.FC = () => {
                 onClick={() => setUpdateDialogOpen(true)}
               >
                 <RiDownloadLine className="h-4 w-4 mr-1" />
-                Update to {updateStore.info?.version}
+                更新到 {updateStore.info?.version}
               </Button>
             )}
 
             {!updateStore.checking && !updateStore.available && !updateStore.error && (
-              <span className="typography-meta text-muted-foreground">Up to date</span>
+              <span className="typography-meta text-muted-foreground">已是最新</span>
             )}
 
             <Button size="sm"
@@ -173,9 +173,9 @@ export const AboutSettings: React.FC = () => {
               onClick={() => updateStore.checkForUpdates()}
               disabled={updateStore.checking}
             >
-              Check for updates
+              检查更新
             </Button>
-          </div>
+           </div>
         </div>
         
         {updateStore.error && (

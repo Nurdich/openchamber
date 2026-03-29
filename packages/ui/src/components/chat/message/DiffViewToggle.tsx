@@ -27,7 +27,7 @@ export const DiffViewToggle: React.FC<DiffViewToggleProps> = ({ mode, onModeChan
             variant="ghost"
             className={cn('h-5 w-5 p-0 opacity-60 hover:opacity-100', className)}
             onClick={handleClick}
-            title={mode === 'side-by-side' ? 'Switch to unified view' : 'Switch to side-by-side view'}
+            title={mode === 'side-by-side' ? '切换到统一视图' : '切换到并排视图'}
         >
             {mode === 'side-by-side' ? (
                 <RiAlignJustify className="h-3 w-3" />

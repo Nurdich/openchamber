@@ -175,21 +175,21 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
             >
               <RiGitBranchLine className="size-4 text-primary" />
               <span className="min-w-0 truncate font-medium text-left">
-                {currentBranch || 'Detached HEAD'}
+                {currentBranch || '分离 HEAD'}
               </span>
               <RiArrowDownSLine className="size-4 opacity-60" />
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent sideOffset={8}>
-          Current branch
+          当前分支
         </TooltipContent>
       </Tooltip>
 
       <DropdownMenuContent align="start" className="w-72 p-0 max-h-[60vh] flex flex-col">
         <Command className="h-full min-h-0">
           <CommandInput
-            placeholder="Search branches..."
+            placeholder="搜索分支..."
             value={search}
             onValueChange={setSearch}
           />
@@ -197,7 +197,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
             scrollbarClassName="overlay-scrollbar--flush overlay-scrollbar--dense overlay-scrollbar--zero"
             disableHorizontal
           >
-            <CommandEmpty>No branches found.</CommandEmpty>
+            <CommandEmpty>未找到分支。</CommandEmpty>
 
             <CommandGroup>
               {showRemoteSelect ? (
@@ -213,7 +213,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
                       <RiArrowLeftLine className="size-4" />
                     </button>
                     <span className="typography-meta text-muted-foreground">
-                      Push <span className="text-foreground font-medium">{sanitizedNewBranch}</span> to:
+                      推送到：
                     </span>
                   </div>
                   <div className="flex flex-col gap-1">
@@ -241,13 +241,13 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
               ) : !showCreate ? (
                 <CommandItem onSelect={handleShowCreate}>
                   <RiAddLine className="size-4" />
-                  <span>Create new branch...</span>
+                  <span>创建新分支...</span>
                 </CommandItem>
               ) : (
                 <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg">
                   <input
                     ref={createInputRef}
-                    placeholder="New branch name"
+                    placeholder="新分支名称"
                     value={newBranchName}
                     onChange={(e) => setNewBranchName(e.target.value)}
                     onKeyDown={(e) => {
@@ -287,7 +287,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
 
             <CommandSeparator />
 
-            <CommandGroup heading="Local branches">
+            <CommandGroup heading="本地分支">
               {filteredLocal.map((branch) => (
                 <CommandItem
                   key={`local-${branch}`}
@@ -299,20 +299,20 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
                     </span>
                     {(branchInfo?.[branch]?.ahead || branchInfo?.[branch]?.behind) && (
                       <span className="typography-micro text-muted-foreground">
-                        {branchInfo[branch].ahead || 0} ahead ·{' '}
-                        {branchInfo[branch].behind || 0} behind
+                        {branchInfo[branch].ahead || 0} 领先 ·{' '}
+                        {branchInfo[branch].behind || 0} 落后
                       </span>
                     )}
                   </span>
                   {currentBranch === branch && (
-                    <span className="typography-micro text-primary">Current</span>
+                    <span className="typography-micro text-primary">当前</span>
                   )}
                 </CommandItem>
               ))}
               {filteredLocal.length === 0 && (
                 <CommandItem disabled className="justify-center">
                   <span className="typography-meta text-muted-foreground">
-                    No local branches
+                    无本地分支
                   </span>
                 </CommandItem>
               )}
@@ -320,7 +320,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
 
             <CommandSeparator />
 
-            <CommandGroup heading="Remote branches">
+            <CommandGroup heading="远程分支">
               {filteredRemote.map((branch) => (
                 <CommandItem
                   key={`remote-${branch}`}
@@ -332,7 +332,7 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
               {filteredRemote.length === 0 && (
                 <CommandItem disabled className="justify-center">
                   <span className="typography-meta text-muted-foreground">
-                    No remote branches
+                    无远程分支
                   </span>
                 </CommandItem>
               )}

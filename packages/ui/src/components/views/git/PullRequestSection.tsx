@@ -516,7 +516,7 @@ export const PullRequestSection: React.FC<{
 
   const openChecksDialog = React.useCallback(async () => {
     if (!github?.prContext) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     if (!pr) return;
@@ -532,7 +532,7 @@ export const PullRequestSection: React.FC<{
       setCheckDetails(ctx);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to load check details', { description: message });
+      toast.error('加载检查详情失败', { description: message });
     } finally {
       setIsLoadingCheckDetails(false);
     }
@@ -540,7 +540,7 @@ export const PullRequestSection: React.FC<{
 
   const openCommentsDialog = React.useCallback(async () => {
     if (!github?.prContext) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     if (!pr) return;
@@ -555,7 +555,7 @@ export const PullRequestSection: React.FC<{
       setCommentsDetails(ctx);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to load comments', { description: message });
+      toast.error('加载评论失败', { description: message });
     } finally {
       setIsLoadingCommentsDetails(false);
     }
@@ -594,11 +594,11 @@ export const PullRequestSection: React.FC<{
     const issue = (commentsDetails?.issueComments ?? []).map((comment) => ({
       id: `issue-${comment.id}`,
       body: comment.body || '',
-      authorName: comment.author?.name || comment.author?.login || 'Unknown author',
+      authorName: comment.author?.name || comment.author?.login || '未知作者',
       authorLogin: comment.author?.login || null,
       avatarUrl: comment.author?.avatarUrl || null,
       createdAt: comment.createdAt,
-      context: 'General comment',
+      context: '普通评论',
       path: null as string | null,
       line: null as number | null,
     }));
@@ -606,11 +606,11 @@ export const PullRequestSection: React.FC<{
     const review = (commentsDetails?.reviewComments ?? []).map((comment) => ({
       id: `review-${comment.id}`,
       body: comment.body || '',
-      authorName: comment.author?.name || comment.author?.login || 'Unknown author',
+      authorName: comment.author?.name || comment.author?.login || '未知作者',
       authorLogin: comment.author?.login || null,
       avatarUrl: comment.author?.avatarUrl || null,
       createdAt: comment.createdAt,
-      context: 'Code review comment',
+      context: '代码审查评论',
       path: comment.path || null,
       line: comment.line ?? null,
     }));
@@ -628,7 +628,7 @@ export const PullRequestSection: React.FC<{
 
   const resolveChatDispatchTarget = React.useCallback((): ChatDispatchTarget | null => {
     if (!currentSessionId) {
-      toast.error('No active session', { description: 'Open a chat session first.' });
+      toast.error('没有活动的会话', { description: '请先打开一个聊天会话。' });
       return null;
     }
 
@@ -637,7 +637,7 @@ export const PullRequestSection: React.FC<{
     const providerID = currentProviderId || lastUsedProvider?.providerID;
     const modelID = currentModelId || lastUsedProvider?.modelID;
     if (!providerID || !modelID) {
-      toast.error('No model selected');
+      toast.error('未选择模型');
       return null;
     }
 
@@ -671,7 +671,7 @@ export const PullRequestSection: React.FC<{
       target.currentVariant ?? undefined,
     ).catch((e) => {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to send message', { description: message });
+      toast.error('发送消息失败', { description: message });
     });
   }, []);
 
@@ -694,7 +694,7 @@ export const PullRequestSection: React.FC<{
             <Button variant="outline" size="sm" asChild className="flex-shrink-0">
               <a href={run.detailsUrl} target="_blank" rel="noopener noreferrer">
                 <RiExternalLinkLine className="size-4" />
-                Open
+                打开
               </a>
             </Button>
           ) : null}
@@ -809,7 +809,7 @@ export const PullRequestSection: React.FC<{
     setActiveMainTab('chat');
 
     if (!github?.prContext) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     if (!directory || !pr) return;
@@ -828,7 +828,7 @@ export const PullRequestSection: React.FC<{
       });
 
       if (failed.length === 0) {
-        toast.message('No failed checks');
+        toast.message('没有失败的检查');
         return;
       }
 
@@ -862,7 +862,7 @@ export const PullRequestSection: React.FC<{
       dispatchSyntheticPrompt(target, visibleText, instructionsText, payloadText);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to load checks', { description: message });
+      toast.error('加载检查失败', { description: message });
     }
   }, [directory, dispatchSyntheticPrompt, github, pr, resolveChatDispatchTarget, setActiveMainTab]);
 
@@ -885,7 +885,7 @@ export const PullRequestSection: React.FC<{
       const reviewComments = context.reviewComments ?? [];
       const total = issueComments.length + reviewComments.length;
       if (total === 0) {
-        toast.message('No PR comments');
+        toast.message('没有 PR 评论');
         return;
       }
 
@@ -905,7 +905,7 @@ export const PullRequestSection: React.FC<{
       dispatchSyntheticPrompt(target, visibleText, instructionsText, payloadText);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to load PR comments', { description: message });
+      toast.error('加载 PR 评论失败', { description: message });
     }
   }, [directory, dispatchSyntheticPrompt, github, pr, resolveChatDispatchTarget, setActiveMainTab]);
 
@@ -1150,7 +1150,7 @@ export const PullRequestSection: React.FC<{
       onGeneratedDescription?.();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to generate description', { description: message });
+      toast.error('生成描述失败', { description: message });
     } finally {
       setIsGenerating(false);
     }
@@ -1158,22 +1158,22 @@ export const PullRequestSection: React.FC<{
 
   const createPr = React.useCallback(async () => {
     if (!github?.prCreate) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
-      toast.error('Title is required');
+      toast.error('标题为必填项');
       return;
     }
 
     const trimmedBase = targetBaseBranch.trim();
     if (!trimmedBase) {
-      toast.error('Base branch is required');
+      toast.error('基础分支为必填项');
       return;
     }
     if (trimmedBase === branch) {
-      toast.error('Base branch must differ from head branch');
+      toast.error('基础分支必须与头部分支不同');
       return;
     }
 
@@ -1190,13 +1190,13 @@ export const PullRequestSection: React.FC<{
         draft,
         ...(selectedRemote ? { remote: selectedRemote.name } : {}),
       });
-      toast.success('PR created');
+      toast.success('PR 已创建');
       updatePrStatus(prStatusKey, (prev) => (prev ? { ...prev, pr } : prev));
       await refresh({ force: true });
       scheduleActionRefresh();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to create PR', { description: message });
+      toast.error('创建 PR 失败', { description: message });
     } finally {
       setIsCreating(false);
     }
@@ -1204,22 +1204,22 @@ export const PullRequestSection: React.FC<{
 
   const mergePr = React.useCallback(async (pr: GitHubPullRequest) => {
     if (!github?.prMerge) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     setIsMerging(true);
     try {
       const result = await github.prMerge({ directory, number: pr.number, method: mergeMethod });
       if (result.merged) {
-        toast.success('PR merged');
+      toast.success('PR 已合并');
       } else {
-        toast.message('PR not merged', { description: result.message || 'Not mergeable' });
+      toast.message('PR 未合并', { description: result.message || '无法合并' });
       }
       await refresh({ force: true });
       scheduleActionRefresh();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Merge failed', { description: message });
+      toast.error('合并失败', { description: message });
       if (pr.url) {
         void openExternal(pr.url);
       }
@@ -1230,18 +1230,18 @@ export const PullRequestSection: React.FC<{
 
   const markReady = React.useCallback(async (pr: GitHubPullRequest) => {
     if (!github?.prReady) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
     setIsMarkingReady(true);
     try {
       await github.prReady({ directory, number: pr.number });
-      toast.success('Marked ready for review');
+      toast.success('已标记为可供审查');
       await refresh({ force: true });
       scheduleActionRefresh();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to mark ready', { description: message });
+      toast.error('标记准备好失败', { description: message });
       if (pr.url) {
         void openExternal(pr.url);
       }
@@ -1252,13 +1252,13 @@ export const PullRequestSection: React.FC<{
 
   const updatePr = React.useCallback(async (pr: GitHubPullRequest) => {
     if (!github?.prUpdate) {
-      toast.error('GitHub runtime API unavailable');
+      toast.error('GitHub 运行时 API 不可用');
       return;
     }
 
     const trimmedTitle = editTitle.trim();
     if (!trimmedTitle) {
-      toast.error('Title is required');
+      toast.error('标题为必填项');
       return;
     }
 
@@ -1280,12 +1280,12 @@ export const PullRequestSection: React.FC<{
           }
         : prev));
       setIsEditingPr(false);
-      toast.success('PR updated');
+      toast.success('PR 已更新');
       await refresh({ force: true });
       scheduleActionRefresh();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to update PR', { description: message });
+      toast.error('更新 PR 失败', { description: message });
     } finally {
       setIsUpdating(false);
     }
@@ -1460,18 +1460,18 @@ export const PullRequestSection: React.FC<{
                           />
                         ) : (
                           <div className="typography-micro text-muted-foreground whitespace-pre-wrap break-words mt-1">
-                            {isHydratingCurrentPrBody ? 'Loading description...' : 'No description provided.'}
+                            {isHydratingCurrentPrBody ? '加载描述中...' : '未提供描述。'}
                           </div>
                         )}
                       </>
                     )}
                     {canMerge && pr.draft ? (
                       <div className="typography-micro text-muted-foreground">
-                        Draft PRs must be marked ready before merge.
+                        草稿 PR 必须标记为准备好才能合并。
                       </div>
                     ) : null}
                     {!canMerge ? (
-                      <div className="typography-micro text-muted-foreground">No merge permission; use Open in GitHub.</div>
+                      <div className="typography-micro text-muted-foreground">无合并权限；请在 GitHub 中打开。</div>
                     ) : null}
                   </div>
 
@@ -1739,7 +1739,7 @@ export const PullRequestSection: React.FC<{
                       e.stopPropagation();
                       setDraft((v) => !v);
                     }}
-                    aria-label="Toggle draft PR"
+                    aria-label="切换草稿 PR"
                     className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     {draft ? (
@@ -1748,7 +1748,7 @@ export const PullRequestSection: React.FC<{
                       <RiCheckboxBlankLine className="size-4" />
                     )}
                   </button>
-                  <span className="typography-ui-label text-foreground select-none">Draft</span>
+                  <span className="typography-ui-label text-foreground select-none">草稿</span>
                 </div>
 
                 {/* Additional Context Section */}
@@ -1756,20 +1756,20 @@ export const PullRequestSection: React.FC<{
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <span className="typography-micro text-muted-foreground">
-                        Additional context (optional)
+                        附加上下文（可选）
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setIsContextSheetOpen(true)}
                       >
-                        {additionalContext.trim() ? 'Edit' : 'Add'}
+                        {additionalContext.trim() ? '编辑' : '添加'}
                       </Button>
                     </div>
                     {additionalContext.trim() && (
                       <div className="flex items-center gap-2">
                         <span className="inline-flex items-center rounded-full bg-[var(--interactive-selection)] px-2 py-0.5 text-xs text-[var(--interactive-selection-foreground)]">
-                          Context added
+                          已添加上下文
                         </span>
                       </div>
                     )}
@@ -1778,10 +1778,10 @@ export const PullRequestSection: React.FC<{
                   <Collapsible open={isContextOpen} onOpenChange={setIsContextOpen}>
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-[var(--interactive-border)] bg-[var(--surface-elevated)] px-3 py-2 hover:bg-[var(--interactive-hover)]">
                       <span className="typography-micro text-muted-foreground">
-                        Additional context (optional)
+                        附加上下文（可选）
                       </span>
                       <span className="typography-micro text-[var(--primary-base)]">
-                        {isContextOpen ? 'Hide' : additionalContext.trim() ? 'Edit' : 'Add'}
+                        {isContextOpen ? '隐藏' : additionalContext.trim() ? '编辑' : '添加'}
                       </span>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -1864,7 +1864,7 @@ export const PullRequestSection: React.FC<{
               Check Details
             </DialogTitle>
             <DialogDescription>
-              {pr ? `PR #${pr.number}` : 'Pull request'}
+              {pr ? `PR #${pr.number}` : '拉取请求'}
             </DialogDescription>
           </DialogHeader>
 

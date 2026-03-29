@@ -43,24 +43,23 @@ export class ChatErrorBoundary extends React.Component<ChatErrorBoundaryProps, C
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2 text-destructive">
-                <RiChat3Line className="h-5 w-5" />
-                Chat Error
+                聊天错误
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                The chat interface encountered an error. This might be due to a temporary network issue or corrupted message data.
+              <p>
+                聊天界面遇到错误。这可能是由于临时的网络问题或损坏的消息数据所致。
               </p>
 
               {this.props.sessionId && (
-                <div className="text-xs text-muted-foreground text-center">
-                  Session: {this.props.sessionId}
+                <div>
+                  会话: {this.props.sessionId}
                 </div>
               )}
 
               {this.state.error && (
-                <details className="text-xs font-mono bg-muted p-3 rounded">
-                  <summary className="cursor-pointer hover:bg-interactive-hover/80">Error details</summary>
+                <details>
+                  <summary className="cursor-pointer hover:bg-interactive-hover/80">错误详情</summary>
                   <pre className="mt-2 overflow-x-auto">
                     {this.state.error.toString()}
                   </pre>
@@ -69,14 +68,13 @@ export class ChatErrorBoundary extends React.Component<ChatErrorBoundaryProps, C
 
               <div className="flex gap-2">
                 <Button onClick={this.handleReset} variant="outline" className="flex-1">
-                  <RiRestartLine className="h-4 w-4 mr-2" />
-                  Reset Chat
+                  重置聊天
                 </Button>
               </div>
 
-              <div className="text-xs text-muted-foreground text-center">
-                If the problem persists, try refreshing the page.
-              </div>
+              <p className="text-muted-foreground text-sm">
+                如果问题持续存在，请尝试刷新页面。
+              </p>
             </CardContent>
           </Card>
         </div>

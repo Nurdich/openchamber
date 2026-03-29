@@ -122,7 +122,7 @@ const sanitizeRemoteName = (value: string): string => {
 const resolvePrWorktreeConfig = (pr: GitHubPullRequestSummary, remoteBranches: string[]) => {
   const headBranch = normalizeBranchName(pr.head || '');
   if (!headBranch) {
-    throw new Error('PR head branch is missing');
+    throw new Error('PR 头分支缺失');
   }
 
   const availableRemoteBranch = remoteBranches.find((remoteBranch) => {
@@ -153,7 +153,7 @@ const resolvePrWorktreeConfig = (pr: GitHubPullRequestSummary, remoteBranches: s
   const remoteUrl = pr.headRepo?.sshUrl || pr.headRepo?.cloneUrl || '';
 
   if (!remoteUrl) {
-    throw new Error('PR head repository URL is unavailable');
+    throw new Error('PR 头仓库 URL 不可用');
   }
 
   return {
@@ -406,7 +406,7 @@ export function NewWorktreeDialog({
     const agentName = resolveDefaultAgentName() || configState.currentAgentName || undefined;
 
     if (!providerID || !modelID) {
-      toast.error('No model selected');
+      toast.error('未选择模型');
       return;
     }
 
@@ -427,12 +427,12 @@ export function NewWorktreeDialog({
 
       const issueRes = await github.issueGet(projectDirectory, args.issue.number);
       if (issueRes.connected === false || !issueRes.repo || !issueRes.issue) {
-        throw new Error('Failed to load issue context');
+        throw new Error('加载问题上下文失败');
       }
 
       const commentsRes = await github.issueComments(projectDirectory, args.issue.number);
       if (commentsRes.connected === false) {
-        throw new Error('Failed to load issue comments');
+        throw new Error('加载问题评论失败');
       }
 
       const visiblePromptText = `Review this issue #${args.issue.number} using the provided issue context`;
@@ -490,7 +490,7 @@ Do not implement changes until I confirm; end with: "Next actions: <1 sentence>"
         ],
       });
 
-      toast.success('Session created from issue');
+      toast.success('从问题创建了会话');
       return;
     }
 
@@ -504,7 +504,7 @@ Do not implement changes until I confirm; end with: "Next actions: <1 sentence>"
         includeCheckDetails: false,
       });
       if (prContext.connected === false || !prContext.repo || !prContext.pr) {
-        throw new Error('Failed to load PR context');
+        throw new Error('加载 PR 上下文失败');
       }
 
       const visiblePromptText = `Review this pull request #${args.pr.number} using the provided PR context`;
@@ -566,7 +566,7 @@ Nice-to-have:
         ],
       });
 
-      toast.success('Session created from PR');
+      toast.success('从 PR 创建了会话');
     }
   }, [
     applySessionModelAndAgentDefaults,
@@ -682,11 +682,11 @@ Nice-to-have:
       let worktreeError: string | null = null;
       
       if (!normalizedBranch) {
-        branchError = 'Branch name is required';
+        branchError = '分支名称为必填项';
       }
       
       if (!normalizedWorktree) {
-        worktreeError = 'Worktree directory is required';
+        worktreeError = '工作树目录为必填项';
       }
       
       // Only run server validation if we have values
@@ -758,7 +758,7 @@ Nice-to-have:
   // Handle worktree creation
   const handleCreate = async () => {
     if (!projectRef || !projectDirectory) {
-      toast.error('No active project');
+      toast.error('无活动项目');
       return;
     }
     
@@ -771,12 +771,12 @@ Nice-to-have:
     const normalizedWorktree = slugifyWorktreeName(worktreeName);
     
     if (!normalizedBranch) {
-      toast.error('Branch name is required');
+      toast.error('分支名称为必填项');
       return;
     }
     
     if (!normalizedWorktree) {
-      toast.error('Worktree directory is required');
+      toast.error('工作树目录为必填项');
       return;
     }
 
@@ -845,11 +845,11 @@ Nice-to-have:
           ? `#${linkedIssue.number} ${linkedIssue.title}`.trim()
           : linkedPrState
             ? `#${linkedPrState.number} ${linkedPrState.title}`.trim()
-            : 'New session';
+            : '新建会话';
 
         const session = await useSessionStore.getState().createSession(sessionTitle, metadata.path, null);
         if (!session?.id) {
-          throw new Error('Failed to create session');
+          throw new Error('创建会话失败');
         }
 
         createdSessionId = session.id;
@@ -867,7 +867,7 @@ Nice-to-have:
         localStorage.setItem(LAST_SOURCE_BRANCH_KEY, newBranchState.sourceBranch);
       }
       
-      toast.success('Worktree created', {
+      toast.success('工作树已创建', {
         description: `${metadata.branch || metadata.name}${sourceLabel ? ` from ${sourceLabel}` : ''}`,
       });
 
@@ -887,15 +887,15 @@ Nice-to-have:
           pr: linkedPrState,
           includeDiff: includePrDiff,
         }).catch((error) => {
-          const message = error instanceof Error ? error.message : 'Failed to send GitHub context';
-          toast.error('Failed to send GitHub context', { description: message });
+          const message = error instanceof Error ? error.message : '发送 GitHub 上下文失败';
+          toast.error('发送 GitHub 上下文失败', { description: message });
         });
       } else {
         onWorktreeCreated?.(metadata.path);
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to create worktree';
-      toast.error('Failed to create worktree', { description: message });
+      const message = error instanceof Error ? error.message : '创建工作树失败';
+      toast.error('创建工作树失败', { description: message });
     } finally {
       setIsCreating(false);
     }
@@ -1004,7 +1004,7 @@ Nice-to-have:
           className={cn('gap-1.5', isMobile && 'flex-1')}
         >
           {isCreating && <RiLoader4Line className="h-3.5 w-3.5 animate-spin" />}
-          {isCreating ? 'Creating...' : 'Create Worktree'}
+          {isCreating ? '创建中...' : '创建工作树'}
         </Button>
       </div>
     </div>
@@ -1015,7 +1015,7 @@ Nice-to-have:
       {isMobile ? (
         <MobileOverlayPanel
           open={open}
-          title="New Worktree"
+          title="新建工作树"
           onClose={() => onOpenChange(false)}
           footer={footerContent}
         >
@@ -1023,8 +1023,8 @@ Nice-to-have:
           <div className="w-full mb-4">
             <SortableTabsStrip
               items={[
-                { id: 'new-branch', label: 'New Branch', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
-                { id: 'existing-branch', label: 'Existing Branch', icon: <RiGitRepositoryLine className="h-3.5 w-3.5" /> },
+                { id: 'new-branch', label: '新建分支', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
+                { id: 'existing-branch', label: '现有分支', icon: <RiGitRepositoryLine className="h-3.5 w-3.5" /> },
               ]}
               activeId={mode}
               onSelect={(id) => handleModeChange(id as Mode)}
@@ -1048,7 +1048,7 @@ Nice-to-have:
                   className="w-full justify-between h-9"
                 >
                   <span className={existingBranchState.selectedBranch ? 'text-foreground' : 'text-muted-foreground'}>
-                    {existingBranchState.selectedBranch || 'Choose a branch...'}
+                    {existingBranchState.selectedBranch || '选择分支...'}
                   </span>
                   <RiGitBranchLine className="h-4 w-4 text-muted-foreground" />
                 </Button>
@@ -1056,24 +1056,24 @@ Nice-to-have:
                 {/* Mobile Branch Picker Overlay */}
                 <MobileOverlayPanel
                   open={existingBranchPickerOpen}
-                  title="Select Branch"
+                  title="选择分支"
                   onClose={() => setExistingBranchPickerOpen(false)}
                 >
                   <div className="space-y-4">
                     {isLoadingBranches ? (
                       <div className="px-2 py-8 text-center typography-small text-muted-foreground">
-                        Loading branches...
+                        正在加载分支...
                       </div>
                     ) : localBranches.length === 0 && remoteBranches.length === 0 ? (
                       <div className="px-2 py-8 text-center typography-small text-muted-foreground">
-                        No branches found
+                        未找到分支
                       </div>
                     ) : (
                       <>
                         {localBranches.length > 0 && (
                           <div className="space-y-2">
                             <div className="typography-small font-semibold text-foreground px-2">
-                              Local branches
+                              本地分支
                             </div>
                             <div className="space-y-1">
                               {localBranches.map(branch => (
@@ -1104,7 +1104,7 @@ Nice-to-have:
                         {remoteBranches.length > 0 && (
                           <div className="space-y-2">
                             <div className="typography-small font-semibold text-foreground px-2">
-                              Remote branches
+                              远程分支
                             </div>
                             <div className="space-y-1">
                               {remoteBranches.map(branch => (
@@ -1140,9 +1140,9 @@ Nice-to-have:
             ) : (
               <div className="space-y-1.5">
                 <div className="flex flex-col items-start gap-1.5">
-                  <label className="typography-ui-label text-foreground block font-semibold">
-                    Branch Name
-                  </label>
+                    <label className="typography-ui-label text-foreground block font-semibold">
+                     分支名称
+                    </label>
                   {mode === 'new-branch' && isGitHubConnected && (
                     <Button
                       variant="outline"
@@ -1151,7 +1151,7 @@ Nice-to-have:
                       className="gap-1.5 h-7"
                     >
                       <RiGithubLine className="size-4 text-status-success" />
-                        {newBranchState.linkedIssue || newBranchState.linkedPr ? 'Change' : 'Start from GitHub Issue/PR'}
+                        {newBranchState.linkedIssue || newBranchState.linkedPr ? '更改' : '从 GitHub Issue/PR 开始'}
                     </Button>
                   )}
                 </div>
@@ -1167,7 +1167,7 @@ Nice-to-have:
                     }));
                   }}
                   onBlur={() => setValidation(prev => ({ ...prev, touched: true }))}
-                  placeholder="feature/my-awesome-feature"
+                  placeholder="feature/我的功能"
                   disabled={!!newBranchState.linkedPr}
                   className={cn(
                     'h-8',
@@ -1198,7 +1198,7 @@ Nice-to-have:
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="typography-ui-label text-foreground font-semibold">
-                  Worktree Directory
+                  工作树目录
                 </label>
                 {mode !== 'existing-branch' && (
                   <button
@@ -1217,10 +1217,10 @@ Nice-to-have:
                         ? 'text-muted-foreground/40 cursor-not-allowed'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     )}
-                    title="Reset to match branch name"
+                    title="重置为匹配分支名称"
                   >
                     <RiRefreshLine className="h-3 w-3" />
-                    <span>Reset</span>
+                    <span>重置</span>
                   </button>
                 )}
               </div>
@@ -1241,7 +1241,7 @@ Nice-to-have:
                   }
                 }}
                 onBlur={() => setValidation(prev => ({ ...prev, touched: true }))}
-                placeholder="my-worktree-directory"
+                placeholder="我的工作树目录"
                 className={cn(
                   'h-8',
                   validation.touched && validation.worktreeError && 'border-destructive'
@@ -1253,73 +1253,73 @@ Nice-to-have:
             {mode === 'new-branch' && !newBranchState.linkedPr && (
               <div className="space-y-1.5">
                 <label className="typography-ui-label text-foreground block font-semibold">
-                  Source Branch
-                </label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSourceBranchPickerOpen(true)}
-                  className="w-full justify-between h-9"
-                >
-                  <span className={newBranchState.sourceBranch ? 'text-foreground' : 'text-muted-foreground'}>
-                    {newBranchState.sourceBranch || 'Select source branch...'}
-                  </span>
-                  <RiGitBranchLine className="h-4 w-4 text-muted-foreground" />
-                </Button>
-                {newBranchState.sourceBranch && (
-                  <div className="typography-micro text-muted-foreground">
-                    New branch will be created from {newBranchState.sourceBranch}
-                  </div>
-                )}
-                
-                {/* Mobile Source Branch Picker Overlay */}
-                <MobileOverlayPanel
-                  open={sourceBranchPickerOpen}
-                  title="Select Source Branch"
-                  onClose={() => setSourceBranchPickerOpen(false)}
-                >
-                  <div className="space-y-4">
-                    {isLoadingBranches ? (
-                      <div className="px-2 py-8 text-center typography-small text-muted-foreground">
-                        Loading branches...
-                      </div>
-                    ) : localBranches.length === 0 && remoteBranches.length === 0 ? (
-                      <div className="px-2 py-8 text-center typography-small text-muted-foreground">
-                        No branches found
-                      </div>
-                    ) : (
-                      <>
-                        {localBranches.length > 0 && (
-                          <div className="space-y-2">
-                            <div className="typography-small font-semibold text-foreground px-2">
-                              Local branches
-                            </div>
-                            <div className="space-y-1">
-                              {localBranches.map(branch => (
-                                <button
-                                  key={branch}
-                                  onClick={() => {
-                                    setNewBranchState(prev => ({ ...prev, sourceBranch: branch }));
-                                    setSourceBranchPickerOpen(false);
-                                  }}
-                                  className={cn(
-                                    'w-full text-left px-3 py-2.5 rounded-md transition-colors',
-                                    newBranchState.sourceBranch === branch
-                                      ? 'bg-interactive-selection text-interactive-selection-foreground'
-                                      : 'hover:bg-interactive-hover'
-                                  )}
-                                >
-                                  <span className="typography-small break-all">{branch}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {remoteBranches.length > 0 && (
-                          <div className="space-y-2">
-                            <div className="typography-small font-semibold text-foreground px-2">
-                              Remote branches
-                            </div>
+                  源分支
+                 </label>
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => setSourceBranchPickerOpen(true)}
+                   className="w-full justify-between h-9"
+                 >
+                   <span className={newBranchState.sourceBranch ? 'text-foreground' : 'text-muted-foreground'}>
+                     {newBranchState.sourceBranch || '选择源分支...'}
+                   </span>
+                   <RiGitBranchLine className="h-4 w-4 text-muted-foreground" />
+                 </Button>
+                 {newBranchState.sourceBranch && (
+                   <div className="typography-micro text-muted-foreground">
+                     将从 {newBranchState.sourceBranch} 创建新分支
+                   </div>
+                 )}
+                 
+                 {/* Mobile Source Branch Picker Overlay */}
+                 <MobileOverlayPanel
+                   open={sourceBranchPickerOpen}
+                   title="选择源分支"
+                   onClose={() => setSourceBranchPickerOpen(false)}
+                 >
+                   <div className="space-y-4">
+                     {isLoadingBranches ? (
+                       <div className="px-2 py-8 text-center typography-small text-muted-foreground">
+                         正在加载分支...
+                       </div>
+                     ) : localBranches.length === 0 && remoteBranches.length === 0 ? (
+                       <div className="px-2 py-8 text-center typography-small text-muted-foreground">
+                         未找到分支
+                       </div>
+                     ) : (
+                       <>
+                         {localBranches.length > 0 && (
+                           <div className="space-y-2">
+                             <div className="typography-small font-semibold text-foreground px-2">
+                               本地分支
+                             </div>
+                             <div className="space-y-1">
+                               {localBranches.map(branch => (
+                                 <button
+                                   key={branch}
+                                   onClick={() => {
+                                     setNewBranchState(prev => ({ ...prev, sourceBranch: branch }));
+                                     setSourceBranchPickerOpen(false);
+                                   }}
+                                   className={cn(
+                                     'w-full text-left px-3 py-2.5 rounded-md transition-colors',
+                                     newBranchState.sourceBranch === branch
+                                       ? 'bg-interactive-selection text-interactive-selection-foreground'
+                                       : 'hover:bg-interactive-hover'
+                                   )}
+                                 >
+                                   <span className="typography-small break-all">{branch}</span>
+                                 </button>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                         {remoteBranches.length > 0 && (
+                           <div className="space-y-2">
+                             <div className="typography-small font-semibold text-foreground px-2">
+                               远程分支
+                             </div>
                             <div className="space-y-1">
                               {remoteBranches.map(branch => (
                                 <button
@@ -1410,17 +1410,17 @@ Nice-to-have:
           <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
             <DialogHeader className="flex flex-row items-center justify-between">
               <div className="flex items-center gap-3">
-                <DialogTitle className="flex items-center gap-2 shrink-0">
+                  <DialogTitle className="flex items-center gap-2 shrink-0">
                   <RiGitBranchLine className="h-5 w-5" />
-                  New Worktree
+                  新建工作树
                 </DialogTitle>
                 
                 {/* Mode Selection - using SortableTabsStrip */}
                 <div className="w-[280px] shrink-0">
                   <SortableTabsStrip
                     items={[
-                      { id: 'new-branch', label: 'New Branch', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
-                      { id: 'existing-branch', label: 'Existing Branch', icon: <RiGitRepositoryLine className="h-3.5 w-3.5" /> },
+                      { id: 'new-branch', label: '新建分支', icon: <RiGitBranchLine className="h-3.5 w-3.5" /> },
+                      { id: 'existing-branch', label: '现有分支', icon: <RiGitRepositoryLine className="h-3.5 w-3.5" /> },
                     ]}
                     activeId={mode}
                     onSelect={(id) => handleModeChange(id as Mode)}
@@ -1437,7 +1437,7 @@ Nice-to-have:
               {mode === 'existing-branch' ? (
                 <div className="space-y-1.5">
                   <label className="typography-ui-label text-foreground block font-semibold">
-                    Select Branch
+                    选择分支
                   </label>
                   <Select
                     value={existingBranchState.selectedBranch}
@@ -1451,22 +1451,22 @@ Nice-to-have:
                     }}
                   >
                     <SelectTrigger size="lg" className="w-fit">
-                      <SelectValue placeholder="Choose a branch..." />
+                      <SelectValue placeholder="选择分支..." />
                     </SelectTrigger>
                   <SelectContent className="max-h-[280px] max-w-[320px]">
                     {isLoadingBranches ? (
                       <div className="px-2 py-4 text-center typography-small text-muted-foreground">
-                        Loading branches...
+                        正在加载分支...
                       </div>
                     ) : localBranches.length === 0 && remoteBranches.length === 0 ? (
                       <div className="px-2 py-4 text-center typography-small text-muted-foreground">
-                        No branches found
+                        未找到分支
                       </div>
                     ) : (
                       <>
                         {localBranches.length > 0 && (
                           <SelectGroup>
-                            <SelectLabel className="typography-small font-semibold text-foreground">Local branches</SelectLabel>
+                            <SelectLabel className="typography-small font-semibold text-foreground">本地分支</SelectLabel>
                             {localBranches.map(branch => (
                               <SelectItem key={branch} value={branch} className="whitespace-normal break-all">
                                 {branch}
@@ -1479,7 +1479,7 @@ Nice-to-have:
                         )}
                         {remoteBranches.length > 0 && (
                           <SelectGroup>
-                            <SelectLabel className="typography-small font-semibold text-foreground">Remote branches</SelectLabel>
+                            <SelectLabel className="typography-small font-semibold text-foreground">远程分支</SelectLabel>
                             {remoteBranches.map(branch => (
                               <SelectItem key={`remotes/${branch}`} value={`remotes/${branch}`} className="whitespace-normal break-all">
                                 {branch}
@@ -1496,7 +1496,7 @@ Nice-to-have:
               <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="typography-ui-label text-foreground block font-semibold">
-                      Branch Name
+                      分支名称
                     </label>
                     {mode === 'new-branch' && isGitHubConnected && (
                       <Button
@@ -1506,7 +1506,7 @@ Nice-to-have:
                         className="gap-1.5 h-7"
                       >
                         <RiGithubLine className="size-4 text-status-success" />
-                      {newBranchState.linkedIssue || newBranchState.linkedPr ? 'Change' : 'Start from GitHub Issue/PR'}
+                      {newBranchState.linkedIssue || newBranchState.linkedPr ? '更改' : '从 GitHub Issue/PR 开始'}
                       </Button>
                     )}
                   </div>
@@ -1522,7 +1522,7 @@ Nice-to-have:
                       }));
                     }}
                     onBlur={() => setValidation(prev => ({ ...prev, touched: true }))}
-                    placeholder="feature/my-awesome-feature"
+                    placeholder="feature/我的功能"
                     disabled={!!newBranchState.linkedPr}
                     className={cn(
                       'h-8',
@@ -1534,7 +1534,7 @@ Nice-to-have:
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <RiCheckLine className="h-3.5 w-3.5 text-status-success" />
                       <span className="typography-micro">
-                        Using PR branch: {newBranchState.linkedPr.head}
+                        使用 PR 分支：{newBranchState.linkedPr.head}
                       </span>
                     </div>
                   )}
@@ -1542,7 +1542,7 @@ Nice-to-have:
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <RiCheckLine className="h-3.5 w-3.5 text-status-success" />
                       <span className="typography-micro">
-                        From issue #{newBranchState.linkedIssue.number}: {newBranchState.linkedIssue.title}
+                        来自 Issue #{newBranchState.linkedIssue.number}：{newBranchState.linkedIssue.title}
                       </span>
                     </div>
                   )}
@@ -1553,7 +1553,7 @@ Nice-to-have:
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="typography-ui-label text-foreground font-semibold">
-                    Worktree Directory
+                    工作树目录
                   </label>
                   {mode !== 'existing-branch' && (
                     <button
@@ -1572,10 +1572,10 @@ Nice-to-have:
                           ? 'text-muted-foreground/40 cursor-not-allowed'
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                       )}
-                      title="Reset to match branch name"
+                      title="重置为匹配分支名称"
                     >
                       <RiRefreshLine className="h-3 w-3" />
-                      <span>Reset</span>
+                      <span>重置</span>
                     </button>
                   )}
                 </div>
@@ -1596,7 +1596,7 @@ Nice-to-have:
                     }
                   }}
                   onBlur={() => setValidation(prev => ({ ...prev, touched: true }))}
-                  placeholder="my-worktree-directory"
+                  placeholder="我的工作树目录"
                   className={cn(
                     'h-8',
                     validation.touched && validation.worktreeError && 'border-destructive'
@@ -1608,29 +1608,29 @@ Nice-to-have:
               {mode === 'new-branch' && !newBranchState.linkedPr && (
                 <div className="space-y-1.5">
                   <label className="typography-ui-label text-foreground block font-semibold">
-                    Source Branch
+                    源分支
                   </label>
                   <Select 
                     value={newBranchState.sourceBranch} 
                     onValueChange={(value) => setNewBranchState(prev => ({ ...prev, sourceBranch: value }))}
                   >
                     <SelectTrigger size="lg" className="w-fit">
-                      <SelectValue placeholder="Select source branch..." />
+                      <SelectValue placeholder="选择源分支..." />
                     </SelectTrigger>
                     <SelectContent className="max-h-[280px] max-w-[320px]">
                       {isLoadingBranches ? (
                         <div className="px-2 py-4 text-center typography-small text-muted-foreground">
-                          Loading branches...
+                          正在加载分支...
                         </div>
                       ) : localBranches.length === 0 && remoteBranches.length === 0 ? (
                         <div className="px-2 py-4 text-center typography-small text-muted-foreground">
-                          No branches found
+                          未找到分支
                         </div>
                       ) : (
                         <>
                           {localBranches.length > 0 && (
                             <SelectGroup>
-                              <SelectLabel className="typography-small font-semibold text-foreground">Local branches</SelectLabel>
+                              <SelectLabel className="typography-small font-semibold text-foreground">本地分支</SelectLabel>
                               {localBranches.map(branch => (
                                 <SelectItem key={branch} value={branch} className="whitespace-normal break-all">
                                   {branch}
@@ -1643,7 +1643,7 @@ Nice-to-have:
                           )}
                           {remoteBranches.length > 0 && (
                             <SelectGroup>
-                              <SelectLabel className="typography-small font-semibold text-foreground">Remote branches</SelectLabel>
+                              <SelectLabel className="typography-small font-semibold text-foreground">远程分支</SelectLabel>
                               {remoteBranches.map(branch => (
                                 <SelectItem key={`remotes/${branch}`} value={`remotes/${branch}`} className="whitespace-normal break-all">
                                   {branch}
@@ -1657,7 +1657,7 @@ Nice-to-have:
                   </Select>
                   {newBranchState.sourceBranch && (
                     <div className="typography-micro text-muted-foreground">
-                      New branch will be created from {newBranchState.sourceBranch}
+                      将从 {newBranchState.sourceBranch} 创建新分支
                     </div>
                   )}
                 </div>
@@ -1741,7 +1741,7 @@ Nice-to-have:
                   onClick={() => onOpenChange(false)}
                   disabled={isCreating}
                 >
-                  Cancel
+                  取消
                 </Button>
                 <Button
                   size="sm"
@@ -1750,7 +1750,7 @@ Nice-to-have:
                   className="gap-1.5"
                 >
                   {isCreating && <RiLoader4Line className="h-3.5 w-3.5 animate-spin" />}
-                  {isCreating ? 'Creating...' : 'Create Worktree'}
+                  {isCreating ? '创建中...' : '创建工作树'}
                 </Button>
               </div>
             </DialogFooter>

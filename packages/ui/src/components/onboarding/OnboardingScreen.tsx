@@ -30,7 +30,7 @@ function BashCommand({ onCopy }: { onCopy: () => void }) {
       <button
         onClick={onCopy}
         className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-        title="Copy to clipboard"
+        title="复制到剪贴板"
       >
         <RiFileCopyLine className="h-4 w-4" />
       </button>
@@ -213,7 +213,7 @@ export function OnboardingScreen({ onCliAvailable }: OnboardingScreenProps) {
       <div className="w-full space-y-4 text-center">
         <div className="space-y-4">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Welcome to OpenChamber
+            欢迎使用 OpenChamber
           </h1>
           <p className="text-muted-foreground">
             <a
@@ -225,17 +225,17 @@ export function OnboardingScreen({ onCliAvailable }: OnboardingScreenProps) {
               OpenCode CLI
               <RiExternalLinkLine className="h-4 w-4" />
             </a>
-            {' '}is required to continue.
+            是继续使用所必需的。
           </p>
         </div>
 
         {platform === 'windows' && (
           <div className="mx-auto max-w-2xl rounded-lg border border-border bg-background/50 p-4 text-left">
-            <div className="text-sm text-foreground">Windows setup (WSL recommended)</div>
+            <div className="text-sm text-foreground">Windows 配置（推荐使用 WSL）</div>
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
-              <li>Install WSL (if needed) with <code className="text-foreground/80">wsl --install</code> in PowerShell.</li>
-              <li>Run the install command below inside your WSL terminal.</li>
-              <li>If OpenChamber does not detect OpenCode automatically, set the binary path below.</li>
+              <li>如需安装 WSL，请在 PowerShell 中运行 <code className="text-foreground/80">wsl --install</code>。</li>
+              <li>在 WSL 终端中运行下面的安装命令。</li>
+              <li>如果 OpenChamber 无法自动检测到 OpenCode，请在下方设置二进制文件路径。</li>
             </ol>
           </div>
         )}
@@ -245,7 +245,7 @@ export function OnboardingScreen({ onCliAvailable }: OnboardingScreenProps) {
             {copied ? (
               <div className="flex items-center justify-center gap-2" style={{ color: 'var(--status-success)' }}>
                 <RiCheckLine className="h-4 w-4" />
-                Copied to clipboard
+                已复制到剪贴板
               </div>
             ) : (
               <BashCommand onCopy={handleCopy} />
@@ -259,12 +259,12 @@ export function OnboardingScreen({ onCliAvailable }: OnboardingScreenProps) {
           rel="noopener noreferrer"
           className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 justify-center"
         >
-          {platform === 'windows' ? 'View Windows + WSL documentation' : 'View documentation'}
+          {platform === 'windows' ? '查看 Windows + WSL 文档' : '查看文档'}
           <RiExternalLinkLine className="h-3 w-3" />
         </a>
 
         <p className="text-sm text-muted-foreground animate-pulse">
-          Waiting for OpenCode installation...
+          等待 OpenCode 安装...
         </p>
 
         <div className="flex justify-center">
@@ -274,13 +274,13 @@ export function OnboardingScreen({ onCliAvailable }: OnboardingScreenProps) {
             disabled={isRetrying}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            {isRetrying ? 'Retrying…' : 'Retry'}
+            {isRetrying ? '重试中…' : '重试'}
           </button>
         </div>
 
         <div className="mx-auto w-full max-w-xl pt-4">
           <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">Already installed? Set the OpenCode CLI path:</div>
+            <div className="text-sm text-muted-foreground">已安装？设置 OpenCode CLI 路径：</div>
             <div className="flex gap-2">
               <Input
                 value={opencodeBinary}
@@ -295,17 +295,17 @@ export function OnboardingScreen({ onCliAvailable }: OnboardingScreenProps) {
                 onClick={handleBrowse}
                 disabled={isRetrying || !isDesktopApp || !isTauriShell()}
               >
-                Browse
+              浏览
               </Button>
               <Button
                 type="button"
                 onClick={handleApplyPath}
                 disabled={isRetrying}
               >
-                Apply
+                应用
               </Button>
             </div>
-            <div className="text-xs text-muted-foreground/70">Saves to OpenChamber settings and reloads OpenCode configuration.</div>
+            <div className="text-xs text-muted-foreground/70">保存到 OpenChamber 设置并重新加载 OpenCode 配置。</div>
           </div>
         </div>
       </div>

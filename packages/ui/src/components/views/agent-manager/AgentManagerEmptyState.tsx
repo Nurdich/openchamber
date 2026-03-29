@@ -158,7 +158,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file.size > MAX_FILE_SIZE) {
-        toast.error(`File "${file.name}" is too large (max 10MB)`);
+        toast.error(`文件 "${file.name}" 过大（最大 10MB）`);
         continue;
       }
 
@@ -182,12 +182,12 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
         attachedCount++;
       } catch (error) {
         console.error('File attach failed', error);
-        toast.error(`Failed to attach "${file.name}"`);
+        toast.error(`无法添加文件 "${file.name}"`);
       }
     }
 
     if (attachedCount > 0) {
-      toast.success(`Attached ${attachedCount} file${attachedCount > 1 ? 's' : ''}`);
+      toast.success(`已添加 ${attachedCount} 个文件`);
     }
 
     if (fileInputRef.current) {
@@ -254,8 +254,8 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
       setAttachedFiles([]);
       setBaseBranch('HEAD');
     } catch (error) {
-      console.error('Failed to create agent group:', error);
-      toast.error('Failed to create agent group');
+      console.error('创建智能体组失败:', error);
+      toast.error('创建智能体组失败');
     } finally {
       setIsSubmitting(false);
     }
@@ -282,17 +282,17 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
         {/* Group Name Input */}
         <div className="space-y-1.5">
           <label htmlFor="group-name" className="typography-ui-label font-medium text-foreground">
-            Group Name
+            分组名称
           </label>
           <Input
             id="group-name"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            placeholder="e.g. feature-auth, bugfix-login"
+            placeholder="例如：feature-auth, bugfix-login"
             className="typography-body"
           />
           <p className="typography-micro text-muted-foreground">
-            Used for worktree directory and branch naming
+            用于工作树目录和分支命名
           </p>
         </div>
 
@@ -300,7 +300,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
         <div className="space-y-1.5">
           <label className="typography-ui-label font-medium text-foreground flex items-center gap-1.5">
             <RiGitBranchLine className="h-4 w-4 text-muted-foreground" />
-            Base Branch
+            基础分支
           </label>
           <BranchSelector
             directory={currentDirectory}
@@ -308,7 +308,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
             onChange={setBaseBranch}
           />
           <p className="typography-micro text-muted-foreground">
-            Creates new branches from <code className="font-mono text-xs">{baseBranch}</code>
+            基于 <code className="font-mono text-xs">{baseBranch}</code> 创建新分支
           </p>
         </div>
 
@@ -316,10 +316,10 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
         <Collapsible open={isSetupCommandsOpen} onOpenChange={setIsSetupCommandsOpen}>
           <CollapsibleTrigger className="w-full flex items-center justify-between py-1 hover:bg-[var(--interactive-hover)] rounded-md px-1 -mx-1 transition-colors">
             <p className="typography-ui-label font-medium text-foreground">
-              Setup commands
+              设置命令
               {setupCommands.filter(cmd => cmd.trim()).length > 0 && (
                 <span className="font-normal text-muted-foreground/70">
-                  {' '}({setupCommands.filter(cmd => cmd.trim()).length} configured)
+                  ({setupCommands.filter(cmd => cmd.trim()).length} 个已配置)
                 </span>
               )}
             </p>
@@ -331,10 +331,10 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
           <CollapsibleContent>
             <div className="pt-2 space-y-2">
               <p className="typography-micro text-muted-foreground/70">
-                Commands run in each new worktree. Use <code className="font-mono text-xs">$ROOT_PROJECT_PATH</code> for project root.
+                命令将在每个新工作树中运行。使用 <code className="font-mono text-xs">$ROOT_PROJECT_PATH</code> 代表项目根目录。
               </p>
               {isLoadingSetupCommands ? (
-                <p className="typography-meta text-muted-foreground/70">Loading...</p>
+                <p className="typography-meta text-muted-foreground/70">加载中...</p>
               ) : (
                 <div className="space-y-1.5">
                   {setupCommands.map((command, index) => (
@@ -346,7 +346,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
                           newCommands[index] = e.target.value;
                           setSetupCommands(newCommands);
                         }}
-                        placeholder="e.g., bun install"
+                        placeholder="例如：bun install"
                         className="h-8 flex-1 font-mono text-xs"
                       />
                       <button
@@ -356,7 +356,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
                           setSetupCommands(newCommands);
                         }}
                         className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                        aria-label="Remove command"
+                        aria-label="移除命令"
                       >
                         <RiCloseLine className="h-4 w-4" />
                       </button>
@@ -368,7 +368,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
                     className="flex items-center gap-1.5 typography-meta text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <RiAddLine className="h-3.5 w-3.5" />
-                    Add command
+                    添加命令
                   </button>
                 </div>
               )}
@@ -379,21 +379,21 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
         {/* Agent Selection */}
         <div className="space-y-1.5">
           <label className="typography-ui-label font-medium text-foreground">
-            Agent
+            智能体
           </label>
           <AgentSelector
             value={selectedAgent}
             onChange={setSelectedAgent}
           />
           <p className="typography-micro text-muted-foreground">
-            Defaults to your configured default agent
+            默认为您配置的默认智能体
           </p>
         </div>
 
         {/* Model Selection */}
         <div className="space-y-1.5">
           <label className="typography-ui-label font-medium text-foreground">
-            Models
+            模型
           </label>
           <ModelMultiSelect
             selectedModels={selectedModels}
@@ -401,7 +401,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
             onRemove={handleRemoveModel}
             onUpdate={handleUpdateModel}
             minModels={1}
-            addButtonLabel="Add model"
+            addButtonLabel="添加模型"
             maxModels={5}
           />
         </div>
@@ -409,7 +409,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
         {/* Chat Input Style Prompt */}
         <div className="space-y-1.5">
           <label htmlFor="prompt" className="typography-ui-label font-medium text-foreground">
-            Prompt
+            提示词
           </label>
           <div
             className="rounded-xl border border-border/80 overflow-hidden focus-within:ring-1 focus-within:ring-primary/50"
@@ -422,7 +422,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask anything..."
+              placeholder="请描述您需要智能体完成的任务..."
               className="min-h-[100px] max-h-[300px] resize-none border-0 bg-transparent dark:bg-transparent px-4 py-3 typography-markdown focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             
@@ -470,7 +470,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Add attachment"
+                  aria-label="添加附件"
                 >
                   <RiAddCircleLine className="h-[18px] w-[18px]" />
                 </button>
@@ -479,7 +479,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
               {/* Right Controls - Model Count */}
               <div className="flex items-center gap-2">
                 <span className="typography-meta text-muted-foreground">
-                  {selectedModels.length} model{selectedModels.length !== 1 ? 's' : ''} selected
+                  {selectedModels.length} 个模型已选择
                 </span>
               </div>
               {/* Submit Button */}
@@ -492,7 +492,7 @@ export const AgentManagerEmptyState: React.FC<AgentManagerEmptyStateProps> = ({
                           ? 'text-primary hover:text-primary'
                           : 'opacity-30'
                   )}
-                  aria-label="Start Agent Group"
+                  aria-label="启动智能体组"
                 >
                   {isSubmittingOrCreating ? (
                     <RiHourglassFill className="h-[18px] w-[18px] animate-spin" />

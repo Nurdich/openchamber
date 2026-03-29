@@ -5,32 +5,31 @@ import { useDeviceInfo } from '@/lib/device';
 import { cn } from '@/lib/utils';
 
 interface SettingsSidebarHeaderProps {
-  /** Total count to display (e.g., "Total 5") */
-  count: number;
-  /** Callback when add button is clicked. If undefined, no add button is shown. */
-  onAdd?: () => void;
-  /** Custom label prefix (default: "Total") */
+  /** 自定义标签前缀（默认："总计"） */
   label?: string;
-  /** Aria label for the add button */
+  /** 正文显示的总数 */
+  count?: number;
+  /** 添加按鈕的 aria label */
   addButtonLabel?: string;
+  /** 点击添加按鈕的回调 */
+  onAdd?: () => void;
 }
 
 /**
- * Standard header for settings sidebars.
- * Displays "Total X" on the left and an optional add button on the right.
+ * 左侧显示"总计 X"，右侧可选显示添加按钮。
  *
  * @example
  * <SettingsSidebarHeader
  *   count={agents.length}
  *   onAdd={() => setCreateDialogOpen(true)}
- *   addButtonLabel="Create new agent"
+ *   addButtonLabel="创建新项目"
  * />
  */
 export const SettingsSidebarHeader: React.FC<SettingsSidebarHeaderProps> = ({
   count,
   onAdd,
-  label = 'Total',
-  addButtonLabel = 'Add new item',
+  label = '总计',
+  addButtonLabel = '添加新项目',
 }) => {
   const { isMobile } = useDeviceInfo();
 

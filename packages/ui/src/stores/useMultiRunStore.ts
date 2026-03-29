@@ -133,6 +133,7 @@ export const useMultiRunStore = create<MultiRunStore>()(
             modelID: string;
             variant?: string;
           }> = [];
+          const failedRuns: Array<{ providerID: string; modelID: string; reason: string }> = [];
 
           const commandsToRun = setupCommands?.filter((cmd) => cmd.trim().length > 0) ?? [];
 
@@ -146,7 +147,64 @@ export const useMultiRunStore = create<MultiRunStore>()(
           // Track current index per model during iteration
           const modelIndexes = new Map<string, number>();
 
-          // 1) Create worktrees + sessions
+          /**
+           * Attempt to create a single worktree + session, with up to `maxAttempts` retries.
+           * Each retry waits `retryDelayMs * attempt` ms (linear back-off).
+           *
+           * Windows git occasionally returns "系统找不到指定的路径" (ERROR_PATH_NOT_FOUND)
+           * when two worktrees are created in rapid succession and the parent .git/worktrees/
+           * directory hasn't fully flushed yet. A short delay is sufficient to let the FS settle.
+           */
+          const createWorktreeAndSession = async (
+            preferredName: string,
+            sessionTitle: string,
+            model: { providerID: string; modelID: string; variant?: string },
+            worktreeArgs: Parameters<typeof createWorktreeWithDefaults>[1],
+          ) => {
+            const maxAttempts = 3;
+            const retryDelayMs = 500;
+            let lastError: unknown;
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              if (attempt > 0) {
+                await new Promise<void>((resolve) => setTimeout(resolve, retryDelayMs * attempt));
+              }
+              try {
+                const worktreeMetadata = await createWorktreeWithDefaults(project, worktreeArgs, {
+                  resolvedRootTrackingRemote: rootTrackingRemote,
+                });
+
+                const enrichedMetadata = {
+                  ...worktreeMetadata,
+                  createdFromBranch: rootBranch,
+                  kind: 'standard' as const,
+                };
+
+                const session = await opencodeClient.withDirectory(
+                  worktreeMetadata.path,
+                  () => opencodeClient.createSession({ title: sessionTitle }),
+                );
+
+                useSessionStore.getState().setWorktreeMetadata(session.id, enrichedMetadata);
+
+                return {
+                  sessionId: session.id,
+                  worktreePath: worktreeMetadata.path,
+                  providerID: model.providerID,
+                  modelID: model.modelID,
+                  variant: model.variant,
+                };
+              } catch (error) {
+                lastError = error;
+                console.warn(`[MultiRun] Attempt ${attempt + 1}/${maxAttempts} failed for ${preferredName}:`, error);
+              }
+            }
+
+            // All attempts exhausted
+            throw lastError;
+          };
+
+          // 1) Create worktrees + sessions (serial to avoid git FS races on Windows)
           for (const model of models) {
             const key = `${model.providerID}:${model.modelID}`;
             const count = modelCounts.get(key) || 1;
@@ -158,47 +216,31 @@ export const useMultiRunStore = create<MultiRunStore>()(
             const preferredName = count > 1
               ? generateWorktreeNameSeed(groupSlug, `${modelSlug}/${index}`)
               : generateWorktreeNameSeed(groupSlug, modelSlug);
+
+            // Session title format: groupSlug/provider/model (or groupSlug/provider/model/index for duplicates)
+            const sessionTitle = count > 1
+              ? `${groupSlug}/${model.providerID}/${model.modelID}/${index}`
+              : `${groupSlug}/${model.providerID}/${model.modelID}`;
+
             try {
-              const worktreeMetadata = await createWorktreeWithDefaults(project, {
+              const run = await createWorktreeAndSession(
                 preferredName,
-                mode: 'new',
-                branchName: preferredName,
-                worktreeName: preferredName,
-                startRef: params.worktreeBaseBranch || 'HEAD',
-                setupCommands: commandsToRun,
-              }, {
-                resolvedRootTrackingRemote: rootTrackingRemote,
-              });
-
-              const enrichedMetadata = {
-                ...worktreeMetadata,
-                createdFromBranch: rootBranch,
-                kind: 'standard' as const,
-              };
-
-              // Session title format: groupSlug/provider/model (or groupSlug/provider/model/index for duplicates)
-              const sessionTitle = count > 1
-                ? `${groupSlug}/${model.providerID}/${model.modelID}/${index}`
-                : `${groupSlug}/${model.providerID}/${model.modelID}`;
-
-              const session = await opencodeClient.withDirectory(
-                worktreeMetadata.path,
-                () => opencodeClient.createSession({ title: sessionTitle })
+                sessionTitle,
+                model,
+                {
+                  preferredName,
+                  mode: 'new',
+                  branchName: preferredName,
+                  worktreeName: preferredName,
+                  startRef: params.worktreeBaseBranch || 'HEAD',
+                  setupCommands: commandsToRun,
+                },
               );
-
-              useSessionStore.getState().setWorktreeMetadata(session.id, enrichedMetadata);
-
-              createdRuns.push({
-                sessionId: session.id,
-                worktreePath: worktreeMetadata.path,
-                providerID: model.providerID,
-                modelID: model.modelID,
-                variant: model.variant,
-              });
-
+              createdRuns.push(run);
             } catch (error) {
-              // Best-effort: allow partial success
-              console.warn('[MultiRun] Failed to create session:', error);
+              const reason = error instanceof Error ? error.message : 'Worktree or session creation failed';
+              console.warn('[MultiRun] Failed to create session after retries:', error);
+              failedRuns.push({ providerID: model.providerID, modelID: model.modelID, reason });
             }
           }
 
@@ -264,7 +306,7 @@ export const useMultiRunStore = create<MultiRunStore>()(
           })();
 
           set({ isLoading: false });
-          return { groupSlug, sessionIds, firstSessionId };
+          return { groupSlug, sessionIds, firstSessionId, failures: failedRuns.length > 0 ? failedRuns : undefined };
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to create Multi-Run',

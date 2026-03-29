@@ -11,7 +11,7 @@
   "scripts": {
     "tauri": "tauri",
     "tauri:dev": "tauri dev --features devtools",
-    "tauri:build": "tauri build",
+    "tauri:build": "node -e \"delete process.env.CI; require('child_process').execFileSync('bunx', ['tauri','build'], {stdio:'inherit', shell:true})\"",
     "build:sidecar": "node ./scripts/build-sidecar.mjs",
     "build": "bun -e \"process.exit(0)\"",
     "type-check": "bun -e \"process.exit(0)\"",

@@ -7,7 +7,9 @@ use base64::{engine::general_purpose, Engine as _};
 use remote_ssh::DesktopSshManagerState;
 use serde::{Deserialize, Serialize};
 use std::env;
+#[cfg(any(target_os = "macos", test))]
 use std::time::{SystemTime, UNIX_EPOCH};
+use rand::Rng;
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -82,6 +84,7 @@ fn dispatch_menu_action<R: tauri::Runtime>(app: &tauri::AppHandle<R>, action: &s
     eval_in_focused_window(app, &script);
 }
 
+#[cfg(target_os = "macos")]
 fn dispatch_check_for_updates<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
     let _ = app.emit("openchamber:check-for-updates", ());
 
@@ -149,6 +152,62 @@ const GITHUB_BUG_REPORT_URL: &str =
 const GITHUB_FEATURE_REQUEST_URL: &str =
     "https://github.com/btriapitsyn/openchamber/issues/new?template=feature_request.yml";
 #[cfg(target_os = "macos")]
+const DISCORD_INVITE_URL: &str = "https://discord.gg/ZYRSdnwwKA";
+
+#[cfg(windows)]
+const MENU_ITEM_NEW_WINDOW_ID: &str = "menu_new_window";
+#[cfg(windows)]
+const MENU_ITEM_NEW_SESSION_ID: &str = "menu_new_session";
+#[cfg(windows)]
+const MENU_ITEM_WORKTREE_CREATOR_ID: &str = "menu_worktree_creator";
+#[cfg(windows)]
+const MENU_ITEM_CHANGE_WORKSPACE_ID: &str = "menu_change_workspace";
+#[cfg(windows)]
+const MENU_ITEM_OPEN_GIT_TAB_ID: &str = "menu_open_git_tab";
+#[cfg(windows)]
+const MENU_ITEM_OPEN_DIFF_TAB_ID: &str = "menu_open_diff_tab";
+#[cfg(windows)]
+const MENU_ITEM_OPEN_FILES_TAB_ID: &str = "menu_open_files_tab";
+#[cfg(windows)]
+const MENU_ITEM_OPEN_TERMINAL_TAB_ID: &str = "menu_open_terminal_tab";
+#[cfg(windows)]
+const MENU_ITEM_THEME_LIGHT_ID: &str = "menu_theme_light";
+#[cfg(windows)]
+const MENU_ITEM_THEME_DARK_ID: &str = "menu_theme_dark";
+#[cfg(windows)]
+const MENU_ITEM_THEME_SYSTEM_ID: &str = "menu_theme_system";
+#[cfg(windows)]
+const MENU_ITEM_TOGGLE_SIDEBAR_ID: &str = "menu_toggle_sidebar";
+#[cfg(windows)]
+const MENU_ITEM_TOGGLE_MEMORY_DEBUG_ID: &str = "menu_toggle_memory_debug";
+#[cfg(windows)]
+const MENU_ITEM_HELP_DIALOG_ID: &str = "menu_help_dialog";
+#[cfg(windows)]
+const MENU_ITEM_DOWNLOAD_LOGS_ID: &str = "menu_download_logs";
+#[cfg(windows)]
+const MENU_ITEM_SETTINGS_ID: &str = "menu_settings";
+#[cfg(windows)]
+const MENU_ITEM_COMMAND_PALETTE_ID: &str = "menu_command_palette";
+#[cfg(windows)]
+const MENU_ITEM_REPORT_BUG_ID: &str = "menu_report_bug";
+#[cfg(windows)]
+const MENU_ITEM_REQUEST_FEATURE_ID: &str = "menu_request_feature";
+#[cfg(windows)]
+const MENU_ITEM_JOIN_DISCORD_ID: &str = "menu_join_discord";
+#[cfg(windows)]
+const MENU_ITEM_CLEAR_CACHE_ID: &str = "menu_clear_cache";
+#[cfg(windows)]
+const MENU_ITEM_EXIT_ID: &str = "menu_exit";
+#[cfg(windows)]
+const MENU_ITEM_OPEN_DEVTOOLS_ID: &str = "menu_open_devtools";
+
+#[cfg(windows)]
+const GITHUB_BUG_REPORT_URL: &str =
+    "https://github.com/btriapitsyn/openchamber/issues/new?template=bug_report.yml";
+#[cfg(windows)]
+const GITHUB_FEATURE_REQUEST_URL: &str =
+    "https://github.com/btriapitsyn/openchamber/issues/new?template=feature_request.yml";
+#[cfg(windows)]
 const DISCORD_INVITE_URL: &str = "https://discord.gg/ZYRSdnwwKA";
 
 #[cfg(target_os = "macos")]
@@ -465,9 +524,32 @@ fn desktop_clear_cache(app: tauri::AppHandle) -> Result<(), String> {
         return Ok(());
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
     {
-        Err("desktop_clear_cache is only supported on macOS".to_string())
+        let mut failures: Vec<String> = Vec::new();
+
+        for (label, window) in app.webview_windows() {
+            if let Err(err) = window.clear_all_browsing_data() {
+                failures.push(format!("{label}: {err}"));
+            }
+        }
+
+        if !failures.is_empty() {
+            return Err(format!(
+                "Failed to clear browsing data for some windows: {}",
+                failures.join("; ")
+            ));
+        }
+
+        eval_in_all_windows(&app, "window.location.reload();");
+
+        log::info!("[desktop] Cleared all webview browsing data and reloaded windows");
+        return Ok(());
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
+    {
+        Err("desktop_clear_cache is only supported on macOS and Windows".to_string())
     }
 }
 
@@ -493,9 +575,20 @@ fn desktop_open_path(path: String, app: Option<String>) -> Result<(), String> {
         return Ok(());
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
     {
-        Err("desktop_open_path is only supported on macOS".to_string())
+        let _ = app;
+        Command::new("explorer")
+            .arg(trimmed)
+            .spawn()
+            .map_err(|err| err.to_string())?;
+        return Ok(());
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
+    {
+        let _ = app;
+        Err("desktop_open_path is only supported on macOS and Windows".to_string())
     }
 }
 
@@ -559,6 +652,81 @@ fn cli_for_app_id(app_id: &str) -> Option<&'static str> {
         "zed" => Some("zed"),
         _ => None,
     }
+}
+
+#[cfg(windows)]
+fn is_jetbrains_app_id_windows(app_id: &str) -> bool {
+    matches!(
+        app_id,
+        "pycharm"
+            | "intellij"
+            | "webstorm"
+            | "phpstorm"
+            | "rider"
+            | "rustrover"
+            | "android-studio"
+            | "goland"
+            | "clion"
+            | "datagrip"
+    )
+}
+
+#[cfg(windows)]
+fn cli_for_app_id_windows(app_id: &str) -> Option<&'static str> {
+    match app_id {
+        "vscode" => Some("code"),
+        "cursor" => Some("cursor"),
+        "vscodium" => Some("codium"),
+        "windsurf" => Some("windsurf"),
+        _ => None,
+    }
+}
+
+#[cfg(windows)]
+fn resolve_jetbrains_cli_windows(app_id: &str, app_name: &str) -> Option<String> {
+    let local_app_data = env::var("LOCALAPPDATA").ok()?;
+    let toolbox_scripts = PathBuf::from(local_app_data)
+        .join("JetBrains")
+        .join("Toolbox")
+        .join("scripts");
+
+    let cli_name = match app_id {
+        "pycharm" => "pycharm",
+        "intellij" => "idea",
+        "webstorm" => "webstorm",
+        "phpstorm" => "pstorm",
+        "rider" => "rider",
+        "rustrover" => "rustrover",
+        "android-studio" => "studio",
+        "goland" => "goland",
+        "clion" => "clion",
+        "datagrip" => "datagrip",
+        _ => return None,
+    };
+
+    let cli_path = toolbox_scripts.join(format!("{}.bat", cli_name));
+    if cli_path.exists() {
+        return Some(cli_path.to_string_lossy().to_string());
+    }
+
+    let exe_name = if !app_name.is_empty() {
+        format!("{}.exe", app_name.trim())
+    } else {
+        format!("{}.exe", cli_name)
+    };
+    if let Ok(output) = Command::new("whereis").arg(&exe_name).output() {
+        if output.status.success() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            if let Some(line) = stdout.lines().next() {
+                let trimmed = line.trim();
+                if !trimmed.is_empty() {
+                    return Some(trimmed.to_string());
+                }
+            }
+        }
+    }
+
+    None
 }
 
 #[tauri::command]
@@ -667,10 +835,82 @@ fn desktop_open_in_app(
         return run_open_command_chain(&specs);
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    {
+        let project = trimmed_project_path.to_string();
+        let file = normalized_file_path.map(|value| value.to_string());
+
+        if trimmed_app_id == "finder" || trimmed_app_id == "explorer" {
+            Command::new("explorer")
+                .arg(&project)
+                .spawn()
+                .map_err(|err| err.to_string())?;
+            return Ok(());
+        }
+
+        if trimmed_app_id == "cmd" {
+            // Use cmd /c start to launch a new detached window
+            Command::new("cmd")
+                .args(["/c", &format!("start cmd /k \"cd /d \"{}\"\"", project)])
+                .spawn()
+                .map_err(|err| err.to_string())?;
+            return Ok(());
+        }
+
+        if trimmed_app_id == "powershell" {
+            Command::new("powershell")
+                .args([
+                    "-NoExit",
+                    "-Command",
+                    &format!("Set-Location -LiteralPath '{}'", project.replace('\'', "''")),
+                ])
+                .spawn()
+                .map_err(|err| err.to_string())?;
+            return Ok(());
+        }
+
+        if trimmed_app_id == "wt" {
+            // Windows Terminal - use new-tab with startingDirectory
+            Command::new("wt")
+                .args(["new-tab", "--startingDirectory", &project])
+                .spawn()
+                .map_err(|err| err.to_string())?;
+            return Ok(());
+        }
+
+        if let Some(cli) = cli_for_app_id_windows(trimmed_app_id.as_str()) {
+            let mut args = vec![project.clone()];
+            if let Some(file_path) = file.as_ref() {
+                args.push(file_path.clone());
+            }
+            Command::new(cli)
+                .args(&args)
+                .spawn()
+                .map_err(|err| err.to_string())?;
+            return Ok(());
+        }
+
+        if is_jetbrains_app_id_windows(trimmed_app_id.as_str()) {
+            if let Some(jb_cli) = resolve_jetbrains_cli_windows(trimmed_app_id.as_str(), trimmed_app_name) {
+                let mut args = vec![project.clone()];
+                if let Some(file_path) = file.as_ref() {
+                    args.push(file_path.clone());
+                }
+                Command::new(jb_cli)
+                    .args(&args)
+                    .spawn()
+                    .map_err(|err| err.to_string())?;
+                return Ok(());
+            }
+        }
+
+        Err(format!("Unable to open in app '{}' on Windows. Please ensure the application CLI is in PATH.", trimmed_app_id))
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
     {
         let _ = normalized_file_path;
-        Err("desktop_open_in_app is only supported on macOS".to_string())
+        Err("desktop_open_in_app is only supported on macOS and Windows".to_string())
     }
 }
 
@@ -683,12 +923,15 @@ struct InstalledAppInfo {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[cfg(target_os = "macos")]
 struct InstalledAppsCache {
     updated_at: u64,
     apps: Vec<InstalledAppInfo>,
 }
 
+#[cfg(target_os = "macos")]
 const INSTALLED_APPS_CACHE_TTL_SECS: u64 = 60 * 60 * 24;
+#[cfg(target_os = "macos")]
 const INSTALLED_APPS_CACHE_FILE: &str = "discovered-apps.json";
 
 #[derive(Serialize)]
@@ -725,10 +968,30 @@ fn desktop_filter_installed_apps(apps: Vec<String>) -> Result<Vec<String>, Strin
         return Ok(installed);
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    {
+        let mut installed: Vec<String> = Vec::new();
+
+        for raw in apps {
+            let trimmed = raw.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+
+            let app_id = trimmed.to_lowercase();
+
+            if is_app_installed_windows(&app_id) {
+                installed.push(trimmed.to_string());
+            }
+        }
+
+        return Ok(installed);
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
     {
         let _ = apps;
-        Err("desktop_filter_installed_apps is only supported on macOS".to_string())
+        Err("desktop_filter_installed_apps is only supported on macOS and Windows".to_string())
     }
 }
 
@@ -832,10 +1095,37 @@ fn desktop_get_installed_apps(
         });
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    {
+        let _ = (&app, &force);
+        let mut installed: Vec<InstalledAppInfo> = Vec::new();
+
+        for raw in apps {
+            let trimmed = raw.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+
+            let app_id = trimmed.to_lowercase();
+            if is_app_installed_windows(&app_id) {
+                installed.push(InstalledAppInfo {
+                    name: trimmed.to_string(),
+                    icon_data_url: None,
+                });
+            }
+        }
+
+        Ok(InstalledAppsResponse {
+            apps: installed,
+            has_cache: false,
+            is_cache_stale: false,
+        })
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
     {
         let _ = apps;
-        Err("desktop_get_installed_apps is only supported on macOS".to_string())
+        Err("desktop_get_installed_apps is only supported on macOS and Windows".to_string())
     }
 }
 
@@ -878,10 +1168,16 @@ fn desktop_fetch_app_icons(apps: Vec<String>) -> Result<Vec<AppIconPayload>, Str
         return Ok(results);
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
     {
         let _ = apps;
-        Err("desktop_fetch_app_icons is only supported on macOS".to_string())
+        Ok(vec![])
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
+    {
+        let _ = apps;
+        Err("desktop_fetch_app_icons is only supported on macOS and Windows".to_string())
     }
 }
 
@@ -1172,6 +1468,119 @@ fn is_app_bundle_installed(bundle_name: &str) -> bool {
     false
 }
 
+#[cfg(windows)]
+fn is_app_installed_windows(app_id: &str) -> bool {
+    if app_id.trim().is_empty() {
+        return false;
+    }
+
+    // Windows built-ins are always available
+    if matches!(app_id, "explorer" | "cmd" | "powershell" | "wt") {
+        return true;
+    }
+
+    let cli_names: &[(&str, &str)] = &[
+        ("vscode", "code"),
+        ("cursor", "cursor"),
+        ("vscodium", "codium"),
+        ("windsurf", "windsurf"),
+        ("pycharm", "pycharm"),
+        ("intellij", "idea"),
+        ("webstorm", "webstorm"),
+        ("phpstorm", "pstorm"),
+        ("rider", "rider"),
+        ("rustrover", "rustrover"),
+        ("android-studio", "studio"),
+        ("goland", "goland"),
+        ("clion", "clion"),
+        ("datagrip", "datagrip"),
+    ];
+
+    let cli_name = cli_names
+        .iter()
+        .find(|(id, _)| *id == app_id)
+        .map(|(_, cli)| *cli);
+
+    if let Some(cli) = cli_name {
+        if let Ok(output) = Command::new("whereis").arg(cli).output() {
+            if output.status.success() {
+                return true;
+            }
+        }
+    }
+
+    let local_app_data = env::var("LOCALAPPDATA").ok();
+    let program_files = env::var("ProgramFiles").ok();
+    let program_files_x86 = env::var("ProgramFiles(x86)").ok();
+
+    let install_paths: Vec<PathBuf> = match app_id {
+        "vscode" => {
+            let mut paths = Vec::new();
+            if let Some(local) = &local_app_data {
+                paths.push(PathBuf::from(local).join("Programs").join("Microsoft VS Code"));
+            }
+            paths
+        }
+        "cursor" => {
+            let mut paths = Vec::new();
+            if let Some(local) = &local_app_data {
+                paths.push(PathBuf::from(local).join("Programs").join("cursor"));
+            }
+            paths
+        }
+        "vscodium" => {
+            let mut paths = Vec::new();
+            if let Some(local) = &local_app_data {
+                paths.push(PathBuf::from(local).join("Programs").join("VSCodium"));
+            }
+            paths
+        }
+        "windsurf" => {
+            let mut paths = Vec::new();
+            if let Some(local) = &local_app_data {
+                paths.push(PathBuf::from(local).join("Programs").join("Windsurf"));
+            }
+            paths
+        }
+        "pycharm" | "intellij" | "webstorm" | "phpstorm" | "rider" | "rustrover" | "goland" | "clion" | "datagrip" => {
+            let mut paths = Vec::new();
+            if let Some(local) = &local_app_data {
+                let toolbox_path = PathBuf::from(local)
+                    .join("JetBrains")
+                    .join("Toolbox")
+                    .join("apps");
+                paths.push(toolbox_path);
+            }
+            if let Some(pf) = &program_files {
+                paths.push(PathBuf::from(pf).join("JetBrains"));
+            }
+            paths
+        }
+        "android-studio" => {
+            let mut paths = Vec::new();
+            if let Some(local) = &local_app_data {
+                paths.push(PathBuf::from(local).join("Android").join("android-studio"));
+            }
+            if let Some(pf) = &program_files {
+                paths.push(PathBuf::from(pf).join("Android").join("Android Studio"));
+            }
+            if let Some(pf86) = &program_files_x86 {
+                paths.push(PathBuf::from(pf86).join("Android").join("android-studio"));
+            }
+            paths
+        }
+        _ => Vec::new(),
+    };
+
+    for path in install_paths {
+        if path.exists() {
+            return true;
+        }
+    }
+
+    false
+}
+
 const SIDECAR_NAME: &str = "openchamber-server";
 const SIDECAR_NOTIFY_PREFIX: &str = "[OpenChamberDesktopNotify] ";
 const HEALTH_TIMEOUT: Duration = Duration::from_secs(20);
@@ -1181,6 +1590,7 @@ const LOCAL_SIDECAR_HEALTH_POLL_INTERVAL: Duration = Duration::from_millis(100);
 const STARTUP_REMOTE_PROBE_SOFT_TIMEOUT: Duration = Duration::from_secs(2);
 const STARTUP_REMOTE_PROBE_HARD_TIMEOUT: Duration = Duration::from_secs(10);
 
+#[allow(dead_code)]
 const DEFAULT_DESKTOP_PORT: u16 = 57123;
 const WINDOW_STATE_DEBOUNCE_MS: u64 = 300;
 const MIN_WINDOW_WIDTH: u32 = 800;
@@ -1196,11 +1606,13 @@ struct SidecarState {
     url: Mutex<Option<String>>,
 }
 
-/// Holds the initialization script and local origin, shared across all windows.
+/// Holds the initialization script, local origin, and secret, shared across all windows.
 #[derive(Default)]
 struct DesktopUiInjectionState {
     script: Mutex<Option<String>>,
     local_origin: Mutex<Option<String>>,
+    /// Secret for Desktop->server authentication, set at startup.
+    secret: Mutex<Option<String>>,
     /// Host URLs that were probed unreachable (e.g. at startup).
     /// `open_new_window` checks this to avoid opening windows at dead hosts.
     unreachable_hosts: Mutex<HashSet<String>>,
@@ -1321,19 +1733,28 @@ fn build_health_url(base_url: &str) -> Option<String> {
     Some(parsed.to_string())
 }
 
-fn settings_file_path() -> PathBuf {
+fn settings_data_dir() -> PathBuf {
     if let Ok(dir) = env::var("OPENCHAMBER_DATA_DIR") {
-        if !dir.trim().is_empty() {
-            return PathBuf::from(dir.trim()).join("settings.json");
+        let trimmed = dir.trim();
+        if !trimmed.is_empty() {
+            return PathBuf::from(trimmed);
         }
     }
-    let home = env::var("HOME").unwrap_or_default();
-    PathBuf::from(home)
-        .join(".config")
-        .join("openchamber")
-        .join("settings.json")
+
+    // All platforms use $HOME/.config/openchamber as the default.
+    // On Windows, HOME is set to C:\Users\<name> by Git/MSYS/most toolchains.
+    // USERPROFILE is the Windows-native equivalent if HOME is absent.
+    let home = env::var("HOME")
+        .or_else(|_| env::var("USERPROFILE"))
+        .unwrap_or_default();
+    PathBuf::from(home).join(".config").join("openchamber")
 }
 
+fn settings_file_path() -> PathBuf {
+    settings_data_dir().join("settings.json")
+}
+
+#[allow(dead_code)]
 fn read_desktop_local_port_from_disk() -> Option<u16> {
     let path = settings_file_path();
     let raw = fs::read_to_string(path).ok();
@@ -1799,65 +2220,14 @@ fn build_local_url(port: u16) -> String {
     format!("http://127.0.0.1:{port}")
 }
 
-/// Kills any stale openchamber-server processes that may be lingering from
-/// previous app sessions or incomplete shutdowns. This ensures a clean
-/// startup and prevents port conflicts.
-fn kill_stale_sidecar_processes() {
-    let process_name = if cfg!(windows) {
-        "openchamber-server.exe"
-    } else {
-        "openchamber-server"
-    };
-
-    let result = if cfg!(target_os = "macos") {
-        // macOS: use pkill to terminate by process name
-        std::process::Command::new("pkill")
-            .arg("-x") // exact match
-            .arg(process_name)
-            .output()
-    } else if cfg!(target_os = "linux") {
-        // Linux: use pkill
-        std::process::Command::new("pkill")
-            .arg("-x")
-            .arg(process_name)
-            .output()
-    } else if cfg!(windows) {
-        // Windows: use taskkill
-        std::process::Command::new("taskkill")
-            .arg("/F")
-            .arg("/IM")
-            .arg(process_name)
-            .output()
-    } else {
-        return;
-    };
-
-    // Log result for debugging (pkill returns 1 if no processes found, which is fine)
-    if let Ok(output) = result {
-        log::debug!(
-            "[sidecar] cleanup result: exit_code={:?}, stdout={}, stderr={}",
-            output.status.code(),
-            String::from_utf8_lossy(&output.stdout).trim(),
-            String::from_utf8_lossy(&output.stderr).trim()
-        );
-    }
-
-    // Brief pause to let the OS clean up the processes
-    std::thread::sleep(Duration::from_millis(100));
-}
 
 async fn spawn_local_server(app: &tauri::AppHandle) -> Result<String> {
     // Clean up any stale sidecar processes from previous sessions
-    kill_stale_sidecar_processes();
 
-    let stored_port = read_desktop_local_port_from_disk();
-    let mut candidates: Vec<Option<u16>> = Vec::new();
-    if let Some(port) = stored_port {
-        candidates.push(Some(port));
-    }
-    candidates.push(Some(DEFAULT_DESKTOP_PORT));
-    candidates.push(None);
+    // Always use random port - never use fixed ports to avoid conflicts with other instances
+    const MAX_RETRIES: u8 = 10;
 
+    #[cfg(not(target_os = "windows"))]
     let dist_dir = resolve_web_dist_dir(app)?;
     let no_proxy = "localhost,127.0.0.1";
 
@@ -1880,16 +2250,10 @@ async fn spawn_local_server(app: &tauri::AppHandle) -> Result<String> {
             .ok()
             .and_then(|v| {
                 let t = v.trim().to_string();
-                if t.is_empty() {
-                    None
-                } else {
-                    Some(PathBuf::from(t))
-                }
+                if t.is_empty() { None } else { Some(PathBuf::from(t)) }
             })
             .or_else(|| {
-                resolved_home_dir_path
-                    .as_ref()
-                    .map(|home| home.join(".config").join("openchamber"))
+                resolved_home_dir_path.as_ref().map(|home| home.join(".config").join("openchamber"))
             });
         let data_dir = data_dir?;
         let settings_path = data_dir.join("settings.json");
@@ -1976,41 +2340,108 @@ async fn spawn_local_server(app: &tauri::AppHandle) -> Result<String> {
     }
 
     if let Ok(existing) = env::var("PATH") {
-        for segment in existing.split(':') {
+        #[cfg(windows)]
+        let sep = ';';
+        #[cfg(not(windows))]
+        let sep = ':';
+        for segment in existing.split(sep) {
             push_unique(segment.to_string());
         }
     }
 
-    let augmented_path = path_segments.join(":");
+    #[cfg(windows)]
+    let path_sep = ";";
+    #[cfg(not(windows))]
+    let path_sep = ":";
+    let augmented_path = path_segments.join(path_sep);
 
-    for candidate in candidates {
-        let port = match candidate {
-            Some(p) => p,
-            None => pick_unused_port()?,
-        };
+    // Always use random port - retry up to MAX_RETRIES times
+    for _ in 0..MAX_RETRIES {
+        let port = pick_unused_port()?;
         let url = build_local_url(port);
+
+        // Generate a random secret for Desktop->server authentication.
+        let secret: String = (0..32)
+            .map(|_| {
+                let idx = rand::thread_rng().gen_range(0..62);
+                let chars = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                chars[idx] as char
+            })
+            .collect();
+
+        // Pass the platform-correct data dir to the sidecar so it reads/writes
+        // the same settings.json as the Rust host process (critical on Windows
+        // where the default is %APPDATA%\openchamber, not ~/.config/openchamber).
+        let resolved_data_dir: Option<String> = {
+            let p = settings_data_dir();
+            let s = p.to_string_lossy().to_string();
+            if s.trim().is_empty() { None } else { Some(s) }
+        };
+
+        // On Windows the sidecar exe and the bundled opencode.exe are siblings in the
+        // same directory.  Resolve that path so the server can find opencode even when
+        // it is not on the system PATH.
+        #[cfg(windows)]
+        let bundled_opencode_path: Option<String> = std::env::current_exe()
+            .ok()
+            .and_then(|exe| exe.parent().map(|dir| dir.join("opencode.exe")))
+            .filter(|p| p.exists())
+            .map(|p| p.to_string_lossy().to_string());
+
+        // On Windows, resolve_web_dist_dir() is not called above (it would require
+        // a compiled resource layout that differs from macOS/Linux).  The server
+        // discovers the dist dir on its own via process.execPath, so we only pass
+        // OPENCHAMBER_DIST_DIR when we have a concrete resolved path.
+        #[cfg(windows)]
+        let windows_dist_dir: Option<String> = resolve_web_dist_dir(app)
+            .ok()
+            .map(|p| p.to_string_lossy().to_string());
 
         let mut cmd = app
             .shell()
             .sidecar(SIDECAR_NAME)
             .map_err(|err| anyhow!("Failed to resolve sidecar '{SIDECAR_NAME}': {err}"))?
             .args(["--port", &port.to_string()])
-            .env("OPENCHAMBER_HOST", "127.0.0.1")
-            .env("OPENCHAMBER_DIST_DIR", dist_dir.clone())
-            .env("OPENCHAMBER_RUNTIME", "desktop")
-            .env("OPENCHAMBER_DESKTOP_NOTIFY", "true")
             .env("PATH", augmented_path.clone())
             .env("NO_PROXY", no_proxy)
-            .env("no_proxy", no_proxy);
+            .env("no_proxy", no_proxy)
+            .env("OPENCHAMBER_HOST", "127.0.0.1")
+            .env("OPENCHAMBER_RUNTIME", "desktop")
+            .env("OPENCHAMBER_DESKTOP_NOTIFY", "true")
+            .env("OPENCHAMBER_SECRET", &secret);
+
+        #[cfg(not(windows))]
+        {
+            cmd = cmd.env("OPENCHAMBER_DIST_DIR", dist_dir.clone());
+        }
+
+        #[cfg(windows)]
+        {
+            if let Some(ref dist) = windows_dist_dir {
+                cmd = cmd.env("OPENCHAMBER_DIST_DIR", dist.as_str());
+            }
+        }
+
+        if let Some(data_dir) = resolved_data_dir.as_deref() {
+            cmd = cmd.env("OPENCHAMBER_DATA_DIR", data_dir);
+        }
 
         if let Some(home) = resolved_home_dir.as_deref() {
             cmd = cmd.env("HOME", home);
         }
 
+        // Prefer an explicit user-configured binary, then fall back to the bundled sidecar.
         if let Some(bin) = opencode_binary_from_settings.as_deref() {
             let trimmed = bin.trim();
             if !trimmed.is_empty() {
                 cmd = cmd.env("OPENCODE_BINARY", trimmed);
+            }
+        }
+
+        #[cfg(windows)]
+        if opencode_binary_from_settings.as_deref().map(|s| s.trim().is_empty()).unwrap_or(true) {
+            if let Some(ref bundled) = bundled_opencode_path {
+                cmd = cmd.env("OPENCODE_BINARY", bundled.as_str());
             }
         }
 
@@ -2077,12 +2508,19 @@ async fn spawn_local_server(app: &tauri::AppHandle) -> Result<String> {
         }
 
         let _ = write_desktop_local_port_to_disk(port);
+
+        // Store the secret so build_init_script can inject it into WebViews.
+        if let Some(state) = app.try_state::<DesktopUiInjectionState>() {
+            *state.secret.lock().expect("desktop secret mutex") = Some(secret);
+        }
+
         return Ok(url);
     }
 
     Err(anyhow!("Sidecar health check failed"))
 }
 
+#[allow(dead_code)]
 fn resolve_web_dist_dir(app: &tauri::AppHandle) -> Result<PathBuf> {
     let candidates = ["web-dist", "resources/web-dist"];
     for candidate in candidates {
@@ -2274,7 +2712,11 @@ fn desktop_new_window_at_url(app: tauri::AppHandle, url: String) -> Result<(), S
         })
         .ok_or_else(|| "Local origin not yet known (sidecar may still be starting)".to_string())?;
 
-    create_window(&app, &url, &local_origin, false).map_err(|e| e.to_string())
+    let secret = app
+        .try_state::<DesktopUiInjectionState>()
+        .and_then(|state| state.secret.lock().ok().and_then(|secret| secret.clone()));
+
+    create_window(&app, &url, &local_origin, secret.as_deref(), false).map_err(|e| e.to_string())
 }
 
 /// Read a file and return its content as base64 with mime type detection.
@@ -2389,16 +2831,19 @@ fn macos_major_version() -> Option<u32> {
 
 /// Build the initialization script injected into every webview window.
 /// This is computed once and reused for all windows.
-fn build_init_script(local_origin: &str) -> String {
+fn build_init_script(local_origin: &str, secret: Option<&str>) -> String {
     let home =
         std::env::var(if cfg!(windows) { "USERPROFILE" } else { "HOME" }).unwrap_or_default();
     let macos_major = macos_major_version().unwrap_or(0);
 
     let home_json = serde_json::to_string(&home).unwrap_or_else(|_| "\"\"".into());
     let local_json = serde_json::to_string(local_origin).unwrap_or_else(|_| "\"\"".into());
+    let secret_json = secret
+        .map(|s| serde_json::to_string(s).unwrap_or_else(|_| "null".into()))
+        .unwrap_or_else(|| "null".into());
 
     let mut init_script = format!(
-        "(function(){{try{{window.__OPENCHAMBER_HOME__={home_json};window.__OPENCHAMBER_MACOS_MAJOR__={macos_major};window.__OPENCHAMBER_LOCAL_ORIGIN__={local_json};}}catch(_e){{}}}})();"
+        "(function(){{try{{window.__OPENCHAMBER_HOME__={home_json};window.__OPENCHAMBER_MACOS_MAJOR__={macos_major};window.__OPENCHAMBER_LOCAL_ORIGIN__={local_json};window.__OPENCHAMBER_SECRET__={secret_json};}}catch(_e){{}}}})();"
     );
 
     // Cleanup: older builds injected a native-ish Instance switcher button into pages.
@@ -2602,12 +3047,13 @@ fn create_window(
     app: &tauri::AppHandle,
     url: &str,
     local_origin: &str,
+    secret: Option<&str>,
     restore_geometry: bool,
 ) -> Result<()> {
     let parsed = url::Url::parse(url).map_err(|err| anyhow!("Invalid URL: {err}"))?;
     let label = next_window_label(app);
 
-    let init_script = build_init_script(local_origin);
+    let init_script = build_init_script(local_origin, secret);
 
     // Store the init script and local origin so new windows and page reloads can reuse it.
     if let Some(state) = app.try_state::<DesktopUiInjectionState>() {
@@ -2822,7 +3268,13 @@ fn build_startup_splash_script() -> String {
 
 fn activate_main_window(app: &tauri::AppHandle, url: &str, local_origin: &str) -> Result<()> {
     let parsed = url::Url::parse(url).map_err(|err| anyhow!("Invalid URL: {err}"))?;
-    let init_script = build_init_script(local_origin);
+
+    // Read secret from state (set by spawn_local_server).
+    let secret = app
+        .try_state::<DesktopUiInjectionState>()
+        .and_then(|state| state.secret.lock().ok().and_then(|secret| secret.clone()));
+
+    let init_script = build_init_script(local_origin, secret.as_deref());
 
     if let Some(state) = app.try_state::<DesktopUiInjectionState>() {
         *state.script.lock().expect("desktop ui injection mutex") = Some(init_script);
@@ -2838,7 +3290,7 @@ fn activate_main_window(app: &tauri::AppHandle, url: &str, local_origin: &str) -
         return Ok(());
     }
 
-    create_window(app, url, local_origin, true)
+    create_window(app, url, local_origin, secret.as_deref(), true)
 }
 
 /// Open a new window pointed at the default host (local or configured default).
@@ -2923,9 +3375,248 @@ fn open_new_window(app: &tauri::AppHandle) {
         }
     }
 
-    if let Err(err) = create_window(app, &target_url, &local_origin, false) {
+    // Read secret from state (set by spawn_local_server).
+    let secret = app
+        .try_state::<DesktopUiInjectionState>()
+        .and_then(|state| state.secret.lock().ok().and_then(|secret| secret.clone()));
+
+    if let Err(err) = create_window(app, &target_url, &local_origin, secret.as_deref(), false) {
         log::error!("[desktop] failed to create new window: {err}");
     }
+}
+
+#[cfg(windows)]
+fn build_windows_menu<R: tauri::Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> tauri::Result<tauri::menu::Menu<R>> {
+    use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
+
+    let new_window = MenuItem::with_id(
+        app,
+        MENU_ITEM_NEW_WINDOW_ID,
+        "New Window",
+        true,
+        Some("Ctrl+Shift+Alt+N"),
+    )?;
+    let new_session = MenuItem::with_id(
+        app,
+        MENU_ITEM_NEW_SESSION_ID,
+        "New Session",
+        true,
+        Some("Ctrl+N"),
+    )?;
+    let worktree_creator = MenuItem::with_id(
+        app,
+        MENU_ITEM_WORKTREE_CREATOR_ID,
+        "New Worktree",
+        true,
+        Some("Ctrl+Shift+N"),
+    )?;
+    let change_workspace = MenuItem::with_id(
+        app,
+        MENU_ITEM_CHANGE_WORKSPACE_ID,
+        "Add Workspace",
+        true,
+        None::<&str>,
+    )?;
+    let settings = MenuItem::with_id(
+        app,
+        MENU_ITEM_SETTINGS_ID,
+        "Settings",
+        true,
+        Some("Ctrl+,"),
+    )?;
+    let command_palette = MenuItem::with_id(
+        app,
+        MENU_ITEM_COMMAND_PALETTE_ID,
+        "Command Palette",
+        true,
+        Some("Ctrl+K"),
+    )?;
+    let exit = MenuItem::with_id(app, MENU_ITEM_EXIT_ID, "Exit", true, Some("Alt+F4"))?;
+
+    let open_git_tab =
+        MenuItem::with_id(app, MENU_ITEM_OPEN_GIT_TAB_ID, "Git", true, Some("Ctrl+G"))?;
+    let open_diff_tab =
+        MenuItem::with_id(app, MENU_ITEM_OPEN_DIFF_TAB_ID, "Diff", true, Some("Ctrl+E"))?;
+    let open_files_tab = MenuItem::with_id(
+        app,
+        MENU_ITEM_OPEN_FILES_TAB_ID,
+        "Files",
+        true,
+        None::<&str>,
+    )?;
+    let open_terminal_tab = MenuItem::with_id(
+        app,
+        MENU_ITEM_OPEN_TERMINAL_TAB_ID,
+        "Terminal",
+        true,
+        Some("Ctrl+T"),
+    )?;
+    let theme_light = MenuItem::with_id(
+        app,
+        MENU_ITEM_THEME_LIGHT_ID,
+        "Light Theme",
+        true,
+        None::<&str>,
+    )?;
+    let theme_dark = MenuItem::with_id(
+        app,
+        MENU_ITEM_THEME_DARK_ID,
+        "Dark Theme",
+        true,
+        None::<&str>,
+    )?;
+    let theme_system = MenuItem::with_id(
+        app,
+        MENU_ITEM_THEME_SYSTEM_ID,
+        "System Theme",
+        true,
+        None::<&str>,
+    )?;
+    let toggle_sidebar = MenuItem::with_id(
+        app,
+        MENU_ITEM_TOGGLE_SIDEBAR_ID,
+        "Toggle Session Sidebar",
+        true,
+        Some("Ctrl+L"),
+    )?;
+    let toggle_memory_debug = MenuItem::with_id(
+        app,
+        MENU_ITEM_TOGGLE_MEMORY_DEBUG_ID,
+        "Toggle Memory Debug",
+        true,
+        Some("Ctrl+Shift+D"),
+    )?;
+    let open_devtools = MenuItem::with_id(
+        app,
+        MENU_ITEM_OPEN_DEVTOOLS_ID,
+        "Open DevTools",
+        true,
+        Some("F12"),
+    )?;
+
+    let help_dialog = MenuItem::with_id(
+        app,
+        MENU_ITEM_HELP_DIALOG_ID,
+        "Keyboard Shortcuts",
+        true,
+        Some("Ctrl+."),
+    )?;
+    let download_logs = MenuItem::with_id(
+        app,
+        MENU_ITEM_DOWNLOAD_LOGS_ID,
+        "Show Diagnostics",
+        true,
+        Some("Ctrl+Shift+L"),
+    )?;
+    let clear_cache = MenuItem::with_id(
+        app,
+        MENU_ITEM_CLEAR_CACHE_ID,
+        "Clear Cache",
+        true,
+        None::<&str>,
+    )?;
+    let report_bug = MenuItem::with_id(
+        app,
+        MENU_ITEM_REPORT_BUG_ID,
+        "Report a Bug",
+        true,
+        None::<&str>,
+    )?;
+    let request_feature = MenuItem::with_id(
+        app,
+        MENU_ITEM_REQUEST_FEATURE_ID,
+        "Request a Feature",
+        true,
+        None::<&str>,
+    )?;
+    let join_discord = MenuItem::with_id(
+        app,
+        MENU_ITEM_JOIN_DISCORD_ID,
+        "Join Discord",
+        true,
+        None::<&str>,
+    )?;
+
+    let theme_submenu = Submenu::with_items(
+        app,
+        "Theme",
+        true,
+        &[&theme_light, &theme_dark, &theme_system],
+    )?;
+
+    Menu::with_items(
+        app,
+        &[
+            &Submenu::with_items(
+                app,
+                "File",
+                true,
+                &[
+                    &new_window,
+                    &PredefinedMenuItem::separator(app)?,
+                    &new_session,
+                    &worktree_creator,
+                    &PredefinedMenuItem::separator(app)?,
+                    &change_workspace,
+                    &settings,
+                    &command_palette,
+                    &PredefinedMenuItem::separator(app)?,
+                    &exit,
+                ],
+            )?,
+            &Submenu::with_items(
+                app,
+                "Edit",
+                true,
+                &[
+                    &PredefinedMenuItem::undo(app, None)?,
+                    &PredefinedMenuItem::redo(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::cut(app, None)?,
+                    &PredefinedMenuItem::copy(app, None)?,
+                    &PredefinedMenuItem::paste(app, None)?,
+                    &PredefinedMenuItem::select_all(app, None)?,
+                ],
+            )?,
+            &Submenu::with_items(
+                app,
+                "View",
+                true,
+                &[
+                    &open_git_tab,
+                    &open_diff_tab,
+                    &open_files_tab,
+                    &open_terminal_tab,
+                    &PredefinedMenuItem::separator(app)?,
+                     &theme_submenu,
+                     &PredefinedMenuItem::separator(app)?,
+                     &toggle_sidebar,
+                     &toggle_memory_debug,
+                     &open_devtools,
+                     &PredefinedMenuItem::separator(app)?,
+                     &PredefinedMenuItem::fullscreen(app, None)?,
+                 ],
+             )?,
+             &Submenu::with_items(
+                 app,
+                "Help",
+                true,
+                &[
+                    &help_dialog,
+                    &download_logs,
+                    &PredefinedMenuItem::separator(app)?,
+                    &clear_cache,
+                    &PredefinedMenuItem::separator(app)?,
+                    &report_bug,
+                    &request_feature,
+                    &PredefinedMenuItem::separator(app)?,
+                    &join_discord,
+                ],
+            )?,
+        ],
+    )
 }
 
 fn main() {
@@ -2964,7 +3655,12 @@ fn main() {
                 build_macos_menu(app)
             }
 
-            #[cfg(not(target_os = "macos"))]
+            #[cfg(windows)]
+            {
+                build_windows_menu(app)
+            }
+
+            #[cfg(not(any(target_os = "macos", windows)))]
             {
                 tauri::menu::Menu::default(app)
             }
@@ -3102,6 +3798,125 @@ fn main() {
                     tauri::async_runtime::spawn_blocking(move || {
                         let _ = crate::desktop_clear_cache(app);
                     });
+                    return;
+                }
+            }
+
+            #[cfg(windows)]
+            {
+                let id = event.id().as_ref();
+
+                if id == MENU_ITEM_NEW_WINDOW_ID {
+                    open_new_window(app);
+                    return;
+                }
+                if id == MENU_ITEM_OPEN_DEVTOOLS_ID {
+                    #[cfg(feature = "devtools")]
+                    if let Some(window) = app.get_webview_window("main") {
+                        window.open_devtools();
+                    }
+                    return;
+                }
+                if id == MENU_ITEM_NEW_SESSION_ID {
+                    dispatch_menu_action(app, "new-session");
+                    return;
+                }
+                if id == MENU_ITEM_WORKTREE_CREATOR_ID {
+                    dispatch_menu_action(app, "new-worktree-session");
+                    return;
+                }
+                if id == MENU_ITEM_CHANGE_WORKSPACE_ID {
+                    dispatch_menu_action(app, "change-workspace");
+                    return;
+                }
+                if id == MENU_ITEM_SETTINGS_ID {
+                    dispatch_menu_action(app, "settings");
+                    return;
+                }
+                if id == MENU_ITEM_COMMAND_PALETTE_ID {
+                    dispatch_menu_action(app, "command-palette");
+                    return;
+                }
+
+                if id == MENU_ITEM_OPEN_GIT_TAB_ID {
+                    dispatch_menu_action(app, "open-git-tab");
+                    return;
+                }
+                if id == MENU_ITEM_OPEN_DIFF_TAB_ID {
+                    dispatch_menu_action(app, "open-diff-tab");
+                    return;
+                }
+                if id == MENU_ITEM_OPEN_FILES_TAB_ID {
+                    dispatch_menu_action(app, "open-files-tab");
+                    return;
+                }
+                if id == MENU_ITEM_OPEN_TERMINAL_TAB_ID {
+                    dispatch_menu_action(app, "open-terminal-tab");
+                    return;
+                }
+
+                if id == MENU_ITEM_THEME_LIGHT_ID {
+                    dispatch_menu_action(app, "theme-light");
+                    return;
+                }
+                if id == MENU_ITEM_THEME_DARK_ID {
+                    dispatch_menu_action(app, "theme-dark");
+                    return;
+                }
+                if id == MENU_ITEM_THEME_SYSTEM_ID {
+                    dispatch_menu_action(app, "theme-system");
+                    return;
+                }
+                if id == MENU_ITEM_TOGGLE_SIDEBAR_ID {
+                    dispatch_menu_action(app, "toggle-sidebar");
+                    return;
+                }
+                if id == MENU_ITEM_TOGGLE_MEMORY_DEBUG_ID {
+                    dispatch_menu_action(app, "toggle-memory-debug");
+                    return;
+                }
+
+                if id == MENU_ITEM_HELP_DIALOG_ID {
+                    dispatch_menu_action(app, "help-dialog");
+                    return;
+                }
+                if id == MENU_ITEM_DOWNLOAD_LOGS_ID {
+                    dispatch_menu_action(app, "download-logs");
+                    return;
+                }
+                if id == MENU_ITEM_CLEAR_CACHE_ID {
+                    let app = app.clone();
+                    tauri::async_runtime::spawn_blocking(move || {
+                        let _ = crate::desktop_clear_cache(app);
+                    });
+                    return;
+                }
+                if id == MENU_ITEM_REPORT_BUG_ID {
+                    use tauri_plugin_shell::ShellExt;
+                    #[allow(deprecated)]
+                    {
+                        let _ = app.shell().open(GITHUB_BUG_REPORT_URL, None);
+                    }
+                    return;
+                }
+                if id == MENU_ITEM_REQUEST_FEATURE_ID {
+                    use tauri_plugin_shell::ShellExt;
+                    #[allow(deprecated)]
+                    {
+                        let _ = app.shell().open(GITHUB_FEATURE_REQUEST_URL, None);
+                    }
+                    return;
+                }
+                if id == MENU_ITEM_JOIN_DISCORD_ID {
+                    use tauri_plugin_shell::ShellExt;
+                    #[allow(deprecated)]
+                    {
+                        let _ = app.shell().open(DISCORD_INVITE_URL, None);
+                    }
+                    return;
+                }
+                if id == MENU_ITEM_EXIT_ID {
+                    app.exit(0);
                     return;
                 }
             }

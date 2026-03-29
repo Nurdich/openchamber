@@ -67,12 +67,12 @@ export const InProgressOperationBanner: React.FC<InProgressOperationBannerProps>
   let description = '';
   if (mergeInProgress) {
     description = mergeInProgress.message 
-      ? `Merging: ${mergeInProgress.message}` 
-      : `Merge in progress (${mergeInProgress.head})`;
+      ? `正在合并：${mergeInProgress.message}` 
+      : `正在合并（${mergeInProgress.head}）`;
   } else if (rebaseInProgress) {
     description = rebaseInProgress.headName 
-      ? `Rebasing ${rebaseInProgress.headName} onto ${rebaseInProgress.onto}` 
-      : `Rebase in progress`;
+      ? `正在将 ${rebaseInProgress.headName} 变基到 ${rebaseInProgress.onto}` 
+      : `正在变基`;
   }
 
   return (
@@ -82,7 +82,7 @@ export const InProgressOperationBanner: React.FC<InProgressOperationBannerProps>
           <OperationIcon className="size-4 text-[var(--status-warning)] shrink-0" />
           <div className="min-w-0">
             <p className="typography-label text-[var(--status-warning)]">
-              {operationLabel} in Progress
+              {operationLabel} 进行中
             </p>
             {description && (
               <p className="typography-micro text-muted-foreground truncate">
@@ -102,6 +102,7 @@ export const InProgressOperationBanner: React.FC<InProgressOperationBannerProps>
               className="gap-1.5"
             >
               <RiSparklingLine className="size-4" />
+              AI 解决冲突
               Resolve with AI
             </Button>
           )}
@@ -119,7 +120,7 @@ export const InProgressOperationBanner: React.FC<InProgressOperationBannerProps>
               ) : (
                 <RiCloseLine className="size-4" />
               )}
-              Abort
+              终止
             </Button>
           )}
 
@@ -136,7 +137,7 @@ export const InProgressOperationBanner: React.FC<InProgressOperationBannerProps>
               ) : (
                 <RiCheckLine className="size-4" />
               )}
-              Continue
+              继续
             </Button>
           )}
         </div>
@@ -144,7 +145,7 @@ export const InProgressOperationBanner: React.FC<InProgressOperationBannerProps>
 
       {hasUnresolvedConflicts && (
         <p className="typography-micro text-[var(--status-warning)] mt-2">
-          Conflicts must be resolved before continuing. Use &quot;Resolve with AI&quot; or resolve manually, then stage changes and click Continue.
+          冲突必须在继续之前解决。使用"AI 解决冲突"或手动解决，然后暂存更改并点击继续。
         </p>
       )}
     </div>

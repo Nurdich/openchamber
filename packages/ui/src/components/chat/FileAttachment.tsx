@@ -32,11 +32,11 @@ export const FileAttachmentButton = memo(() => {
         }
       } catch (error) {
         console.error('File attach failed', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to attach file');
+        toast.error(error instanceof Error ? error.message : '附件添加失败');
       }
     }
     if (attachedCount > 0) {
-      toast.success(`Attached ${attachedCount} file${attachedCount > 1 ? 's' : ''}`);
+        toast.success(`已添加 ${attachedCount} 个文件`);
     }
   };
 
@@ -59,7 +59,7 @@ export const FileAttachmentButton = memo(() => {
 
       if (skipped.length > 0) {
         const summary = skipped.map((s: { name?: string; reason?: string }) => `${s?.name || 'file'}: ${s?.reason || 'skipped'}`).join('\n');
-        toast.error(`Some files were skipped:\n${summary}`);
+        toast.error(`部分文件被跳过:\n${summary}`);
       }
 
       const asFiles = picked
@@ -88,7 +88,7 @@ export const FileAttachmentButton = memo(() => {
       }
     } catch (error) {
       console.error('VS Code file pick failed', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to pick files in VS Code');
+      toast.error(error instanceof Error ? error.message : 'VS Code 选择文件失败');
     }
   };
 
@@ -111,13 +111,13 @@ export const FileAttachmentButton = memo(() => {
               'hover:bg-muted text-muted-foreground',
               buttonSizeClass
             )}
-            aria-label="Attach files"
+            aria-label="添加附件"
           >
             <RiAttachment2 className={iconSizeClass} />
           </button>
         </TooltipTrigger>
         <TooltipContent side="top">
-          <p>Attach files</p>
+          <p>添加附件</p>
         </TooltipContent>
       </Tooltip>
     </>
@@ -171,7 +171,7 @@ const ImagePreview = memo(({ file, onRemove }: ImagePreviewProps) => {
             onRemove();
           }}
           className="flex items-center justify-center h-5 w-5 flex-shrink-0 hover:bg-[var(--interactive-hover)] rounded-full transition-colors cursor-pointer"
-          aria-label={`Remove ${displayName}`}
+          aria-label={`移除 ${displayName}`}
         >
           <RiCloseLine className="h-4 w-4 text-muted-foreground" />
         </span>
@@ -190,8 +190,8 @@ const ImagePreview = memo(({ file, onRemove }: ImagePreviewProps) => {
       <button
         onClick={onRemove}
         className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full bg-background/80 text-foreground hover:text-destructive flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        title="Remove image"
-        aria-label={`Remove ${displayName}`}
+        title="移除图片"
+        aria-label={`移除 ${displayName}`}
       >
         <RiCloseLine className="h-2.5 w-2.5" />
       </button>
@@ -253,7 +253,7 @@ const FileChip = memo(({ file, onRemove }: FileChipProps) => {
           onRemove();
         }}
         className="flex items-center justify-center h-5 w-5 flex-shrink-0 hover:bg-[var(--interactive-hover)] rounded-full transition-colors cursor-pointer"
-        aria-label={`Remove ${displayName}`}
+        aria-label={`移除 ${displayName}`}
       >
         <RiCloseLine className="h-4 w-4 text-muted-foreground" />
       </span>

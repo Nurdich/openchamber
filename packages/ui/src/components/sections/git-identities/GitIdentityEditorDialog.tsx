@@ -130,11 +130,11 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
 
   const handleSave = async () => {
     if (!userName.trim() || !userEmail.trim()) {
-      toast.error('User name and email are required');
+      toast.error('用户名和邮箱为必填项');
       return;
     }
     if (authType === 'token' && !host.trim()) {
-      toast.error('Host is required for token-based authentication');
+      toast.error('基于令牌的认证需要填写主机地址');
       return;
     }
 
@@ -161,14 +161,14 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
       }
 
       if (success) {
-        toast.success(isNewProfile ? 'Profile created' : 'Profile updated');
+        toast.success(isNewProfile ? '配置已创建' : '配置已更新');
         onOpenChange(false);
       } else {
-        toast.error(isNewProfile ? 'Failed to create profile' : 'Failed to update profile');
+        toast.error(isNewProfile ? '创建配置失败' : '更新配置失败');
       }
     } catch (error) {
       console.error('Error saving profile:', error);
-      toast.error('An error occurred while saving');
+      toast.error('保存时发生错误');
     } finally {
       setIsSaving(false);
     }
@@ -180,15 +180,15 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
     try {
       const success = await deleteProfile(profileId);
       if (success) {
-        toast.success('Profile deleted');
+        toast.success('配置已删除');
         setIsDeleteDialogOpen(false);
         onOpenChange(false);
       } else {
-        toast.error('Failed to delete profile');
+        toast.error('删除配置失败');
       }
     } catch (error) {
       console.error('Error deleting profile:', error);
-      toast.error('An error occurred while deleting');
+      toast.error('删除时发生错误');
     } finally {
       setIsDeleting(false);
     }
@@ -200,12 +200,12 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
   }, [color]);
 
   const title = importData
-    ? 'Import Credential'
+    ? '导入凭据'
     : isNewProfile
-    ? 'New Identity'
+    ? '新建身份'
     : isGlobalProfile
-    ? 'Global Identity'
-    : (selectedProfile?.name || 'Edit Identity');
+    ? '全局身份'
+    : (selectedProfile?.name || '编辑身份');
 
   return (
     <>
@@ -215,10 +215,10 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>
               {isGlobalProfile
-                ? 'System-wide Git identity (read-only)'
+                ? '系统全局 Git 身份（只读）'
                 : isNewProfile
-                ? 'Create a new Git identity profile'
-                : 'Edit identity profile settings'}
+                ? '创建新的 Git 身份配置'
+                : '编辑身份配置设置'}
             </DialogDescription>
           </DialogHeader>
 
@@ -227,17 +227,17 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
             {!isGlobalProfile && (
               <div className="space-y-3">
                 <div>
-                  <label className="typography-ui-label text-foreground block mb-1.5">Profile Name</label>
+                  <label className="typography-ui-label text-foreground block mb-1.5">配置名称</label>
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Work Profile, Personal, etc."
+                    placeholder="工作配置、个人等"
                     className="h-8"
                   />
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
-                  <span className="typography-ui-label text-foreground">Color</span>
+                  <span className="typography-ui-label text-foreground">颜色</span>
                   <div className="flex gap-1.5">
                     {PROFILE_COLORS.map((c) => (
                       <button
@@ -258,7 +258,7 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
-                  <span className="typography-ui-label text-foreground">Icon</span>
+                  <span className="typography-ui-label text-foreground">图标</span>
                   <div className="flex gap-1.5">
                     {PROFILE_ICONS.map((i) => {
                       const IconComponent = i.Icon;
@@ -294,14 +294,14 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
             <div className="space-y-3">
               <div>
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <label className="typography-ui-label text-foreground">User Name</label>
+                  <label className="typography-ui-label text-foreground">用户名</label>
                   {!isGlobalProfile && <span className="text-[var(--status-error)] text-xs">*</span>}
                   <Tooltip delayDuration={1000}>
                     <TooltipTrigger asChild>
                       <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent sideOffset={8} className="max-w-xs">
-                      The name that will appear in Git commit messages.
+                      显示在 Git 提交记录中的名称。
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -318,14 +318,14 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
 
               <div>
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <label className="typography-ui-label text-foreground">Email Address</label>
+                  <label className="typography-ui-label text-foreground">邮箱地址</label>
                   {!isGlobalProfile && <span className="text-[var(--status-error)] text-xs">*</span>}
                   <Tooltip delayDuration={1000}>
                     <TooltipTrigger asChild>
                       <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent sideOffset={8} className="max-w-xs">
-                      Should match your email in GitHub/GitLab for proper attribution.
+                      应与您在 GitHub/GitLab 中的邮箱一致，以便正确关联贡献。
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -348,7 +348,7 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
                 <div className="border-t border-border/40" />
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="typography-ui-label text-foreground">Auth Method</span>
+                    <span className="typography-ui-label text-foreground">认证方式</span>
                     <div className="flex items-center gap-1">
                       <Button size="sm"
                         type="button"
@@ -380,13 +380,13 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
                   {authType === 'ssh' && (
                     <div>
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <label className="typography-ui-label text-foreground">SSH Key Path</label>
+                        <label className="typography-ui-label text-foreground">SSH 密钥路径</label>
                         <Tooltip delayDuration={1000}>
                           <TooltipTrigger asChild>
                             <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                           </TooltipTrigger>
                           <TooltipContent sideOffset={8} className="max-w-xs">
-                            Optional path to private key. e.g. ~/.ssh/id_ed25519
+                            私钥路径（可选），例如 ~/.ssh/id_ed25519
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -402,14 +402,14 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
                   {authType === 'token' && (
                     <div>
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <label className="typography-ui-label text-foreground">Host</label>
+                        <label className="typography-ui-label text-foreground">主机</label>
                         <span className="text-[var(--status-error)] text-xs">*</span>
                         <Tooltip delayDuration={1000}>
                           <TooltipTrigger asChild>
                             <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                           </TooltipTrigger>
                           <TooltipContent sideOffset={8} className="max-w-xs">
-                            Token will be read from ~/.git-credentials for this host.
+                            令牌将从 ~/.git-credentials 中读取该主机的凭据。
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -435,15 +435,15 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
                 onClick={() => setIsDeleteDialogOpen(true)}
                 className="text-[var(--status-error)] hover:text-[var(--status-error)] border-[var(--status-error)]/30 hover:bg-[var(--status-error)]/10 mr-auto"
               >
-                <RiDeleteBinLine className="w-3.5 h-3.5 mr-1" /> Delete
-              </Button>
+              <RiDeleteBinLine className="w-3.5 h-3.5 mr-1" /> 删除
+            </Button>
             )}
             <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="text-foreground hover:bg-interactive-hover hover:text-foreground">
-              {isGlobalProfile ? 'Close' : 'Cancel'}
+              {isGlobalProfile ? '关闭' : '取消'}
             </Button>
             {!isGlobalProfile && (
               <Button size="sm" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'Saving...' : isNewProfile ? 'Create' : 'Save'}
+                {isSaving ? '保存中...' : isNewProfile ? '创建' : '保存'}
               </Button>
             )}
           </DialogFooter>
@@ -457,17 +457,17 @@ export const GitIdentityEditorDialog: React.FC<GitIdentityEditorDialogProps> = (
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Profile</DialogTitle>
+            <DialogTitle>删除配置</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedProfile?.name || name}"?
+              确定要删除 "{selectedProfile?.name || name}"？
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>
-              Cancel
+              取消
             </Button>
             <Button size="sm" variant="destructive" onClick={() => void handleConfirmDelete()} disabled={isDeleting}>
-              Delete
+              删除
             </Button>
           </DialogFooter>
         </DialogContent>

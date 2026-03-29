@@ -33,11 +33,11 @@ import { toast } from '@/components/ui/toast';
 
 // Status text for accessibility and labels
 const statusLabels: Record<string, string> = {
-    idle: 'Start Voice',
-    listening: 'Listening',
-    processing: 'Processing',
-    speaking: 'AI Speaking',
-    error: 'Voice Error',
+    idle: '开始语音',
+    listening: '正在聆听',
+    processing: '处理中',
+    speaking: 'AI 说话中',
+    error: '语音错误',
 };
 
 // iOS Safari detection utility
@@ -60,10 +60,10 @@ const normalizeVoiceErrorMessage = (error: string): string => {
     }
 
     if (typeof window !== 'undefined' && !window.isSecureContext) {
-        return 'Voice requires a secure connection (HTTPS) or localhost. Please use HTTPS or access via localhost.';
+        return '语音需要安全连接 (HTTPS) 或本地主机。请使用 HTTPS 或通过本地主机访问。';
     }
 
-    return 'Microphone access is unavailable in this runtime. On desktop, check System Settings -> Privacy & Security -> Microphone for OpenChamber.';
+        return '在此运行时中无法访问麦克风。在桌面上，请检查系统设置 -> 隐私与安全 -> 麦克风，为 OpenChamber 授权。';
 };
 
 /**
@@ -135,10 +135,10 @@ export function BrowserVoiceButton() {
 
     // Status text for accessibility
     const statusText = isError
-        ? error || 'Voice Error'
+        ? error || '语音错误'
         : conversationMode && status === 'idle'
-          ? 'Start Voice (Continuous mode on)'
-          : statusLabels[status] || 'Start Voice';
+          ? '开始语音（连续模式已开启）'
+          : statusLabels[status] || '开始语音';
 
     // Tooltip content based on state
     const getTooltipContent = () => {
@@ -146,12 +146,12 @@ export function BrowserVoiceButton() {
             return normalizeVoiceErrorMessage(error);
         }
         if (isActive) {
-            return 'Stop voice conversation';
+            return '停止语音对话';
         }
         if (isMobile) {
-            return 'Start voice conversation';
+            return '开始语音对话';
         }
-        return `Start voice conversation (Shift+Click for continuous mode) • Cmd/Ctrl+Shift+V to toggle`;
+        return `开始语音对话（Shift+点击进入连续模式）• Cmd/Ctrl+Shift+V 切换`;
     };
 
     // Handle voice activation (used by both click and touch)
@@ -271,12 +271,12 @@ export function BrowserVoiceButton() {
     if (!isSupported) {
         const supportDetails = browserVoiceService.getSupportDetails();
         const tooltipMessage = !supportDetails.secureContext
-            ? 'Voice requires HTTPS or localhost. Please use a secure connection.'
+            ? '语音需要 HTTPS 或本地主机。请使用安全连接。'
             : !supportDetails.recognition
-                ? 'Speech recognition not supported in this browser. Try Chrome, Edge, or Safari.'
+                ? '此浏览器不支持语音识别。请尝试使用 Chrome、Edge 或 Safari。'
                 : !supportDetails.synthesis
-                    ? 'Speech synthesis not supported in this browser.'
-                    : 'Voice not supported in this browser';
+                    ? '此浏览器不支持语音合成。'
+                    : '此浏览器不支持语音功能';
 
         return (
             <TooltipProvider>
@@ -367,8 +367,8 @@ export function BrowserVoiceButton() {
                     variant="ghost"
                     onPointerDownCapture={(event) => event.stopPropagation()}
                     onClick={handleToggleConversationMode}
-                    aria-label={conversationMode ? 'Continuous mode on' : 'Continuous mode off'}
-                    title={conversationMode ? 'Continuous mode on' : 'Continuous mode off'}
+                    aria-label={conversationMode ? '连续模式已开启' : '连续模式已关闭'}
+                    title={conversationMode ? '连续模式已开启' : '连续模式已关闭'}
                     className={
                         `${buttonSizeClass} p-0 ${clearHoverBackgroundClass} ${conversationMode ? 'text-[var(--status-info)] hover:text-[var(--status-info)]' : 'text-muted-foreground hover:text-foreground'}`
                     }

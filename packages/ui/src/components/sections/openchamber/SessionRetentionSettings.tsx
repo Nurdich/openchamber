@@ -24,14 +24,14 @@ export const SessionRetentionSettings: React.FC = () => {
   const handleRunCleanup = React.useCallback(async () => {
     const result = await runCleanup({ force: true });
     if (result.deletedIds.length === 0 && result.failedIds.length === 0) {
-      toast.message('No sessions eligible for deletion');
+      toast.message('没有符合删除条件的会话');
       return;
     }
     if (result.deletedIds.length > 0) {
-      toast.success(`Deleted ${result.deletedIds.length} session${result.deletedIds.length === 1 ? '' : 's'}`);
+      toast.success(`已删除 ${result.deletedIds.length} 个会话`);
     }
     if (result.failedIds.length > 0) {
-      toast.error(`Failed to delete ${result.failedIds.length} session${result.failedIds.length === 1 ? '' : 's'}`);
+      toast.error(`删除 ${result.failedIds.length} 个会话失败`);
     }
   }, [runCleanup]);
 
@@ -40,14 +40,14 @@ export const SessionRetentionSettings: React.FC = () => {
       <div className="mb-1 px-1">
         <div className="flex items-center gap-2">
           <h3 className="typography-ui-header font-medium text-foreground">
-            Session Retention
+            会话保留
           </h3>
           <Tooltip delayDuration={1000}>
             <TooltipTrigger asChild>
               <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
             </TooltipTrigger>
             <TooltipContent sideOffset={8} className="max-w-xs">
-              Automatically delete inactive sessions based on their last activity. Keeps recent 5 sessions.
+              根据上次活动自动删除不活跃的会话。保留最近 5 个会话。
             </TooltipContent>
           </Tooltip>
         </div>
@@ -70,14 +70,14 @@ export const SessionRetentionSettings: React.FC = () => {
           <Checkbox
             checked={autoDeleteEnabled}
             onChange={setAutoDeleteEnabled}
-            ariaLabel="Enable auto-cleanup"
+            ariaLabel="启用自动清理"
           />
-          <span className="typography-ui-label text-foreground">Enable Auto-Cleanup</span>
+          <span className="typography-ui-label text-foreground">启用自动清理</span>
         </div>
 
         <div className="flex flex-col gap-2 py-1.5 sm:flex-row sm:items-center sm:gap-8">
           <div className="flex min-w-0 flex-col sm:w-56 shrink-0">
-            <span className="typography-ui-label text-foreground">Retention Period</span>
+            <span className="typography-ui-label text-foreground">保留期限</span>
           </div>
           <div className="flex items-center gap-2 sm:w-fit">
             <NumberInput
@@ -86,18 +86,18 @@ export const SessionRetentionSettings: React.FC = () => {
               min={MIN_DAYS}
               max={MAX_DAYS}
               step={1}
-              aria-label="Retention period in days"
+              aria-label="保留天数"
               className="w-20 tabular-nums"
             />
-            <span className="typography-ui-label text-muted-foreground">days</span>
+            <span className="typography-ui-label text-muted-foreground">天</span>
             <Button size="sm"
               type="button"
               variant="ghost"
               onClick={() => setAutoDeleteAfterDays(DEFAULT_RETENTION_DAYS)}
               disabled={autoDeleteAfterDays === DEFAULT_RETENTION_DAYS}
               className="h-7 w-7 px-0 text-muted-foreground hover:text-foreground"
-              aria-label="Reset retention period"
-              title="Reset"
+              aria-label="重置保留期限"
+              title="重置"
             >
               <RiRestartLine className="h-3.5 w-3.5" />
             </Button>
@@ -108,7 +108,7 @@ export const SessionRetentionSettings: React.FC = () => {
       <div className="mt-1 px-2 py-1.5 space-y-1">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-8">
           <div className="flex min-w-0 flex-col sm:w-56 shrink-0">
-            <p className="typography-meta text-foreground font-medium">Manual Cleanup</p>
+            <p className="typography-meta text-foreground font-medium">手动清理</p>
           </div>
           <div className="flex items-center gap-2 sm:w-fit">
             <Button
@@ -119,12 +119,12 @@ export const SessionRetentionSettings: React.FC = () => {
               disabled={isRunning}
               className="!font-normal"
             >
-              {isRunning ? 'Cleaning up...' : 'Run cleanup now'}
+              {isRunning ? '清理中...' : '立即清理'}
             </Button>
-          </div>
+            </div>
         </div>
         <p className="typography-meta text-muted-foreground">
-          Eligible for deletion right now: <span className="tabular-nums">{pendingCount}</span>
+          当前可删除: <span className="tabular-nums">{pendingCount}</span>
         </p>
       </div>
     </div>

@@ -371,7 +371,7 @@ export const ContextPanelContent: React.FC = () => {
       : null;
 
     return {
-      sessionTitle: currentSession?.title || 'Untitled Session',
+      sessionTitle: currentSession?.title || '未命名会话',
       messagesCount: sessionMessages.length,
       userMessagesCount: userMessages.length,
       assistantMessagesCount: assistantMessages.length,
@@ -395,16 +395,16 @@ export const ContextPanelContent: React.FC = () => {
   if (!currentSessionId) {
     return (
       <div className="flex h-full items-center justify-center p-6 text-center typography-ui-label text-muted-foreground">
-        Open a session to inspect context.
+        打开一个会话来检查上下文。
       </div>
     );
   }
 
   const segments: Array<{ key: string; label: string; value: number; color: string }> = [
-    { key: 'user', label: 'User', value: viewModel.breakdown.user, color: 'var(--status-success)' },
-    { key: 'assistant', label: 'Assistant', value: viewModel.breakdown.assistant, color: 'var(--primary-base)' },
-    { key: 'tool', label: 'Tool Calls', value: viewModel.breakdown.tool, color: 'var(--status-warning)' },
-    { key: 'other', label: 'Other', value: viewModel.breakdown.other, color: 'var(--surface-muted-foreground)' },
+    { key: 'user', label: '用户', value: viewModel.breakdown.user, color: 'var(--status-success)' },
+    { key: 'assistant', label: '助手', value: viewModel.breakdown.assistant, color: 'var(--primary-base)' },
+    { key: 'tool', label: '工具调用', value: viewModel.breakdown.tool, color: 'var(--status-warning)' },
+    { key: 'other', label: '其他', value: viewModel.breakdown.other, color: 'var(--surface-muted-foreground)' },
   ];
 
   return (
@@ -453,10 +453,10 @@ export const ContextPanelContent: React.FC = () => {
         {/* ── Stat grid ── */}
         <div className="mb-5 grid grid-cols-2 gap-2">
           {([
-            { label: 'Messages', value: formatNumber(viewModel.messagesCount) },
-            { label: 'User', value: formatNumber(viewModel.userMessagesCount) },
-            { label: 'Assistant', value: formatNumber(viewModel.assistantMessagesCount) },
-            { label: 'Cost', value: formatMoney(viewModel.totalAssistantCost) },
+            { label: '消息数', value: formatNumber(viewModel.messagesCount) },
+            { label: '用户消息', value: formatNumber(viewModel.userMessagesCount) },
+            { label: '助手消息', value: formatNumber(viewModel.assistantMessagesCount) },
+            { label: '费用', value: formatMoney(viewModel.totalAssistantCost) },
           ] as const).map((item) => (
             <div key={item.label} className="rounded-lg bg-[var(--surface-elevated)]/70 px-3 py-2.5">
               <div className="typography-micro text-muted-foreground/70">{item.label}</div>
@@ -470,11 +470,11 @@ export const ContextPanelContent: React.FC = () => {
           <div className="typography-micro text-muted-foreground">Last Assistant Message</div>
           <div className="mt-2.5 grid grid-cols-3 gap-x-4 gap-y-2.5">
             {([
-              { label: 'Input', value: viewModel.tokenBreakdown.input },
-              { label: 'Output', value: viewModel.tokenBreakdown.output },
-              { label: 'Reasoning', value: viewModel.tokenBreakdown.reasoning },
-              { label: 'Cache Read', value: viewModel.tokenBreakdown.cacheRead },
-              { label: 'Cache Write', value: viewModel.tokenBreakdown.cacheWrite },
+              { label: '输入', value: viewModel.tokenBreakdown.input },
+              { label: '输出', value: viewModel.tokenBreakdown.output },
+              { label: '推理', value: viewModel.tokenBreakdown.reasoning },
+              { label: '缓存读取', value: viewModel.tokenBreakdown.cacheRead },
+              { label: '缓存写入', value: viewModel.tokenBreakdown.cacheWrite },
             ] as const).map((item) => (
               <div key={item.label}>
                 <div className="typography-micro text-muted-foreground/70">{item.label}</div>
@@ -565,8 +565,8 @@ export const ContextPanelContent: React.FC = () => {
                               event.stopPropagation();
                               void handleCopyRawMessage(message.info.id, jsonValue);
                             }}
-                            aria-label={isCopied ? 'Copied' : 'Copy JSON'}
-                            title={isCopied ? 'Copied' : 'Copy'}
+                            aria-label={isCopied ? '已复制' : '复制JSON'}
+                            title={isCopied ? '已复制' : '复制'}
                           >
                             {isCopied ? <RiCheckLine className="size-3.5" /> : <RiFileCopyLine className="size-3.5" />}
                           </button>

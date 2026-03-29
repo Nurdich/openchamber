@@ -37,46 +37,46 @@ interface Option<T extends string> {
 const THEME_MODE_OPTIONS: Array<{ value: ThemeMode; label: string }> = [
     {
         value: 'system',
-        label: 'System',
+        label: '跟随系统',
     },
     {
         value: 'light',
-        label: 'Light',
+        label: '浅色',
     },
     {
         value: 'dark',
-        label: 'Dark',
+        label: '深色',
     },
 ];
 
 const DIFF_LAYOUT_OPTIONS: Option<'dynamic' | 'inline' | 'side-by-side'>[] = [
     {
         id: 'dynamic',
-        label: 'Dynamic',
-        description: 'New inline, modified side-by-side.',
+        label: '动态',
+        description: '新增内联，修改并排显示。',
     },
     {
         id: 'inline',
-        label: 'Always inline',
-        description: 'Show as a single unified view.',
+        label: '始终内联',
+        description: '显示为统一视图。',
     },
     {
         id: 'side-by-side',
-        label: 'Always side-by-side',
-        description: 'Compare original and modified files.',
+        label: '始终并排',
+        description: '对比原始和修改后的文件。',
     },
 ];
 
 const DIFF_VIEW_MODE_OPTIONS: Option<'single' | 'stacked'>[] = [
     {
         id: 'single',
-        label: 'Single file',
-        description: 'Show one file at a time.',
+        label: '单个文件',
+        description: '一次显示一个文件。',
     },
     {
         id: 'stacked',
-        label: 'All files',
-        description: 'Stack all changed files together.',
+        label: '所有文件',
+        description: '将所有更改的文件堆叠在一起。',
     },
 ];
 
@@ -84,16 +84,16 @@ const MERMAID_RENDERING_OPTIONS: Option<'svg' | 'ascii'>[] = [
     {
         id: 'svg',
         label: 'SVG',
-        description: 'Render diagrams as scalable graphics.',
+        description: '将图表渲染为可缩放图形。',
     },
     {
         id: 'ascii',
         label: 'ASCII',
-        description: 'Render diagrams as text blocks.',
+        description: '将图表渲染为文本块。',
     },
 ];
 
-const DEFAULT_PWA_INSTALL_NAME = 'OpenChamber - AI Coding Assistant';
+const DEFAULT_PWA_INSTALL_NAME = '打开Chamber - AI Coding Assistant';
 
 type PwaInstallNameWindow = Window & {
     __OPENCHAMBER_SET_PWA_INSTALL_NAME__?: (value: string) => string;
@@ -104,38 +104,38 @@ const USER_MESSAGE_RENDERING_OPTIONS: Option<'markdown' | 'plain'>[] = [
     {
         id: 'markdown',
         label: 'Markdown',
-        description: 'Render user text with markdown formatting.',
+        description: '使用 Markdown 格式渲染用户文本。',
     },
     {
         id: 'plain',
-        label: 'Plain text',
-        description: 'Render user text with preserved whitespace and links.',
+        label: '纯文本',
+        description: '使用保留的空白和链接渲染用户文本。',
     },
 ];
 
 const CHAT_RENDER_MODE_OPTIONS: Option<'sorted' | 'live'>[] = [
     {
         id: 'sorted',
-        label: 'Sorted',
-        description: 'Render completed assistant messages without live streaming.',
+        label: '排序',
+        description: '渲染已完成的助手消息，不使用实时流式传输。',
     },
     {
         id: 'live',
-        label: 'Live',
-        description: 'Stream assistant text and tools as they arrive.',
+        label: '实时',
+        description: '实时流式传输助手文本和工具。',
     },
 ];
 
 const ACTIVITY_RENDER_MODE_OPTIONS: Option<'collapsed' | 'summary'>[] = [
     {
         id: 'collapsed',
-        label: 'Collapsed',
-        description: 'Keep Activity collapsed by default.',
+        label: '折叠',
+        description: '默认保持 Activity 折叠。',
     },
     {
         id: 'summary',
-        label: 'Expanded',
-        description: 'Expand Activity by default.',
+        label: '展开',
+        description: '默认展开 Activity。',
     },
 ];
 
@@ -298,7 +298,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
     );
 
     const formatThemeLabel = React.useCallback((themeName: string, variant: 'light' | 'dark') => {
-        const suffix = variant === 'dark' ? ' Dark' : ' Light';
+        const suffix = variant === 'dark' ? ' 深色' : ' 浅色';
         return themeName.endsWith(suffix) ? themeName.slice(0, -suffix.length) : themeName;
     }, []);
 
@@ -396,14 +396,14 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
     return (
         <div className="space-y-8">
 
-                {/* --- Appearance & Themes --- */}
+                {/* --- 外观 & 主题 --- */}
                 {hasAppearanceSettings && (
                     <div className="mb-8 space-y-3">
                         <section className="px-2 pb-2 pt-0 space-y-0.5">
 
                             <div className="pb-1.5">
                                 <div className="flex min-w-0 flex-col gap-1.5">
-                                    <span className="typography-ui-header font-medium text-foreground">Color Mode</span>
+                                    <span className="typography-ui-header font-medium text-foreground">颜色模式</span>
                                     <div className="flex flex-wrap items-center gap-1">
                                         {THEME_MODE_OPTIONS.map((option) => (
                                             <Button
@@ -427,10 +427,10 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
 
                             <div className="mt-2 grid grid-cols-1 gap-2 py-1.5 md:grid-cols-[14rem_auto] md:gap-x-8 md:gap-y-2">
                                 <div className="flex min-w-0 items-center gap-2">
-                                    <span className="typography-ui-label text-foreground shrink-0">Light Theme</span>
+                                    <span className="typography-ui-label text-foreground shrink-0">浅色主题</span>
                                     <Select value={selectedLightTheme?.metadata.id ?? ''} onValueChange={setLightThemePreference}>
-                                        <SelectTrigger aria-label="Select light theme" className="w-fit">
-                                            <SelectValue placeholder="Select theme" />
+                                        <SelectTrigger aria-label="选择浅色主题" className="w-fit">
+                                            <SelectValue placeholder="选择主题" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {lightThemes.map((theme) => (
@@ -442,10 +442,10 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                     </Select>
                                 </div>
                                 <div className="flex min-w-0 items-center gap-2">
-                                    <span className="typography-ui-label text-foreground shrink-0">Dark Theme</span>
+                                    <span className="typography-ui-label text-foreground shrink-0">深色主题</span>
                                     <Select value={selectedDarkTheme?.metadata.id ?? ''} onValueChange={setDarkThemePreference}>
-                                        <SelectTrigger aria-label="Select dark theme" className="w-fit">
-                                            <SelectValue placeholder="Select theme" />
+                                        <SelectTrigger aria-label="选择深色主题" className="w-fit">
+                                            <SelectValue placeholder="选择主题" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {darkThemes.map((theme) => (
@@ -477,20 +477,20 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                     }}
                                     className="inline-flex items-center typography-ui-label font-normal text-foreground underline decoration-[1px] underline-offset-2 hover:text-foreground/80 disabled:cursor-not-allowed disabled:text-muted-foreground/60"
                                 >
-                                    {themesReloading ? 'Reloading themes...' : 'Reload themes'}
+                                    {themesReloading ? '正在重载主题...' : '重载主题'}
                                 </button>
                                 <Tooltip delayDuration={700}>
                                     <TooltipTrigger asChild>
                                         <button
                                             type="button"
                                             className="flex items-center justify-center rounded-md p-1 text-muted-foreground/70 hover:text-foreground"
-                                            aria-label="Theme import info"
+                                            aria-label="主题导入信息"
                                         >
                                             <RiInformationLine className="h-3.5 w-3.5" />
                                         </button>
                                     </TooltipTrigger>
                                     <TooltipContent sideOffset={8}>
-                                        Import custom themes from ~/.config/openchamber/themes/
+                                        从 ~/.config/openchamber/themes/ 导入自定义主题
                                     </TooltipContent>
                                 </Tooltip>
                             </div>
@@ -498,8 +498,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                             {showPwaInstallNameSetting && (
                                 <div className="py-1.5 space-y-1.5">
                                     <div className="flex min-w-0 flex-col">
-                                        <span className="typography-ui-label text-foreground">Install App Name</span>
-                                        <span className="typography-meta text-muted-foreground">Used by PWA installation process.</span>
+                                        <span className="typography-ui-label text-foreground">安装应用名称</span>
+                                        <span className="typography-meta text-muted-foreground">PWA 安装流程使用。</span>
                                     </div>
                                     <div className="flex w-full max-w-[28rem] items-center gap-2">
                                         <Input
@@ -518,7 +518,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             }}
                                             className="h-7"
                                             maxLength={64}
-                                            aria-label="PWA install app name"
+                                            aria-label="PWA 安装应用名称"
                                         />
                                         <Button size="sm"
                                             type="button"
@@ -528,8 +528,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                                 void applyPwaInstallName('');
                                             }}
                                             className="h-7 w-7 px-0 text-muted-foreground hover:text-foreground"
-                                            aria-label="Reset install app name"
-                                            title="Reset"
+                                            aria-label="重置安装应用名称"
+                                            title="重置"
                                         >
                                             <RiRestartLine className="h-3.5 w-3.5" />
                                         </Button>
@@ -544,13 +544,13 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                 {hasLayoutSettings && (
                     <div className="mb-8 space-y-3">
                         <section className="p-2 space-y-0.5">
-                            <h4 className="typography-ui-header font-medium text-foreground">Spacing & Layout</h4>
+                            <h4 className="typography-ui-header font-medium text-foreground">间距与布局</h4>
                             <div className="pl-2">
 
                             {shouldShow('fontSize') && !isMobile && (
                                 <div className="flex items-center gap-8 py-1">
                                     <div className="flex min-w-0 flex-col w-56 shrink-0">
-                                        <span className="typography-ui-label text-foreground">Interface Font Size</span>
+                                        <span className="typography-ui-label text-foreground">界面字体大小</span>
                                     </div>
                                     <div className="flex items-center gap-2 w-fit">
                                         <NumberInput
@@ -559,7 +559,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             min={50}
                                             max={200}
                                             step={5}
-                                            aria-label="Font size percentage"
+                                            aria-label="字体大小百分比"
                                             className="w-16"
                                         />
                                         <Button size="sm"
@@ -568,8 +568,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             onClick={() => setFontSize(100)}
                                             disabled={fontSize === 100}
                                             className="h-7 w-7 px-0 text-muted-foreground hover:text-foreground"
-                                            aria-label="Reset font size"
-                                            title="Reset"
+                                            aria-label="重置字体大小"
+                                            title="重置"
                                         >
                                             <RiRestartLine className="h-3.5 w-3.5" />
                                         </Button>
@@ -580,7 +580,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                             {shouldShow('terminalFontSize') && (
                                 <div className={cn("py-1", isMobile ? "flex flex-col gap-3" : "flex items-center gap-8")}>
                                     <div className={cn("flex min-w-0 flex-col", isMobile ? "w-full" : "w-56 shrink-0")}>
-                                        <span className="typography-ui-label text-foreground">Terminal Font Size</span>
+                                        <span className="typography-ui-label text-foreground">终端字体大小</span>
                                     </div>
                                     <div className={cn("flex items-center gap-2", isMobile ? "w-full" : "w-fit")}>
                                         <NumberInput
@@ -597,8 +597,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             onClick={() => setTerminalFontSize(13)}
                                             disabled={terminalFontSize === 13}
                                             className="h-7 w-7 px-0 text-muted-foreground hover:text-foreground"
-                                            aria-label="Reset terminal font size"
-                                            title="Reset"
+                                            aria-label="重置终端字体大小"
+                                            title="重置"
                                         >
                                             <RiRestartLine className="h-3.5 w-3.5" />
                                         </Button>
@@ -609,7 +609,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                             {shouldShow('spacing') && (
                                 <div className={cn("py-1", isMobile ? "flex flex-col gap-3" : "flex items-center gap-8")}>
                                     <div className={cn("flex min-w-0 flex-col", isMobile ? "w-full" : "w-56 shrink-0")}>
-                                        <span className="typography-ui-label text-foreground">Spacing Density</span>
+                                        <span className="typography-ui-label text-foreground">间距密度</span>
                                     </div>
                                     <div className={cn("flex items-center gap-2", isMobile ? "w-full" : "w-fit")}>
                                         <NumberInput
@@ -626,8 +626,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             onClick={() => setPadding(100)}
                                             disabled={padding === 100}
                                             className="h-7 w-7 px-0 text-muted-foreground hover:text-foreground"
-                                            aria-label="Reset spacing"
-                                            title="Reset"
+                                            aria-label="重置间距"
+                                            title="重置"
                                         >
                                             <RiRestartLine className="h-3.5 w-3.5" />
                                         </Button>
@@ -639,13 +639,13 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                 <div className={cn("py-1", isMobile ? "flex flex-col gap-3" : "flex items-center gap-8")}>
                                     <div className={cn("flex min-w-0 flex-col", isMobile ? "w-full" : "w-56 shrink-0")}>
                                         <div className="flex items-center gap-1.5">
-                                            <span className="typography-ui-label text-foreground">Input Bar Offset</span>
+                                            <span className="typography-ui-label text-foreground">输入框偏移</span>
                                             <Tooltip delayDuration={1000}>
                                                 <TooltipTrigger asChild>
                                                     <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                                                 </TooltipTrigger>
                                                 <TooltipContent sideOffset={8} className="max-w-xs">
-                                                    Raise input bar to avoid OS-level screen obstructions like home bars.
+                                                    抬起输入框以避免操作系统级别的屏幕遮挡，如底部安全区域。
                                                 </TooltipContent>
                                             </Tooltip>
                                         </div>
@@ -665,8 +665,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             onClick={() => setInputBarOffset(0)}
                                             disabled={inputBarOffset === 0}
                                             className="h-7 w-7 px-0 text-muted-foreground hover:text-foreground"
-                                            aria-label="Reset input bar offset"
-                                            title="Reset"
+                                            aria-label="重置输入框偏移"
+                                            title="重置"
                                         >
                                             <RiRestartLine className="h-3.5 w-3.5" />
                                         </Button>
@@ -684,7 +684,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                 {hasNavigationSettings && (
                     <div className="space-y-3">
                         <section className="px-2 pb-2 pt-0">
-                            <h4 className="typography-ui-header font-medium text-foreground">Navigation</h4>
+                            <h4 className="typography-ui-header font-medium text-foreground">导航</h4>
+
                             {shouldShow('terminalQuickKeys') && !isMobile && (
                                 <div
                                     className="group flex cursor-pointer items-center gap-2 py-1.5"
@@ -702,16 +703,16 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                     <Checkbox
                                         checked={showTerminalQuickKeysOnDesktop}
                                         onChange={setShowTerminalQuickKeysOnDesktop}
-                                        ariaLabel="Terminal quick keys"
+                                        ariaLabel="终端快捷键"
                                     />
                                     <div className="flex min-w-0 items-center gap-1.5">
-                                        <span className="typography-ui-label text-foreground">Terminal Quick Keys</span>
+                                        <span className="typography-ui-label text-foreground">终端快捷键</span>
                                         <Tooltip delayDuration={1000}>
                                             <TooltipTrigger asChild>
                                                 <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                                             </TooltipTrigger>
                                             <TooltipContent sideOffset={8} className="max-w-xs">
-                                                Show Esc, Ctrl, Arrows in terminal view
+                                                在终端视图中显示 Esc、Ctrl、方向键
                                             </TooltipContent>
                                         </Tooltip>
                                     </div>
@@ -730,8 +731,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                 <div className="grid grid-cols-1 gap-y-2 md:grid-cols-[minmax(0,16rem)_minmax(0,16rem)] md:justify-start md:gap-x-2">
                                     {shouldShow('chatRenderMode') && (
                                         <section className="p-2 md:col-span-2">
-                                            <h4 className="typography-ui-header font-medium text-foreground">Chat Render Mode</h4>
-                                            <div role="radiogroup" aria-label="Chat render mode" className="mt-1 grid w-full max-w-[26rem] grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <h4 className="typography-ui-header font-medium text-foreground">聊天渲染模式</h4>
+                                            <div role="radiogroup" aria-label="聊天 render mode" className="mt-1 grid w-full max-w-[26rem] grid-cols-1 gap-3 sm:grid-cols-2">
                                                 {CHAT_RENDER_MODE_OPTIONS.map((option) => {
                                                     const selected = chatRenderMode === option.id;
                                                     const previewPhase = chatRenderPreviewTick % 12;
@@ -814,8 +815,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
 
                                     {shouldShow('activityRenderMode') && chatRenderMode === 'sorted' && (
                                         <section className="p-2 md:col-span-2">
-                                            <h4 className="typography-ui-header font-medium text-foreground">Activity Default</h4>
-                                            <div role="radiogroup" aria-label="Activity default mode" className="mt-0.5 space-y-0">
+                                            <h4 className="typography-ui-header font-medium text-foreground">Activity 默认</h4>
+                                            <div role="radiogroup" aria-label="Activity 默认模式" className="mt-0.5 space-y-0">
                                                 {ACTIVITY_RENDER_MODE_OPTIONS.map((option) => {
                                                     const selected = activityRenderMode === option.id;
                                                     return (
@@ -836,7 +837,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                                             <Radio
                                                                 checked={selected}
                                                                 onChange={() => handleActivityRenderModeChange(option.id)}
-                                                                ariaLabel={`Activity default mode: ${option.label}`}
+                                                                ariaLabel={`Activity 默认 mode: ${option.label}`}
                                                             />
                                                             <span className={cn('typography-ui-label font-normal', selected ? 'text-foreground' : 'text-foreground/50')}>
                                                                 {option.label}
@@ -850,7 +851,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
 
                                     {shouldShow('expandedTools') && (
                                         <section className="p-2 md:col-span-2 space-y-0.5">
-                                            <div className="typography-ui-header font-medium text-foreground py-1.5">Show tools opened by default:</div>
+                                            <div className="typography-ui-header font-medium text-foreground py-1.5">默认展开工具:</div>
 
                                             <div
                                                 className="group flex cursor-pointer items-center gap-2 py-0.5"
@@ -868,7 +869,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                                 <Checkbox
                                                     checked={showExpandedBashTools}
                                                     onChange={handleShowExpandedBashToolsChange}
-                                                    ariaLabel="Show expanded bash tools"
+                                                    ariaLabel="显示展开的 Bash 工具"
                                                 />
                                                 <span className="typography-ui-label text-foreground">Bash</span>
                                             </div>
@@ -889,17 +890,17 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                                 <Checkbox
                                                     checked={showExpandedEditTools}
                                                     onChange={handleShowExpandedEditToolsChange}
-                                                    ariaLabel="Show expanded edit tools"
+                                                    ariaLabel="显示展开的编辑工具"
                                                 />
-                                                <span className="typography-ui-label text-foreground">Edit tools</span>
+                                                <span className="typography-ui-label text-foreground">编辑工具</span>
                                             </div>
                                         </section>
                                     )}
 
                                     {shouldShow('userMessageRendering') && (
                                         <section className="p-2">
-                                            <h4 className="typography-ui-header font-medium text-foreground">User Message Rendering</h4>
-                                            <div role="radiogroup" aria-label="User message rendering mode" className="mt-0.5 space-y-0">
+                                            <h4 className="typography-ui-header font-medium text-foreground">用户消息渲染</h4>
+                                            <div role="radiogroup" aria-label="用户消息渲染模式" className="mt-0.5 space-y-0">
                                                 {USER_MESSAGE_RENDERING_OPTIONS.map((option) => {
                                                     const selected = normalizeUserMessageRenderingMode(userMessageRenderingMode) === option.id;
                                                     return (
@@ -934,8 +935,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
 
                                     {shouldShow('mermaidRendering') && (
                                         <section className="p-2">
-                                            <h4 className="typography-ui-header font-medium text-foreground">Mermaid Rendering</h4>
-                                            <div role="radiogroup" aria-label="Mermaid rendering mode" className="mt-0.5 space-y-0">
+                                            <h4 className="typography-ui-header font-medium text-foreground">Mermaid 渲染</h4>
+                                            <div role="radiogroup" aria-label="Mermaid 渲染模式" className="mt-0.5 space-y-0">
                                                 {MERMAID_RENDERING_OPTIONS.map((option) => {
                                                     const selected = mermaidRenderingMode === option.id;
                                                     return (
@@ -970,8 +971,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
 
                                     {shouldShow('diffLayout') && !isVSCode && (
                                         <section className="p-2">
-                                            <h4 className="typography-ui-header font-medium text-foreground">Diff Layout</h4>
-                                            <div role="radiogroup" aria-label="Diff layout" className="mt-0.5 space-y-0">
+                                            <h4 className="typography-ui-header font-medium text-foreground">Diff 布局</h4>
+                                            <div role="radiogroup" aria-label="Diff 布局" className="mt-0.5 space-y-0">
                                                 {DIFF_LAYOUT_OPTIONS.map((option) => {
                                                     const selected = diffLayoutPreference === option.id;
                                                     return (
@@ -992,7 +993,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                                             <Radio
                                                                 checked={selected}
                                                                 onChange={() => setDiffLayoutPreference(option.id)}
-                                                                ariaLabel={`Diff layout: ${option.label}`}
+                                                                ariaLabel={`Diff 布局: ${option.label}`}
                                                             />
                                                             <span className={cn('typography-ui-label font-normal', selected ? 'text-foreground' : 'text-foreground/50')}>
                                                                 {option.label}
@@ -1006,8 +1007,8 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
 
                                     {shouldShow('diffLayout') && !isVSCode && (
                                         <section className="p-2">
-                                            <h4 className="typography-ui-header font-medium text-foreground">Diff View Mode</h4>
-                                            <div role="radiogroup" aria-label="Diff view mode" className="mt-0.5 space-y-0">
+                                            <h4 className="typography-ui-header font-medium text-foreground">Diff 查看模式</h4>
+                                            <div role="radiogroup" aria-label="Diff 查看模式" className="mt-0.5 space-y-0">
                                                 {DIFF_VIEW_MODE_OPTIONS.map((option) => {
                                                     const selected = diffViewMode === option.id;
                                                     return (
@@ -1028,7 +1029,7 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                                             <Radio
                                                                 checked={selected}
                                                                 onChange={() => setDiffViewMode(option.id)}
-                                                                ariaLabel={`Diff view mode: ${option.label}`}
+                                                                ariaLabel={`Diff 查看模式: ${option.label}`}
                                                             />
                                                             <span className={cn('typography-ui-label font-normal', selected ? 'text-foreground' : 'text-foreground/50')}>
                                                                 {option.label}
@@ -1061,9 +1062,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={showReasoningTraces}
                                                 onChange={setShowReasoningTraces}
-                                                ariaLabel="Show reasoning traces"
+                                                ariaLabel="显示推理轨迹"
                                             />
-                                            <span className="typography-ui-label text-foreground">Show Reasoning Traces</span>
+                                            <span className="typography-ui-label text-foreground">显示推理轨迹</span>
                                         </div>
                                     )}
 
@@ -1084,9 +1085,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={stickyUserHeader}
                                                 onChange={handleStickyUserHeaderChange}
-                                                ariaLabel="Sticky user header"
+                                                ariaLabel="固定用户标题"
                                             />
-                                            <span className="typography-ui-label text-foreground">Sticky User Header</span>
+                                            <span className="typography-ui-label text-foreground">固定用户标题</span>
                                         </div>
                                     )}
 
@@ -1107,9 +1108,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={showToolFileIcons}
                                                 onChange={handleShowToolFileIconsChange}
-                                                ariaLabel="Show tool file icons"
+                                                ariaLabel="显示工具文件图标"
                                             />
-                                            <span className="typography-ui-label text-foreground">Show Tool File Icons</span>
+                                            <span className="typography-ui-label text-foreground">显示工具文件图标</span>
                                         </div>
                                     )}
 
@@ -1130,9 +1131,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={showMobileSessionStatusBar}
                                                 onChange={setShowMobileSessionStatusBar}
-                                                ariaLabel="Show mobile status bar"
+                                                ariaLabel="显示移动状态栏"
                                             />
-                                            <span className="typography-ui-label text-foreground">Show Mobile Status Bar</span>
+                                            <span className="typography-ui-label text-foreground">显示移动状态栏</span>
                                         </div>
                                     )}
 
@@ -1153,9 +1154,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={directoryShowHidden}
                                                 onChange={setDirectoryShowHidden}
-                                                ariaLabel="Show dotfiles"
+                                                ariaLabel="显示隐藏文件"
                                             />
-                                            <span className="typography-ui-label text-foreground">Show Dotfiles</span>
+                                            <span className="typography-ui-label text-foreground">显示隐藏文件</span>
                                         </div>
                                     )}
 
@@ -1176,16 +1177,16 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={queueModeEnabled}
                                                 onChange={setQueueMode}
-                                                ariaLabel="Queue messages by default"
+                                                ariaLabel="默认排队消息"
                                             />
                                             <div className="flex min-w-0 items-center gap-1.5">
-                                                <span className="typography-ui-label text-foreground">Queue Messages by Default</span>
+                                            <span className="typography-ui-label text-foreground">默认排队消息</span>
                                                 <Tooltip delayDuration={1000}>
                                                     <TooltipTrigger asChild>
                                                         <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                                                     </TooltipTrigger>
                                                     <TooltipContent sideOffset={8} className="max-w-xs">
-                                                        When enabled, Enter queues messages. Use {getModifierLabel()}+Enter to send.
+                                                        启用后，Enter 键会将消息排队。使用 {getModifierLabel()}+Enter 发送。
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </div>
@@ -1209,9 +1210,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={persistChatDraft}
                                                 onChange={setPersistChatDraft}
-                                                ariaLabel="Persist draft messages"
+                                                ariaLabel="保留草稿消息"
                                             />
-                                            <span className="typography-ui-label text-foreground">Persist Draft Messages</span>
+                                            <span className="typography-ui-label text-foreground">保留草稿消息</span>
                                         </div>
                                     )}
 
@@ -1232,9 +1233,9 @@ export const OpenChamberVisualSettings: React.FC<OpenChamberVisualSettingsProps>
                                             <Checkbox
                                                 checked={inputSpellcheckEnabled}
                                                 onChange={handleInputSpellcheckChange}
-                                                ariaLabel="Enable spellcheck in text inputs"
+                                                ariaLabel="在文本输入中启用拼写检查"
                                             />
-                                            <span className="typography-ui-label text-foreground">Enable Spellcheck in Text Inputs</span>
+                                            <span className="typography-ui-label text-foreground">在文本输入中启用拼写检查</span>
                                         </div>
                                     )}
 

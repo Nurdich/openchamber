@@ -116,13 +116,13 @@ const CAPABILITY_DEFINITIONS: CapabilityDefinition[] = [
     {
         key: 'tool_call',
         icon: RiToolsLine,
-        label: 'Tool calling',
+        label: '工具调用',
         isActive: (metadata) => metadata?.tool_call === true,
     },
     {
         key: 'reasoning',
         icon: RiBrainAi3Line,
-        label: 'Reasoning',
+        label: '推理',
         isActive: (metadata) => metadata?.reasoning === true,
     },
 ];
@@ -141,10 +141,10 @@ type ModalityIcon = {
 type ModelApplyResult = 'applied' | 'provider-missing' | 'model-missing';
 
 const MODALITY_ICON_MAP: Record<string, ModalityIconDefinition> = {
-    text: { icon: RiText, label: 'Text' },
-    image: { icon: RiFileImageLine, label: 'Image' },
-    video: { icon: RiFileVideoLine, label: 'Video' },
-    audio: { icon: RiFileMusicLine, label: 'Audio' },
+    text: { icon: RiText, label: '文本' },
+    image: { icon: RiFileImageLine, label: '图片' },
+    video: { icon: RiFileVideoLine, label: '视频' },
+    audio: { icon: RiFileMusicLine, label: '音频' },
     pdf: { icon: RiFilePdfLine, label: 'PDF' },
 };
 
@@ -221,13 +221,13 @@ const formatCompactPrice = (metadata?: ModelMetadata): string | null => {
     const hasOutput = typeof outputCost === 'number' && Number.isFinite(outputCost);
 
     if (hasInput && hasOutput) {
-        return `In ${formatCost(inputCost)} · Out ${formatCost(outputCost)}`;
+        return `输入 ${formatCost(inputCost)} · 输出 ${formatCost(outputCost)}`;
     }
     if (hasInput) {
-        return `In ${formatCost(inputCost)}`;
+        return `输入 ${formatCost(inputCost)}`;
     }
     if (hasOutput) {
-        return `Out ${formatCost(outputCost)}`;
+        return `输出 ${formatCost(outputCost)}`;
     }
     return null;
 };

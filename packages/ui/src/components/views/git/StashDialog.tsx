@@ -58,20 +58,27 @@ export const StashDialog: React.FC<StashDialogProps> = ({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <RiAlertLine className="size-5 text-[var(--status-warning)]" />
-            <DialogTitle>Uncommitted Changes</DialogTitle>
+            <DialogTitle>待提交的更改</DialogTitle>
           </div>
           <DialogDescription>
-            You have uncommitted changes that would be overwritten by this {operation}.
+            您有待提交的更改，将被此操作覆盖。
+            是否要临时保存它们？
             Would you like to stash them temporarily?
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-2">
           <p className="typography-meta text-muted-foreground mb-3">
-            This will:
+            这将执行以下操作：
           </p>
           <ol className="list-decimal list-inside space-y-1 typography-meta text-foreground">
-            <li>Stash your uncommitted changes</li>
+            <li>保存您的未提交更改</li>
+            <li>
+              {operation === 'merge' ? '合并' : '变基'}{' '}
+              {operation === 'merge' ? '到' : '到'}{' '}
+              <span className="font-mono text-primary">{targetBranch}</span>
+            </li>
+            {restoreAfter && <li>恢复您保存的更改</li>}
             <li>
               {operation === 'merge' ? 'Merge' : 'Rebase'}{' '}
               {operation === 'merge' ? 'with' : 'onto'}{' '}
@@ -86,13 +93,13 @@ export const StashDialog: React.FC<StashDialogProps> = ({
             checked={restoreAfter}
             onChange={setRestoreAfter}
             disabled={isProcessing}
-            ariaLabel="Restore changes after operation"
+            ariaLabel="操作完成后恢复更改"
           />
           <span
             className="typography-ui-label text-foreground cursor-pointer select-none"
             onClick={() => !isProcessing && setRestoreAfter(!restoreAfter)}
           >
-            Restore changes after the {operation}
+            操作完成后恢复更改
           </span>
         </div>
 
@@ -103,7 +110,7 @@ export const StashDialog: React.FC<StashDialogProps> = ({
             onClick={handleCancel}
             disabled={isProcessing}
           >
-            Cancel
+            取消
           </Button>
           <Button
             variant="default"
@@ -115,10 +122,11 @@ export const StashDialog: React.FC<StashDialogProps> = ({
             {isProcessing ? (
               <>
                 <RiLoader4Line className="size-4 animate-spin" />
-                Processing...
+                <RiLoader4Line className="size-4 animate-spin" />
+                处理中...
               </>
             ) : (
-              `Stash & ${operationLabel}`
+              `保存并${operationLabel}`
             )}
           </Button>
         </DialogFooter>

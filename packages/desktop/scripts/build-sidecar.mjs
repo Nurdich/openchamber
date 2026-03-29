@@ -133,3 +133,96 @@ if (process.platform !== 'win32') {
 
 console.log(`[desktop] sidecar ready: ${sidecarOutPath}`);
 console.log(`[desktop] web assets ready: ${resourcesWebDistDir}`);
+
+// Download opencode-cli to exe directory (same as sidecar)
+// Tauri expects: opencode-x86_64-pc-windows-msvc.exe (triple replaces .exe suffix)
+const opencodeCliBaseName = process.platform === 'win32'
+  ? `opencode-${targetTriple}.exe`
+  : `opencode-${targetTriple}`;
+const opencodeCliOutPath = path.join(sidecarsDir, opencodeCliBaseName);
+
+const getOpencodeDownloadUrl = () => {
+  const os = process.platform === 'darwin' ? 'darwin' : process.platform === 'win32' ? 'windows' : 'linux';
+  const arch = process.arch === 'arm64' ? 'arm64' : 'x64';
+  const ext = os === 'linux' ? '.tar.gz' : '.zip';
+  return `https://github.com/anomalyco/opencode/releases/latest/download/opencode-${os}-${arch}${ext}`;
+};
+
+const downloadOpencodeCli = async () => {
+  const url = getOpencodeDownloadUrl();
+  console.log(`[desktop] downloading opencode-cli from ${url}...`);
+  
+  const { execSync } = await import('node:child_process');
+  
+  // Create temp dir
+  const tmpDir = path.join(desktopTauriDir, 'tmp-opencode');
+  await fs.mkdir(tmpDir, { recursive: true });
+  const archivePath = path.join(tmpDir, `opencode-archive${url.endsWith('.tar.gz') ? '.tar.gz' : '.zip'}`);
+  
+  // Download with curl
+  try {
+    execSync(`curl -# -L -o "${archivePath}" "${url}"`, { stdio: 'inherit' });
+  } catch (e) {
+    console.warn('[desktop] failed to download opencode-cli, continuing without it');
+    return;
+  }
+  
+  // Extract
+  if (url.endsWith('.tar.gz')) {
+    execSync(`tar -xzf "${archivePath}" -C "${tmpDir}"`, { stdio: 'inherit' });
+  } else {
+    execSync(`unzip -q -o "${archivePath}" -d "${tmpDir}"`, { stdio: 'inherit' });
+  }
+  
+  // Find the opencode binary in extracted files
+  const extractedDir = await fs.readdir(tmpDir);
+  let opencodeBinPath = null;
+  for (const item of extractedDir) {
+    const itemPath = path.join(tmpDir, item);
+    const stat = await fs.stat(itemPath);
+    if (stat.isFile() && (item === 'opencode' || item === 'opencode.exe')) {
+      opencodeBinPath = itemPath;
+      break;
+    }
+    if (stat.isDirectory() && (item === 'opencode' || item === 'opencode.exe')) {
+      const nestedPath = path.join(itemPath, process.platform === 'win32' ? 'opencode.exe' : 'opencode');
+      if (await fs.access(nestedPath).then(() => true).catch(() => false)) {
+        opencodeBinPath = nestedPath;
+        break;
+      }
+    }
+  }
+  
+  if (!opencodeBinPath) {
+    // Try looking in subdirectories
+    for (const item of extractedDir) {
+      const itemPath = path.join(tmpDir, item);
+      const stat = await fs.stat(itemPath);
+      if (stat.isDirectory()) {
+        const files = await fs.readdir(itemPath);
+        for (const f of files) {
+          if (f === 'opencode' || f === 'opencode.exe') {
+            opencodeBinPath = path.join(itemPath, f);
+            break;
+          }
+        }
+      }
+      if (opencodeBinPath) break;
+    }
+  }
+  
+  if (opencodeBinPath) {
+    await fs.copyFile(opencodeBinPath, opencodeCliOutPath);
+    if (process.platform !== 'win32') {
+      await fs.chmod(opencodeCliOutPath, 0o755);
+    }
+    console.log(`[desktop] opencode-cli ready: ${opencodeCliOutPath}`);
+  } else {
+    console.warn('[desktop] could not find opencode binary in archive, skipping');
+  }
+  
+  // Cleanup
+  await fs.rm(tmpDir, { recursive: true, force: true });
+};
+
+await downloadOpencodeCli();

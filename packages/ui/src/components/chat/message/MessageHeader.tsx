@@ -30,7 +30,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ isUser, providerID, agent
                                 {hasLogo && logoSrc ? (
                                     <img
                                         src={logoSrc}
-                                        alt={`${providerID} logo`}
+                                        alt={`${providerID} 图标`}
                                         className="h-4 w-4"
                                         style={{
                                             filter: isDarkTheme ? 'brightness(0.9) contrast(1.1) invert(1)' : 'brightness(0.9) contrast(1.1)',
@@ -53,7 +53,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ isUser, providerID, agent
                                 isUser ? 'text-primary' : 'text-foreground'
                             )}
                         >
-                            {isUser ? 'You' : (modelName || 'Assistant')}
+                            {isUser ? '你' : (modelName || '助手')}
                         </h3>
                         {!isUser && agentName && (
                             <div

@@ -188,9 +188,9 @@ export const AgentMentionAutocomplete = React.forwardRef<AgentMentionAutocomplet
         <div className="px-2 pt-2 pb-1 border-b border-border/60">
           <div className="flex items-center gap-1 rounded-lg bg-[var(--surface-elevated)] p-1">
             {([
-              { id: 'commands' as const, label: 'Commands' },
-              { id: 'agents' as const, label: 'Agents' },
-              { id: 'files' as const, label: 'Files' },
+              { id: 'commands' as const, label: '命令' },
+              { id: 'agents' as const, label: '代理' },
+              { id: 'files' as const, label: '文件' },
             ]).map((tab) => (
               <button
                 key={tab.id}
@@ -231,12 +231,12 @@ export const AgentMentionAutocomplete = React.forwardRef<AgentMentionAutocomplet
           </div>
         ) : (
           <div className="px-3 py-2 typography-ui-label text-muted-foreground">
-            No agents found
+            未找到代理
           </div>
         )}
       </ScrollableOverlay>
       <div className="px-3 pt-1 pb-1.5 border-t typography-meta text-muted-foreground">
-        ↑↓ navigate • Enter select • Esc close
+        ↑↓ 导航 • Enter 选择 • Esc 关闭
       </div>
     </div>
   );

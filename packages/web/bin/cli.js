@@ -2733,6 +2733,12 @@ const commands = {
 
     const serveSpin = showOutput ? createSpinner(options) : null;
 
+    // Compute the real dist path from cli.js __dirname (which is always the true file location).
+    // This is passed explicitly to the server child process because on Windows with Bun,
+    // import.meta.url inside the spawned server script may resolve to a Bun runtime internal
+    // path (e.g. B:\~BUN\...) rather than the actual package directory.
+    const distDirForServer = path.resolve(__dirname, '..', 'dist');
+
     const child = spawn(runtimeBin, serverArgs, {
       detached: true,
       windowsHide: true,
@@ -2741,6 +2747,7 @@ const commands = {
         ...process.env,
         OPENCHAMBER_PORT: String(targetPort),
         OPENCODE_BINARY: opencodeBinary,
+        OPENCHAMBER_DIST_DIR: distDirForServer,
         ...(effectiveUiPassword ? { OPENCHAMBER_UI_PASSWORD: effectiveUiPassword } : {}),
         ...(process.env.OPENCODE_SKIP_START ? { OPENCHAMBER_SKIP_OPENCODE_START: process.env.OPENCODE_SKIP_START } : {}),
       },

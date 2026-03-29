@@ -131,7 +131,7 @@ export function InlineCommentInput({
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
             {fileLabel && <span className="truncate max-w-[200px]">{fileLabel}</span>}
             {fileLabel && lineRange && <span>•</span>}
-            {displayRange && <span>Lines {displayRange.start}-{displayRange.end}</span>}
+            {displayRange && <span>行 {displayRange.start}-{displayRange.end}</span>}
           </div>
         )}
         
@@ -140,7 +140,7 @@ export function InlineCommentInput({
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Add a comment... (Cmd+Enter to save)"
+          placeholder="添加评论... (Cmd+Enter 保存)"
           className="min-h-[80px] text-sm resize-y"
           style={{
             backgroundColor: currentTheme?.colors?.surface?.subtle,
@@ -156,7 +156,7 @@ export function InlineCommentInput({
             onTouchStart={(e) => e.stopPropagation()}
             className="h-8 text-muted-foreground hover:text-foreground"
           >
-            Cancel
+            取消
           </Button>
           <Button
             size="sm"
@@ -170,7 +170,7 @@ export function InlineCommentInput({
               color: currentTheme?.colors?.status?.successForeground,
             }}
           >
-            {isEditing ? 'Save' : 'Comment'}
+            {isEditing ? '保存' : '评论'}
           </Button>
         </div>
       </div>

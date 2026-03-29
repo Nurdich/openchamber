@@ -90,7 +90,7 @@ export const KeyboardShortcutsSettings: React.FC = () => {
     setShortcutOverride(actionId, normalized);
     setPendingOverwrite(null);
     setErrorText('');
-    setWarningText(isRiskyBrowserShortcut(normalized) ? 'This shortcut can conflict with browser defaults. It is still saved.' : '');
+    setWarningText(isRiskyBrowserShortcut(normalized) ? '此快捷键可能与浏览器默认快捷键冲突，但仍然会被保存。' : '');
     setDraftByAction((current) => {
       const rest = { ...current };
       delete rest[actionId];
@@ -107,7 +107,7 @@ export const KeyboardShortcutsSettings: React.FC = () => {
     setShortcutOverride(pendingOverwrite.actionId, pendingOverwrite.combo);
     setPendingOverwrite(null);
     setErrorText('');
-    setWarningText(isRiskyBrowserShortcut(pendingOverwrite.combo) ? 'This shortcut can conflict with browser defaults. It is still saved.' : '');
+    setWarningText(isRiskyBrowserShortcut(pendingOverwrite.combo) ? '此快捷键可能与浏览器默认快捷键冲突，但仍然会被保存。' : '');
     setDraftByAction((current) => {
       const rest = { ...current };
       delete rest[pendingOverwrite.actionId];
@@ -131,7 +131,7 @@ export const KeyboardShortcutsSettings: React.FC = () => {
     <div className="mb-8">
       <div className="mb-1 px-1">
         <div className="flex items-center gap-2">
-          <h3 className="typography-ui-header font-medium text-foreground">Keyboard Shortcuts</h3>
+          <h3 className="typography-ui-header font-medium text-foreground">键盘快捷键</h3>
           <Button
             type="button"
             variant="outline"
@@ -145,14 +145,14 @@ export const KeyboardShortcutsSettings: React.FC = () => {
               setWarningText('');
             }}
           >
-            Reset All
+            重置全部
           </Button>
           <Tooltip delayDuration={1000}>
             <TooltipTrigger asChild>
               <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
             </TooltipTrigger>
             <TooltipContent sideOffset={8} className="max-w-xs">
-              Capture a new key combo, save it, and bindings will update immediately.
+              捕获新的按键组合，保存后会立即更新绑定。
             </TooltipContent>
           </Tooltip>
         </div>
@@ -163,11 +163,11 @@ export const KeyboardShortcutsSettings: React.FC = () => {
           {pendingOverwrite && (
             <div className="rounded-lg border border-[var(--status-warning-border)] bg-[var(--status-warning-background)] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <span className="typography-meta text-foreground">
-                This combo is already used by another shortcut. Overwrite and clear that other mapping?
+                此组合已被其他快捷键使用。覆盖并清除该映射？
               </span>
               <div className="flex gap-2 shrink-0">
-                <Button type="button" size="xs" className="!font-normal" onClick={confirmOverwrite}>Overwrite</Button>
-                <Button type="button" size="xs" className="!font-normal" variant="ghost" onClick={() => setPendingOverwrite(null)}>Cancel</Button>
+                <Button type="button" size="xs" className="!font-normal" onClick={confirmOverwrite}>覆盖</Button>
+                <Button type="button" size="xs" className="!font-normal" variant="ghost" onClick={() => setPendingOverwrite(null)}>取消</Button>
               </div>
             </div>
           )}
@@ -199,7 +199,7 @@ export const KeyboardShortcutsSettings: React.FC = () => {
               <div className="flex min-w-0 flex-1 items-center gap-2 sm:w-fit sm:flex-initial">
                 <Input
                   readOnly
-                  value={capturingActionId === action.id ? 'Press keys...' : formatShortcutForDisplay(displayCombo)}
+                  value={capturingActionId === action.id ? '请按键...' : formatShortcutForDisplay(displayCombo)}
                   onFocus={() => {
                     setCapturingActionId(action.id);
                     setErrorText('');
@@ -241,17 +241,17 @@ export const KeyboardShortcutsSettings: React.FC = () => {
                   onClick={() => {
                     const next = draftByAction[action.id];
                     if (!next) {
-                      setErrorText('Capture a shortcut first.');
+                      setErrorText('请先捕获快捷键。');
                       return;
                     }
                     saveCombo(action.id, next);
                   }}
                   disabled={!hasDraft}
                 >
-                  Save
+                  保存
                 </Button>
                 <Button type="button" size="xs" className="!font-normal" variant="ghost" onClick={() => resetOne(action.id)}>
-                  Reset
+                  重置
                 </Button>
               </div>
             </div>

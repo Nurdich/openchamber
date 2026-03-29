@@ -14,10 +14,10 @@ const formatDateLabel = (value: string | number) => {
   yesterday.setDate(today.getDate() - 1);
 
   if (isSameDay(targetDate, today)) {
-    return 'Today';
+    return '今天';
   }
   if (isSameDay(targetDate, yesterday)) {
-    return 'Yesterday';
+    return '昨天';
   }
   const formatted = targetDate.toLocaleDateString('en-US', {
     month: 'short',
@@ -37,9 +37,9 @@ export const formatSessionDateLabel = (updatedMs: number): string => {
 
   if (isSameDay(updatedDate, today)) {
     const diff = Date.now() - updatedMs;
-    if (diff < 60_000) return 'Just now';
-    if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}min ago`;
-    return `${Math.floor(diff / 3_600_000)}h ago`;
+    if (diff < 60_000) return '刚刚';
+    if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}分钟前`;
+    return `${Math.floor(diff / 3_600_000)}小时前`;
   }
 
   return formatDateLabel(updatedMs);
@@ -148,16 +148,16 @@ export const resolveArchivedFolderName = (session: Session, projectRoot: string 
   const projectWorktree = normalizePath((session as Session & { project?: { worktree?: string | null } | null }).project?.worktree ?? null);
   const resolved = sessionDirectory ?? projectWorktree;
   if (!resolved) {
-    return 'unassigned';
+    return '未分配';
   }
   if (projectRoot && resolved === projectRoot) {
-    return 'project root';
+    return '项目根目录';
   }
   const source = projectRoot && resolved.startsWith(`${projectRoot}/`)
     ? resolved.slice(projectRoot.length + 1)
     : resolved;
   const segments = source.split('/').filter(Boolean);
-  return segments[segments.length - 1] ?? 'unassigned';
+  return segments[segments.length - 1] ?? '未分配';
 };
 
 export const isSessionRelatedToProject = (

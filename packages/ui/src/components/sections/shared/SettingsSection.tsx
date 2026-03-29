@@ -19,7 +19,7 @@ interface SettingsSectionProps {
  * Provides consistent spacing and optional divider.
  *
  * @example
- * <SettingsSection title="Appearance" description="Customize the look and feel">
+ * <SettingsSection title="外观" description="自定义外观和体验">
  *   <ThemeSelector />
  *   <FontSizeSelector />
  * </SettingsSection>

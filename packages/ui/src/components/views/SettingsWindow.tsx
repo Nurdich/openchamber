@@ -50,8 +50,8 @@ export const SettingsWindow: React.FC<SettingsWindowProps> = ({ open, onOpenChan
             'bg-background'
           )}
         >
-          <DialogPrimitive.Description id={descriptionId} className="sr-only">
-            OpenChamber settings window.
+          <DialogPrimitive.Description id={descriptionId}>
+            OpenChamber 设置窗口。
           </DialogPrimitive.Description>
           <SettingsView onClose={() => onOpenChange(false)} isWindowed />
         </DialogPrimitive.Content>

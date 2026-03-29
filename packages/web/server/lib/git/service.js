@@ -236,18 +236,32 @@ const buildGitEnv = async () => {
 const createGit = async (directory) => {
   const env = await buildGitEnv();
   const spawnOptions = { windowsHide: true };
-  const binary = getGitBinary();
-  const hasCustomBinary = typeof binary === 'string' && binary.trim() && binary !== 'git' && binary !== 'git.exe';
-  const unsafe = hasCustomBinary ? { allowUnsafeCustomBinary: true } : undefined;
+  let binary = getGitBinary();
+
+  // simple-git's isBadArgument regex only allows [a-z0-9/.\\_~-] which excludes
+  // spaces.  On Windows, git is typically installed under "C:\Program Files\Git\..."
+  // which contains a space and would trigger the WRONG_CHARS_ERR warning on every
+  // call even with allowUnsafeCustomBinary set.
+  //
+  // Instead of passing the full path as the binary, we prepend its parent directory
+  // to PATH and fall back to the short name ("git.exe").  The child process will
+  // find the correct git binary via the augmented PATH without triggering the
+  // simple-git path validation.
+  if (process.platform === 'win32' && typeof binary === 'string' && binary !== 'git' && binary !== 'git.exe') {
+    const gitDir = path.dirname(binary);
+    const currentPath = typeof env.PATH === 'string' ? env.PATH : (process.env.PATH || '');
+    env.PATH = gitDir + path.delimiter + currentPath;
+    binary = 'git.exe';
+  }
+
   if (!directory) {
-    return simpleGit({ env, spawnOptions, binary, unsafe });
+    return simpleGit({ env, spawnOptions, binary });
   }
   return simpleGit({
     baseDir: normalizeDirectoryPath(directory),
     env,
     spawnOptions,
     binary,
-    unsafe,
   });
 };
 
@@ -2399,11 +2413,30 @@ export async function removeWorktree(directory, input = {}) {
     return true;
   }
 
-  await runGitCommandOrThrow(
+  const removeResult = await runGitCommand(
     context.primaryWorktree,
-    ['worktree', 'remove', '--force', matchedEntry.worktree],
-    'Failed to remove git worktree'
+    ['worktree', 'remove', '--force', matchedEntry.worktree]
   );
+
+  if (!removeResult.success) {
+    const msg = removeResult.message || '';
+    // On Windows, paths exceeding MAX_PATH (260 chars) cause git to fail with
+    // "Filename too long".  Fall back to a manual rm + worktree prune so the
+    // worktree is still cleaned up even when git cannot do it itself.
+    const isLongPath = msg.includes('Filename too long') || msg.includes('filename too long');
+    if (isLongPath) {
+      console.warn('[git] worktree remove failed due to long path, falling back to fs.rm + prune:', matchedEntry.worktree);
+      try {
+        await fsp.rm(matchedEntry.worktree, { recursive: true, force: true });
+      } catch (rmErr) {
+        console.warn('[git] fs.rm fallback failed:', rmErr instanceof Error ? rmErr.message : String(rmErr));
+      }
+      // Tell git to forget the now-deleted worktree entry.
+      await runGitCommand(context.primaryWorktree, ['worktree', 'prune']);
+    } else {
+      throw new Error(msg || 'Failed to remove git worktree');
+    }
+  }
 
   if (deleteLocalBranch) {
     const branchName = cleanBranchName(String(matchedEntry.branchRef || matchedEntry.branch || '').trim());

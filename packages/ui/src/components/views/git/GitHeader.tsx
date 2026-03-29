@@ -140,19 +140,20 @@ const IdentityDropdown: React.FC<IdentityDropdownProps> = ({
               )}
               {!iconOnly && (
                 <span className="git-identity-label min-w-0 flex-1 truncate text-left">
-                  {activeProfile?.name || 'No identity'}
+                  {activeProfile?.name || '未设置身份'}
                 </span>
               )}
               <RiArrowDownSLine className="size-4 opacity-60" />
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
-        <TooltipContent sideOffset={8}>Git identity</TooltipContent>
+            <TooltipContent sideOffset={8}>Git 身份</TooltipContent>
       </Tooltip>
       <DropdownMenuContent align="end" className="w-64">
         {identities.length === 0 ? (
           <div className="px-2 py-1.5">
-            <p className="typography-meta text-muted-foreground">
+              <p className="typography-meta text-muted-foreground">
+              没有可用的配置文件。
               No profiles available to apply.
             </p>
           </div>
@@ -232,7 +233,7 @@ export const GitHeader: React.FC<GitHeaderProps> = ({
               <RiHistoryLine className="size-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent sideOffset={8}>History</TooltipContent>
+          <TooltipContent sideOffset={8}>历史</TooltipContent>
         </Tooltip>
       ) : null}
     </div>

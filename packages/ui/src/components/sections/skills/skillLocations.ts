@@ -13,29 +13,29 @@ export const SKILL_LOCATION_OPTIONS: Array<{
     value: 'user-opencode',
     scope: 'user',
     source: 'opencode',
-    label: 'User / OpenCode',
-    description: 'Global OpenCode config location',
+    label: '用户 / OpenCode',
+    description: '全局 OpenCode 配置目录'
   },
   {
     value: 'project-opencode',
     scope: 'project',
     source: 'opencode',
-    label: 'Project / OpenCode',
-    description: 'Current project .opencode location',
+    label: '项目 / OpenCode',
+    description: '当前项目 .opencode 目录'
   },
   {
     value: 'user-agents',
     scope: 'user',
     source: 'agents',
-    label: 'User / Agents',
-    description: 'Global .agents compatibility location',
+    label: '用户 / Agents',
+    description: '全局 .agents 兼容目录'
   },
   {
     value: 'project-agents',
     scope: 'project',
     source: 'agents',
-    label: 'Project / Agents',
-    description: 'Current project .agents compatibility location',
+    label: '项目 / Agents',
+    description: '当前项目 .agents 兼容目录'
   },
 ];
 

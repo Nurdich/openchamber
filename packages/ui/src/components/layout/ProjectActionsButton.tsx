@@ -357,7 +357,7 @@ export const ProjectActionsButton = ({
       if (maybeUrl) {
         watch.openedUrl = true;
         void openExternal(maybeUrl);
-        toast.success('Opened URL from action output');
+        toast.success('已从操作输出中打开链接');
       }
       urlWatchByRunKeyRef.current[runKey] = watch;
     }
@@ -430,7 +430,7 @@ export const ProjectActionsButton = ({
     }
 
     if (!normalizedDirectory) {
-      toast.error('No active directory for action');
+      toast.error('操作没有活动目录');
       return;
     }
 
@@ -488,14 +488,14 @@ export const ProjectActionsButton = ({
 
       if (desktopForwardUrl) {
         void openExternal(desktopForwardUrl);
-        toast.success('Opened forwarded URL');
+        toast.success('已打开转发的链接');
       } else if (manualOpenUrl) {
         void openExternal(manualOpenUrl);
-        toast.success('Opened action URL');
+        toast.success('已打开操作链接');
       } else if (hasCustomOpenUrl) {
-        toast.error('Invalid custom URL format');
+        toast.error('无效的自定义URL格式');
       } else if (hasDesktopForwardSelection) {
-        toast.error('Selected desktop SSH forward is unavailable');
+        toast.error('选中的桌面SSH转发不可用');
       }
 
       urlWatchByRunKeyRef.current[key] = {
@@ -513,7 +513,7 @@ export const ProjectActionsButton = ({
         return next;
       });
       delete urlWatchByRunKeyRef.current[runKey];
-      toast.error(error instanceof Error ? error.message : 'Failed to run action');
+      toast.error(error instanceof Error ? error.message : '运行操作失败');
     }
   }, [
     desktopSshInstances,

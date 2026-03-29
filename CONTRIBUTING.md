@@ -30,7 +30,7 @@ Launches Tauri in dev mode with WebView devtools enabled and a distinct dev icon
 ### VS Code Extension
 
 ```bash
-bun run vscode:dev    # Watch mode (extension + webview rebuild on save)
+bun run vscode:dev    # 观看模式（扩展+保存时重建网页视图）
 ```
 
 To test in VS Code:
@@ -45,9 +45,9 @@ No dev server — this is a source-level library consumed by other packages. Dur
 ## Before Submitting
 
 ```bash
-bun run type-check   # Must pass
-bun run lint         # Must pass
-bun run build        # Must succeed
+bun run type-check   # 必须通过
+bun run lint         # 必须通过
+bun run build        # 一定要成功
 ```
 
 ## Code Style

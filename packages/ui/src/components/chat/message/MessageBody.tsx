@@ -89,7 +89,7 @@ const UserSubtaskPart: React.FC<{ part: SubtaskPartLike }> = ({ part }) => {
     return (
         <div className="mt-2">
             <div className="flex items-center gap-2 flex-wrap">
-                <span className="typography-meta font-semibold text-foreground">Delegated task</span>
+                <span className="typography-meta font-semibold text-foreground">委托任务</span>
                 {command ? (
                     <span className="inline-flex h-5 items-center rounded px-1.5 text-[11px] leading-none bg-foreground/5 text-muted-foreground">
                         /{command}
@@ -120,7 +120,7 @@ const UserSubtaskPart: React.FC<{ part: SubtaskPartLike }> = ({ part }) => {
                         className="typography-meta text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
                         onClick={() => setExpanded((value) => !value)}
                     >
-                        {expanded ? 'Hide prompt' : 'Show prompt'}
+                        {expanded ? '隐藏提示词' : '显示提示词'}
                     </button>
                     {expanded ? (
                         <pre className="typography-meta mt-1.5 overflow-x-auto whitespace-pre-wrap break-words text-foreground/85">
@@ -139,7 +139,7 @@ const UserSubtaskPart: React.FC<{ part: SubtaskPartLike }> = ({ part }) => {
                             void setCurrentSession(taskSessionID);
                         }}
                     >
-                        Open subtask session
+                        打开子任务会话
                     </button>
                 </div>
             ) : null}
@@ -189,7 +189,7 @@ const UserShellActionPart: React.FC<{ part: ShellActionPartLike }> = ({ part }) 
     return (
         <div className="mt-2">
             <div className="flex items-center gap-2 flex-wrap">
-                <span className="typography-meta font-semibold text-foreground">Shell command</span>
+                <span className="typography-meta font-semibold text-foreground">Shell 命令</span>
                 {status ? (
                     <span className={cn(
                         'inline-flex h-5 items-center rounded px-1.5 text-[11px] leading-none',
@@ -216,7 +216,7 @@ const UserShellActionPart: React.FC<{ part: ShellActionPartLike }> = ({ part }) 
                             className="typography-meta text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
                             onClick={() => setExpanded((value) => !value)}
                         >
-                            {expanded ? 'Hide output' : 'Show output'}
+                            {expanded ? '隐藏输出' : '显示输出'}
                         </button>
                         <button
                             type="button"
@@ -224,8 +224,8 @@ const UserShellActionPart: React.FC<{ part: ShellActionPartLike }> = ({ part }) 
                             onClick={() => {
                                 void copyOutputToClipboard();
                             }}
-                            aria-label={copiedOutput ? 'Copied' : 'Copy output'}
-                            title={copiedOutput ? 'Copied' : 'Copy output'}
+                            aria-label={copiedOutput ? '已复制' : '复制输出'}
+                            title={copiedOutput ? '已复制' : '复制输出'}
                         >
                             {copiedOutput ? <RiCheckLine className="h-3.5 w-3.5" /> : <RiFileCopyLine className="h-3.5 w-3.5" />}
                         </button>
@@ -432,7 +432,7 @@ const UserMessageBody: React.FC<{
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6 text-muted-foreground bg-transparent hover:text-foreground hover:!bg-transparent active:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-2 focus-visible:ring-primary/50"
-                                aria-label="Revert to this message"
+                                aria-label="从此处回退"
                                 onPointerDown={(event) => event.stopPropagation()}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -442,7 +442,7 @@ const UserMessageBody: React.FC<{
                                 <RiArrowGoBackLine className="h-3 w-3" />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent sideOffset={6}>Revert from here</TooltipContent>
+                        <TooltipContent sideOffset={6}>从此处回退</TooltipContent>
                     </Tooltip>
                 )}
                 {onFork && (
@@ -453,7 +453,7 @@ const UserMessageBody: React.FC<{
                                 variant="ghost"
                                 size="icon"
                                 className="h-6 w-6 text-muted-foreground bg-transparent hover:text-foreground hover:!bg-transparent active:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-2 focus-visible:ring-primary/50"
-                                aria-label="Fork from this message"
+                                aria-label="从此处分叉"
                                 onPointerDown={(event) => event.stopPropagation()}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -463,7 +463,7 @@ const UserMessageBody: React.FC<{
                                 <RiGitBranchLine className="h-3 w-3" />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent sideOffset={6}>Fork from here</TooltipContent>
+                        <TooltipContent sideOffset={6}>从此处分叉</TooltipContent>
                     </Tooltip>
                 )}
                 {canCopyMessage && hasCopyableText && (
@@ -475,7 +475,7 @@ const UserMessageBody: React.FC<{
                                 size="icon"
                                 data-visible={copyHintVisible || isMessageCopied ? 'true' : undefined}
                                 className="h-6 w-6 text-muted-foreground bg-transparent hover:text-foreground hover:!bg-transparent active:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-2 focus-visible:ring-primary/50"
-                                aria-label="Copy message text"
+                                aria-label="复制消息文本"
                                 onPointerDown={(event) => event.stopPropagation()}
                                 onClick={handleCopyButtonClick}
                                 onFocus={() => setCopyHintVisible(true)}
@@ -492,7 +492,7 @@ const UserMessageBody: React.FC<{
                                 )}
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent sideOffset={6}>Copy message</TooltipContent>
+                        <TooltipContent sideOffset={6}>复制消息</TooltipContent>
                     </Tooltip>
                 )}
             </div>
@@ -1335,7 +1335,7 @@ const AssistantMessageBody: React.FC<Omit<MessageBodyProps, 'isUser'>> = ({
                                   !hasCopyableText && 'opacity-50'
                               )}
                               disabled={!hasCopyableText}
-                              aria-label="Copy message text"
+                              aria-label="复制消息文本"
                               aria-hidden={!hasCopyableText}
                               onPointerDown={(event) => event.stopPropagation()}
                               onClick={handleCopyButtonClick}

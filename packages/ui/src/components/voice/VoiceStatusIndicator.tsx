@@ -67,29 +67,29 @@ const statusConfig: Record<
     idle: {
         icon: RiMicOffLine,
         color: 'text-muted-foreground',
-        label: 'Voice Ready',
+        label: '语音就绪',
     },
     listening: {
         icon: RiMicLine,
         color: 'text-primary',
-        label: 'Listening...',
+        label: '正在聆听...',
         animation: 'animate-pulse',
     },
     processing: {
         icon: RiLoader4Line,
         color: 'text-primary',
-        label: 'Processing...',
+        label: '处理中...',
         animation: 'animate-spin',
     },
     speaking: {
         icon: RiVolumeUpLine,
         color: 'text-green-500',
-        label: 'Speaking...',
+        label: '正在说话...',
     },
     error: {
         icon: RiAlertLine,
         color: 'text-destructive',
-        label: 'Voice Error',
+        label: '语音错误',
     },
 };
 
@@ -123,7 +123,7 @@ export function VoiceStatusIndicator({
                 {conversationMode && status === 'idle' && (
                     <span
                         className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full"
-                        aria-label="Conversation mode active"
+                        aria-label="对话模式已激活"
                     />
                 )}
             </div>

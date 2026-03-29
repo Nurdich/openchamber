@@ -135,12 +135,12 @@ export const AgentManagerView: React.FC<AgentManagerViewProps> = ({ className })
   }, [selectGroup]);
 
   const handleCreateGroup = React.useCallback(async (params: CreateMultiRunParams) => {
-    toast.info(`Creating agent group "${params.name}" with ${params.models.length} model(s)...`);
+    toast.info(`正在创建智能体组 "${params.name}"，使用 ${params.models.length} 个模型...`);
 
     const result = await createMultiRun(params);
 
     if (result) {
-      toast.success(`Agent group "${params.name}" created with ${result.sessionIds.length} session(s)`);
+      toast.success(`智能体组 "${params.name}" 已创建，共 ${result.sessionIds.length} 个会话`);
       const groupSlug = result.groupSlug;
 
       const waitForGroup = async (attempts = 6) => {
@@ -166,7 +166,7 @@ export const AgentManagerView: React.FC<AgentManagerViewProps> = ({ className })
       selectGroup(groupSlug);
     } else {
       const error = useMultiRunStore.getState().error;
-      toast.error(error || 'Failed to create agent group');
+      toast.error(error || '创建智能体组失败');
     }
   }, [createMultiRun, loadGroups, selectGroup]);
 

@@ -32,8 +32,8 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
     setCopiedDiagnostics(false);
     try {
       if (!diagnosticsReport) {
-        toast.error('Copy failed', {
-          description: 'Diagnostics not ready yet. Wait a second and retry.',
+        toast.error('复制失败', {
+          description: '诊断信息尚未就绪，请稍后重试。',
         });
         return;
       }
@@ -41,14 +41,14 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
       const result = await debugUtils.copyTextToClipboard(diagnosticsReport);
       if (result.ok) {
         setCopiedDiagnostics(true);
-        toast.success('Diagnostics copied');
+        toast.success('诊断信息已复制');
       } else {
-        toast.error('Copy failed', {
+        toast.error('复制失败', {
           description: result.error,
         });
       }
     } catch (error) {
-      toast.error('Copy failed');
+      toast.error('复制失败');
       console.error('Failed to copy diagnostics:', error);
     } finally {
       setIsCopyingDiagnostics(false);
@@ -117,13 +117,13 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
             <h2 className="text-lg font-semibold">OpenChamber</h2>
             {displayVersion && (
               <p className="typography-meta text-muted-foreground">
-                Version {displayVersion}
+                版本 {displayVersion}
               </p>
             )}
           </div>
 
           <p className="typography-meta text-muted-foreground">
-            A fan-made interface for{' '}
+            为{' '}
             <a
               href="https://opencode.ai/"
               target="_blank"
@@ -132,7 +132,7 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
             >
               OpenCode
             </a>{' '}
-            agent
+            打造的社区界面
           </p>
 
           <div className="flex flex-col items-center gap-2 pt-2">
@@ -146,13 +146,13 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
               )}
             >
               {copiedDiagnostics
-                ? 'Diagnostics copied'
+                ? '诊断信息已复制'
                 : isPreparingDiagnostics
-                  ? 'Preparing diagnostics...'
-                  : 'Copy diagnostics'}
+                  ? '正在准备诊断信息...'
+                  : '复制诊断信息'}
             </button>
             <p className="typography-micro text-muted-foreground">
-              Includes OpenChamber state, OpenCode health, directories, and projects.
+              包含 OpenChamber 状态、OpenCode 健康状态、目录和项目信息。
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
           </div>
 
           <p className="typography-meta text-muted-foreground/60 pt-2">
-            Made with love to comunity
+            用爱为社区打造
           </p>
         </div>
       </DialogContent>

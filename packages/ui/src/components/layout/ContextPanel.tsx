@@ -57,11 +57,11 @@ const getRelativePathLabel = (filePath: string | null, directory: string): strin
 };
 
 const getModeLabel = (mode: 'diff' | 'file' | 'context' | 'plan' | 'chat'): string => {
-  if (mode === 'chat') return 'Chat';
-  if (mode === 'file') return 'Files';
-  if (mode === 'diff') return 'Diff';
-  if (mode === 'plan') return 'Plan';
-  return 'Context';
+  if (mode === 'chat') return '对话';
+  if (mode === 'file') return '文件';
+  if (mode === 'diff') return '差异';
+  if (mode === 'plan') return '计划';
+  return '上下文';
 };
 
 const getFileNameFromPath = (path: string | null): string | null => {
@@ -88,7 +88,7 @@ const getTabLabel = (tab: { mode: 'diff' | 'file' | 'context' | 'plan' | 'chat';
   }
 
   if (tab.mode === 'file') {
-    return getFileNameFromPath(tab.targetPath) || 'Files';
+    return getFileNameFromPath(tab.targetPath) || '文件';
   }
 
   return getModeLabel(tab.mode);
@@ -461,8 +461,8 @@ export const ContextPanel: React.FC = () => {
           size="sm"
           onClick={handleToggleExpanded}
           className="h-7 w-7 p-0"
-          title={isExpanded ? 'Collapse panel' : 'Expand panel'}
-          aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
+          title={isExpanded ? '折叠面板' : '展开面板'}
+          aria-label={isExpanded ? '折叠面板' : '展开面板'}
         >
           {isExpanded ? <RiFullscreenExitLine className="h-3.5 w-3.5" /> : <RiFullscreenLine className="h-3.5 w-3.5" />}
         </Button>

@@ -18,8 +18,8 @@ import { cn } from '@/lib/utils';
 
 const DEFAULT_NOTIFICATION_TEMPLATES = {
   completion: { title: '{agent_name} is ready', message: '{model_name} completed the task' },
-  error: { title: 'Tool error', message: '{last_message}' },
-  question: { title: 'Input needed', message: '{last_message}' },
+  error: { title: '工具错误', message: '{last_message}' },
+  question: { title: '需要输入', message: '{last_message}' },
   subtask: { title: '{agent_name} is ready', message: '{model_name} completed the task' },
 } as const;
 
@@ -214,13 +214,13 @@ export const NotificationSettings: React.FC = () => {
         if (permission === 'granted') {
           setNativeNotificationsEnabled(true);
         } else {
-          toast.error('Notification permission denied', {
-            description: 'Please enable notifications in your browser settings.',
+          toast.error('通知权限被拒绝', {
+            description: '请在浏览器设置中启用通知。',
           });
         }
       } catch (error) {
         console.error('Failed to request notification permission:', error);
-        toast.error('Failed to request notification permission');
+          toast.error('请求通知权限失败');
       }
     } else if (checked && notificationPermission === 'granted') {
       setNativeNotificationsEnabled(true);
@@ -517,7 +517,7 @@ export const NotificationSettings: React.FC = () => {
         <div className="mb-8">
           <div className="mb-1 px-1">
               <h3 className="typography-ui-header font-medium text-foreground">
-                Notification Delivery
+                通知推送
               </h3>
           </div>
 
@@ -542,9 +542,9 @@ export const NotificationSettings: React.FC = () => {
                 onChange={(checked) => {
                   void handleToggleChange(checked);
                 }}
-                ariaLabel="Enable notifications"
+                ariaLabel="启用通知"
               />
-              <span className="typography-ui-label text-foreground">Enable Notifications</span>
+              <span className="typography-ui-label text-foreground">启用通知</span>
             </div>
 
             {nativeNotificationsEnabled && canShowNotifications && (
@@ -564,9 +564,9 @@ export const NotificationSettings: React.FC = () => {
                 <Checkbox
                   checked={notificationMode === 'always'}
                   onChange={(checked) => setNotificationMode(checked ? 'always' : 'hidden-only')}
-                  ariaLabel="Notify while app is focused"
+                  ariaLabel="应用聚焦时通知"
                 />
-                <span className="typography-ui-label text-foreground">Notify While App is Focused</span>
+              <span className="typography-ui-label text-foreground">应用聚焦时通知</span>
               </div>
             )}
           </section>
@@ -574,16 +574,16 @@ export const NotificationSettings: React.FC = () => {
           {isBrowser && (
             <div className="mt-1 px-2">
               <p className="typography-meta text-muted-foreground/70">
-                Your browser may ask for permission the first time.
+                您的浏览器可能会在首次时请求权限。
               </p>
               {notificationPermission === 'denied' && (
                 <p className="typography-meta text-[var(--status-error)] mt-1">
-                  Notification permission denied. Enable it in your browser settings.
+                  通知权限被拒绝。请在浏览器设置中启用。
                 </p>
               )}
               {notificationPermission === 'granted' && !nativeNotificationsEnabled && (
                 <p className="typography-meta text-muted-foreground/70 mt-1">
-                  Permission granted, but notifications are disabled.
+                  权限已授予，但通知被禁用。
                 </p>
               )}
             </div>
@@ -591,7 +591,7 @@ export const NotificationSettings: React.FC = () => {
           {isVSCode && (
             <div className="mt-1 px-2">
               <p className="typography-meta text-muted-foreground/70">
-                When enabled, notifications are delivered through VS Code native notifications.
+                启用后，通知将通过 VS Code 原生通知发送。
               </p>
             </div>
           )}
@@ -603,7 +603,7 @@ export const NotificationSettings: React.FC = () => {
             <div className="mb-8">
               <div className="mb-1 px-1">
                 <h3 className="typography-ui-header font-medium text-foreground">
-                  Notification Events
+                  通知事件
                 </h3>
               </div>
 
@@ -621,8 +621,8 @@ export const NotificationSettings: React.FC = () => {
                     }
                   }}
                 >
-                  <Checkbox checked={notifyOnCompletion} onChange={setNotifyOnCompletion} ariaLabel="Agent completion" />
-                  <span className="typography-ui-label text-foreground">Agent Completion</span>
+                  <Checkbox checked={notifyOnCompletion} onChange={setNotifyOnCompletion} ariaLabel="代理完成" />
+                  <span className="typography-ui-label text-foreground">代理完成</span>
                 </div>
 
                 <div
@@ -638,8 +638,8 @@ export const NotificationSettings: React.FC = () => {
                     }
                   }}
                 >
-                  <Checkbox checked={notifyOnSubtasks} onChange={setNotifyOnSubtasks} ariaLabel="Subagent completion" />
-                  <span className="typography-ui-label text-foreground">Subagent Completion</span>
+                  <Checkbox checked={notifyOnSubtasks} onChange={setNotifyOnSubtasks} ariaLabel="子代理完成" />
+                  <span className="typography-ui-label text-foreground">子代理完成</span>
                 </div>
 
                 <div
@@ -655,8 +655,8 @@ export const NotificationSettings: React.FC = () => {
                     }
                   }}
                 >
-                  <Checkbox checked={notifyOnError} onChange={setNotifyOnError} ariaLabel="Agent errors" />
-                  <span className="typography-ui-label text-foreground">Agent Errors</span>
+                  <Checkbox checked={notifyOnError} onChange={setNotifyOnError} ariaLabel="代理错误" />
+                  <span className="typography-ui-label text-foreground">代理错误</span>
                 </div>
 
                 <div
@@ -672,8 +672,8 @@ export const NotificationSettings: React.FC = () => {
                     }
                   }}
                 >
-                  <Checkbox checked={notifyOnQuestion} onChange={setNotifyOnQuestion} ariaLabel="Agent questions" />
-                  <span className="typography-ui-label text-foreground">Agent Questions</span>
+                  <Checkbox checked={notifyOnQuestion} onChange={setNotifyOnQuestion} ariaLabel="代理提问" />
+                  <span className="typography-ui-label text-foreground">代理提问</span>
                 </div>
               </section>
             </div>
@@ -682,10 +682,10 @@ export const NotificationSettings: React.FC = () => {
             <div className="mb-8">
               <div className="mb-1 px-1">
                 <h3 className="typography-ui-header font-medium text-foreground">
-                  Notification Templates
+                  通知模板
                 </h3>
                 <p className="typography-meta text-muted-foreground mt-0.5">
-                  Variables: <code className="text-[var(--primary-base)]">{'{project_name}'}</code> <code className="text-[var(--primary-base)]">{'{worktree}'}</code> <code className="text-[var(--primary-base)]">{'{branch}'}</code> <code className="text-[var(--primary-base)]">{'{session_name}'}</code> <code className="text-[var(--primary-base)]">{'{agent_name}'}</code> <code className="text-[var(--primary-base)]">{'{model_name}'}</code> <code className="text-[var(--primary-base)]">{'{last_message}'}</code>
+                  变量: <code className="text-[var(--primary-base)]">{'{project_name}'}</code> <code className="text-[var(--primary-base)]">{'{worktree}'}</code> <code className="text-[var(--primary-base)]">{'{branch}'}</code> <code className="text-[var(--primary-base)]">{'{session_name}'}</code> <code className="text-[var(--primary-base)]">{'{agent_name}'}</code> <code className="text-[var(--primary-base)]">{'{model_name}'}</code> <code className="text-[var(--primary-base)]">{'{last_message}'}</code>
                 </p>
               </div>
 
@@ -693,11 +693,11 @@ export const NotificationSettings: React.FC = () => {
                 {(['completion', 'subtask', 'error', 'question'] as const).map((event) => (
                   <section key={event} className="p-2">
                     <span className="typography-ui-label text-foreground font-normal capitalize block">
-                      {event === 'subtask' ? 'Subagent Completion' : event}
+                      {event === 'subtask' ? '子代理完成' : event}
                     </span>
                     <div className="mt-1.5 space-y-2">
                       <div>
-                        <label className="typography-micro text-muted-foreground block mb-1">Title</label>
+                        <label className="typography-micro text-muted-foreground block mb-1">标题</label>
                         <Input
                           value={notificationTemplates[event].title}
                           onChange={(e) => updateTemplate(event, 'title', e.target.value)}
@@ -706,7 +706,7 @@ export const NotificationSettings: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="typography-micro text-muted-foreground block mb-1">Message</label>
+                        <label className="typography-micro text-muted-foreground block mb-1">消息内容</label>
                         <Input
                           value={notificationTemplates[event].message}
                           onChange={(e) => updateTemplate(event, 'message', e.target.value)}
@@ -724,7 +724,7 @@ export const NotificationSettings: React.FC = () => {
             <div className="mb-8">
               <div className="mb-1 px-1">
                 <h3 className="typography-ui-header font-medium text-foreground">
-                  AI Summarization
+                  AI 摘要
                 </h3>
               </div>
 
@@ -745,21 +745,21 @@ export const NotificationSettings: React.FC = () => {
                   <Checkbox
                     checked={summarizeLastMessage}
                     onChange={setSummarizeLastMessage}
-                    ariaLabel="Summarize last message"
+                    ariaLabel="摘要最后一条消息"
                   />
-                  <span className="typography-ui-label text-foreground">Summarize Last Message</span>
+                  <span className="typography-ui-label text-foreground">摘要最后一条消息</span>
                 </div>
 
                 <div className={cn("flex flex-col gap-2 py-1 sm:flex-row sm:items-center sm:gap-8")}>
                   <div className="flex min-w-0 flex-col sm:w-56 shrink-0">
                     <div className="flex items-center gap-2">
-                      <span className="typography-ui-label text-foreground">Summarization Model</span>
+                      <span className="typography-ui-label text-foreground">摘要模型</span>
                       <Tooltip delayDuration={1000}>
                         <TooltipTrigger asChild>
                           <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent sideOffset={8} className="max-w-xs">
-                          Used for notification and voice summaries.
+                          用于通知和语音摘要。
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -770,10 +770,10 @@ export const NotificationSettings: React.FC = () => {
                       onValueChange={handleUtilityModelChange}
                     >
                       <SelectTrigger className="w-fit min-w-[220px]">
-                        <SelectValue placeholder="Not selected" />
+                        <SelectValue placeholder="未选择" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={UTILITY_NOT_SELECTED_VALUE}>Not selected</SelectItem>
+                        <SelectItem value={UTILITY_NOT_SELECTED_VALUE}>未选择</SelectItem>
                         {utilityModelOptions.map((model) => (
                           <SelectItem key={model.id} value={model.id}>
                             {model.name}
@@ -788,8 +788,8 @@ export const NotificationSettings: React.FC = () => {
                   <>
                     <div className="flex items-center gap-8 py-1.5 mt-1 border-t border-[var(--surface-subtle)]">
                       <div className="flex min-w-0 flex-col w-56 shrink-0">
-                        <span className="typography-ui-label text-foreground">Threshold</span>
-                        <span className="typography-meta text-muted-foreground">Messages longer than this will be summarized</span>
+                        <span className="typography-ui-label text-foreground">阈值</span>
+                        <span className="typography-meta text-muted-foreground">超过此长度的消息将被摘要</span>
                       </div>
                       <div className="flex items-center gap-2 w-fit">
                         <NumberInput
@@ -815,8 +815,8 @@ export const NotificationSettings: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-8 py-1.5">
                       <div className="flex min-w-0 flex-col w-56 shrink-0">
-                        <span className="typography-ui-label text-foreground">Length</span>
-                        <span className="typography-meta text-muted-foreground">Target character length of the summary</span>
+                        <span className="typography-ui-label text-foreground">长度</span>
+                        <span className="typography-meta text-muted-foreground">摘要的目标字符长度</span>
                       </div>
                       <div className="flex items-center gap-2 w-fit">
                         <NumberInput
@@ -844,8 +844,8 @@ export const NotificationSettings: React.FC = () => {
                 ) : (
                   <div className={cn("py-1.5 mt-1 border-t border-[var(--surface-subtle)]", isMobile ? "flex flex-col gap-3" : "flex items-center gap-8")}>
                     <div className={cn("flex min-w-0 flex-col", isMobile ? "w-full" : "w-56 shrink-0")}>
-                      <span className="typography-ui-label text-foreground">Max Length</span>
-                      <span className="typography-meta text-muted-foreground">Truncate {'{last_message}'} to this length</span>
+                      <span className="typography-ui-label text-foreground">最大长度</span>
+                      <span className="typography-meta text-muted-foreground">将 {'{last_message}'} 截断到此长度</span>
                     </div>
                     <div className={cn("flex items-center gap-2", isMobile ? "w-full" : "w-fit")}>
                       <NumberInput
@@ -880,7 +880,7 @@ export const NotificationSettings: React.FC = () => {
           <div className="mb-8">
             <div className="mb-1 px-1">
               <h3 className="typography-ui-header font-medium text-foreground">
-                Background Push Notifications
+                后台推送通知
               </h3>
             </div>
 
@@ -896,14 +896,14 @@ export const NotificationSettings: React.FC = () => {
                       void handleDisableBackgroundNotifications();
                     }
                   }}
-                  ariaLabel="Enable push notifications"
+                  ariaLabel="启用推送通知"
                 />
                 <div className="flex min-w-0 flex-col">
-                  <span className={cn("typography-ui-label", !pushSupported ? "text-muted-foreground" : "text-foreground")}>Enable push notifications</span>
+                  <span className={cn("typography-ui-label", !pushSupported ? "text-muted-foreground" : "text-foreground")}>启用推送通知</span>
                   <span className="typography-meta text-muted-foreground">
                     {!pushSupported
-                      ? "Push not supported. Desktop Chrome/Edge and Android support push. iOS requires an installed PWA."
-                      : "Receive alerts via your operating system background service"}
+                      ? "推送不受支持。桌面版 Chrome/Edge 和 Android 支持推送。iOS 需要安装 PWA。"
+                      : "通过操作系统的后台服务接收提醒"}
                   </span>
                 </div>
                 {pushBusy && (

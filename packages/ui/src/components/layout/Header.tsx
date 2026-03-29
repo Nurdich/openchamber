@@ -525,11 +525,11 @@ export const Header: React.FC<HeaderProps> = ({
             }
           }
           if (otherModels.length > 0) {
-            group.modelFamilies.push({
-              familyId: null,
-              familyLabel: 'Other',
-              models: otherModels,
-            });
+              group.modelFamilies.push({
+                familyId: null,
+                familyLabel: '其他',
+                models: otherModels,
+              });
           }
         }
       }
@@ -1061,20 +1061,20 @@ export const Header: React.FC<HeaderProps> = ({
     }
   }, [isDesktopApp]);
 
-  const tabs: TabConfig[] = React.useMemo(() => {
+    const tabs: TabConfig[] = React.useMemo(() => {
     if (isMobile) {
       const base: TabConfig[] = [
-        { id: 'chat', label: 'Chat', icon: RiChat4Line },
+        { id: 'chat', label: '聊天', icon: RiChat4Line },
       ];
 
       if (showPlanTab) {
-        base.push({ id: 'plan', label: 'Plan', icon: RiFileTextLine });
+        base.push({ id: 'plan', label: '计划', icon: RiFileTextLine });
       }
 
       base.push(
-        { id: 'diff', label: 'Diff', icon: 'diff' },
-        { id: 'files', label: 'Files', icon: RiFolder6Line },
-        { id: 'terminal', label: 'Terminal', icon: RiTerminalBoxLine },
+        { id: 'diff', label: '差异', icon: 'diff' },
+        { id: 'files', label: '文件', icon: RiFolder6Line },
+        { id: 'terminal', label: '终端', icon: RiTerminalBoxLine },
       );
 
       return base;
@@ -1116,8 +1116,8 @@ export const Header: React.FC<HeaderProps> = ({
 
   const quotaDisplayTabs = React.useMemo(() => {
     return [
-      { value: 'usage' as const, label: 'Used' },
-      { value: 'remaining' as const, label: 'Remaining' },
+      { value: 'usage' as const, label: '已用' },
+      { value: 'remaining' as const, label: '剩余' },
     ];
   }, []);
 
@@ -1287,7 +1287,7 @@ export const Header: React.FC<HeaderProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-64">
             <DropdownMenuLabel className="typography-ui-header font-semibold text-foreground">
-              GitHub Accounts
+              GitHub 账户
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {githubAccounts.map((account) => {
@@ -1371,7 +1371,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Plan ({shortcutLabel('toggle_context_plan')})</p>
+            <p>计划（{shortcutLabel('toggle_context_plan')}）</p>
           </TooltipContent>
         </Tooltip>
       )}
@@ -1394,8 +1394,8 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 aria-label={isDesktopApp
-                  ? `Open instance, usage and MCP (current: ${currentInstanceLabel})`
-                  : 'Open services, usage and MCP'}
+                  ? `打开实例、用量和 MCP（当前：${currentInstanceLabel}）`
+                  : '打开服务、用量和 MCP'}
                 className={cn(
                   desktopHeaderIconButtonClass,
                   isDesktopApp ? 'w-auto max-w-[14rem] justify-start gap-1.5 px-2.5' : 'h-8 w-8'
@@ -1410,7 +1410,7 @@ export const Header: React.FC<HeaderProps> = ({
           </TooltipTrigger>
           <TooltipContent>
             <p>
-              {isDesktopApp ? `Current instance: ${currentInstanceLabel}` : 'Services'} ({shortcutLabel('toggle_services_menu')}; next tab {shortcutLabel('cycle_services_tab')})
+              {isDesktopApp ? `当前实例：${currentInstanceLabel}` : '服务'}（{shortcutLabel('toggle_services_menu')}；下一个标签 {shortcutLabel('cycle_services_tab')}）
             </p>
           </TooltipContent>
         </Tooltip>
@@ -1457,7 +1457,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Usage header bar */}
               <div className="flex items-center justify-between gap-3 border-b border-[var(--interactive-border)] px-4 py-2.5">
                 <div className="flex min-w-0 items-baseline gap-2">
-                  <span className="typography-ui-header font-semibold text-foreground">Rate limits</span>
+                            <span className="typography-ui-header font-semibold text-foreground">速率限制</span>
                   <span className="truncate typography-micro text-muted-foreground">{formatTime(quotaLastUpdated)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -1513,7 +1513,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                       {group.entries.length === 0 && (!group.modelFamilies || group.modelFamilies.length === 0) ? (
                         <div className="px-4 pb-2">
-                          <span className="typography-ui-label text-muted-foreground">{group.error ?? 'No rate limits reported.'}</span>
+                          <span className="typography-ui-label text-muted-foreground">{group.error ?? '未报告速率限制'}</span>
                         </div>
                       ) : (
                         <div className="space-y-3 px-4 pb-2">
@@ -1682,9 +1682,9 @@ export const Header: React.FC<HeaderProps> = ({
               <RiLayoutLeftLine className="h-[18px] w-[18px]" />
             </button>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>Open sessions ({shortcutLabel('toggle_sidebar')})</p>
-          </TooltipContent>
+            <TooltipContent>
+              <p>打开会话列表（{shortcutLabel('toggle_sidebar')}）</p>
+            </TooltipContent>
         </Tooltip>
       ) : null}
 
@@ -1702,7 +1702,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>New session ({shortcutLabel('new_chat')})</p>
+              <p>新建会话（{shortcutLabel('new_chat')}）</p>
             </TooltipContent>
           </Tooltip>
         ) : null}
@@ -1812,7 +1812,7 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {isSessionSwitcherOpen && (
-          <span className="typography-ui-label font-semibold text-foreground">Sessions</span>
+          <span className="typography-ui-label font-semibold text-foreground">会话</span>
         )}
       </div>
 
@@ -1914,7 +1914,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Services</p>
+                  <p>服务</p>
                 </TooltipContent>
               </Tooltip>
               <DropdownMenuContent
@@ -1964,7 +1964,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <div className="border-b border-[var(--interactive-border)]">
                         <div className="flex items-center justify-between gap-3 px-4 py-3">
                           <div className="flex flex-col min-w-0 gap-0.5">
-                            <span className="typography-ui-header font-semibold text-foreground">Rate limits</span>
+                  <span className="typography-ui-header font-semibold text-foreground">速率限制</span>
                             <span className="truncate typography-micro text-muted-foreground">
                               {formatTime(quotaLastUpdated)}
                             </span>
@@ -1981,7 +1981,7 @@ export const Header: React.FC<HeaderProps> = ({
                                     : 'text-muted-foreground hover:text-foreground'
                                 )}
                               >
-                                Used
+                                已用
                               </button>
                               <span className="text-muted-foreground typography-ui-label px-0.5">·</span>
                               <button
@@ -1994,7 +1994,7 @@ export const Header: React.FC<HeaderProps> = ({
                                     : 'text-muted-foreground hover:text-foreground'
                                 )}
                               >
-                                Remaining
+                                剩余
                               </button>
                             </div>
                             <button
@@ -2016,7 +2016,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                       {!hasRateLimits && (
                         <div className="px-4 py-6 text-center">
-                          <span className="typography-ui-label text-muted-foreground">No rate limits available.</span>
+                          <span className="typography-ui-label text-muted-foreground">无可用速率限制</span>
                         </div>
                       )}
 

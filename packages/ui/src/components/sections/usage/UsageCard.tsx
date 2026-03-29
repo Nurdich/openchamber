@@ -25,7 +25,7 @@ export const UsageCard: React.FC<UsageCardProps> = ({
 }) => {
   const displayMode = useQuotaStore((state) => state.displayMode);
   const displayPercent = displayMode === 'remaining' ? window.remainingPercent : window.usedPercent;
-  const barLabel = displayMode === 'remaining' ? 'remaining' : 'used';
+const barLabel = displayMode === 'remaining' ? '剩余' : '已用';
   const percentLabel = window.valueLabel ?? formatPercent(displayPercent);
   const resetLabel = window.resetAfterFormatted ?? window.resetAtFormatted ?? '';
   const windowLabel = formatWindowLabel(title);
@@ -50,7 +50,7 @@ export const UsageCard: React.FC<UsageCardProps> = ({
             <Checkbox
               checked={toggleEnabled}
               onChange={(checked) => onToggle?.(checked)}
-              ariaLabel="Show in dropdown"
+ariaLabel="在下拉菜单中显示"
             />
           )}
           <div className="min-w-0 flex flex-col">
@@ -74,7 +74,7 @@ export const UsageCard: React.FC<UsageCardProps> = ({
         />
         <div className="mt-1 flex items-center justify-between">
           <span className="typography-micro text-muted-foreground">
-            {resetLabel ? `Resets ${resetLabel}` : ''}
+{resetLabel ? `于 ${resetLabel} 重置` : ''}
           </span>
           <span className="typography-micro text-muted-foreground">
             {barLabel}

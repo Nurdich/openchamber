@@ -217,17 +217,17 @@ export const SyncActions: React.FC<SyncActionsProps> = ({
             'fetch',
             <RiRefreshLine className="size-4" />,
             <RiLoader4Line className="size-4 animate-spin" />,
-            'Fetch',
+            '获取',
             onFetch,
-            'Fetch from remote'
+            '从远程仓库获取更新'
           )
         : renderButton(
             'fetch',
             <RiRefreshLine className="size-4" />,
             <RiLoader4Line className="size-4 animate-spin" />,
-            'Fetch',
+            '获取',
             handleFetch,
-            'Fetch from remote'
+            '从远程仓库获取更新'
           )}
 
       {hasMultipleRemotes
@@ -235,18 +235,18 @@ export const SyncActions: React.FC<SyncActionsProps> = ({
             'pull',
             <RiArrowDownLine className="size-4" />,
             <RiLoader4Line className="size-4 animate-spin" />,
-            'Pull',
+            '拉取',
             onPull,
-            behindCount > 0 ? `Pull changes (${behindCount} behind)` : 'Pull changes',
+            behindCount > 0 ? `拉取更新（落后 ${behindCount} 个提交）` : '从远程拉取更新',
             behindCount
           )
         : renderButton(
             'pull',
             <RiArrowDownLine className="size-4" />,
             <RiLoader4Line className="size-4 animate-spin" />,
-            'Pull',
+            '拉取',
             handlePull,
-            behindCount > 0 ? `Pull changes (${behindCount} behind)` : 'Pull changes',
+            behindCount > 0 ? `拉取更新（落后 ${behindCount} 个提交）` : '从远程拉取更新',
             behindCount
           )}
 
@@ -254,9 +254,9 @@ export const SyncActions: React.FC<SyncActionsProps> = ({
         'push',
         <RiArrowUpLine className="size-4" />,
         <RiLoader4Line className="size-4 animate-spin" />,
-        'Push',
+        '推送',
         handlePush,
-        aheadCount > 0 ? `Push changes (${aheadCount} ahead)` : 'Push changes',
+        aheadCount > 0 ? `推送到远程（领先 ${aheadCount} 个提交）` : '推送到远程',
         aheadCount
       )}
     </div>

@@ -23,8 +23,8 @@ export const PreviewToggleButton: React.FC<PreviewToggleButtonProps> = ({
   onToggle,
 }) => {
   const isPreview = currentMode === 'preview';
-  const ariaLabel = isPreview ? 'Switch to edit mode' : 'Switch to preview mode';
-  const tooltipText = isPreview ? 'Edit' : 'Preview';
+const ariaLabel = isPreview ? "切换到编辑模式" : "切换到预览模式";
+const tooltipText = isPreview ? "编辑" : "预览";
 
   return (
     <Tooltip delayDuration={500}>

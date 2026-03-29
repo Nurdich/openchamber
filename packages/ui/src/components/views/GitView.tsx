@@ -505,10 +505,10 @@ export const GitView: React.FC = () => {
   const handleCopyCommitHash = React.useCallback((hash: string) => {
     void copyTextToClipboard(hash).then((result) => {
       if (result.ok) {
-        toast.success('Commit hash copied');
+toast.success('提交哈希已复制');
         return;
       }
-      toast.error('Failed to copy');
+toast.error('复制失败');
     });
   }, []);
 
@@ -808,18 +808,18 @@ export const GitView: React.FC = () => {
           throw new Error('No remote available for fetch');
         }
         await git.gitFetch(currentDirectory, { remote: remote.name });
-        toast.success(`Fetched from ${remote.name}`);
+toast.success(`已从 ${remote.name} 获取`);
       } else if (action === 'pull') {
         if (!remote) {
           throw new Error('No remote available for pull');
         }
         const result = await git.gitPull(currentDirectory, { remote: remote.name });
         toast.success(
-          `Pulled ${result.files.length} file${result.files.length === 1 ? '' : 's'} from ${remote.name}`
+          `从 ${remote.name} 拉取了 ${result.files.length} 个文件`
         );
       } else if (action === 'push') {
         await git.gitPush(currentDirectory);
-        toast.success('Pushed to upstream');
+toast.success('已推送到远程');
       }
 
       await refreshStatusAndBranches(false);
@@ -829,7 +829,7 @@ export const GitView: React.FC = () => {
         err instanceof Error
           ? err.message
           : `Failed to ${action === 'pull' ? 'pull' : action}`;
-      toast.error(message);
+toast.error(message);
     } finally {
       setSyncAction(null);
     }
@@ -867,13 +867,13 @@ export const GitView: React.FC = () => {
   const handleCommit = async (options: { pushAfter?: boolean } = {}) => {
     if (!currentDirectory) return;
     if (!commitMessage.trim()) {
-      toast.error('Please enter a commit message');
+toast.error('请输入提交信息');
       return;
     }
 
     const filesToCommit = Array.from(selectedPaths).sort();
     if (filesToCommit.length === 0) {
-      toast.error('Select at least one file to commit');
+toast.error('请选择至少一个文件来提交');
       return;
     }
 
@@ -884,7 +884,7 @@ export const GitView: React.FC = () => {
       await git.createGitCommit(currentDirectory, commitMessage.trim(), {
         files: filesToCommit,
       });
-      toast.success('Commit created successfully');
+toast.success('提交创建成功');
       setCommitMessage('');
       setSelectedPaths(new Set());
       setHasUserAdjustedSelection(false);
@@ -894,7 +894,7 @@ export const GitView: React.FC = () => {
 
       if (options.pushAfter) {
         await git.gitPush(currentDirectory);
-        toast.success('Pushed to upstream');
+toast.success('已推送到远程');
         triggerFireworks();
         await refreshStatusAndBranches(false);
       } else {
@@ -905,7 +905,7 @@ export const GitView: React.FC = () => {
       setIntegrateRefreshKey((v) => v + 1);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create commit';
-      toast.error(message);
+toast.error(message);
     } finally {
       setCommitAction(null);
     }
@@ -914,7 +914,7 @@ export const GitView: React.FC = () => {
   const handleGenerateCommitMessage = React.useCallback(async () => {
     if (!currentDirectory) return;
     if (selectedPaths.size === 0) {
-      toast.error('Select at least one file to describe');
+toast.error('请选择至少一个文件来描述');
       return;
     }
 
@@ -965,7 +965,7 @@ export const GitView: React.FC = () => {
 
     try {
       await git.createBranch(currentDirectory, branchName, checkoutBase ?? 'HEAD');
-      toast.success(`Created branch ${branchName}`);
+toast.success(`已创建分支 ${branchName}`);
 
       // Checkout the new branch and stay on it
       await git.checkoutBranch(currentDirectory, branchName);
@@ -983,10 +983,10 @@ export const GitView: React.FC = () => {
           pushError instanceof Error
             ? pushError.message
             : `Unable to push new branch to ${remoteName}.`;
-        toast.warning('Branch created locally', {
+toast.warning('分支已在本地创建', {
           description: (
             <span className="text-foreground/80 dark:text-foreground/70">
-              Upstream setup failed: {message}
+上游设置失败: {message}
             </span>
           ),
         });
@@ -996,10 +996,10 @@ export const GitView: React.FC = () => {
       await refreshLog();
 
       if (pushSucceeded) {
-        toast.success(`Upstream set for ${branchName} on ${remoteName}`);
+toast.success(`已为 ${branchName} 在 ${remoteName} 设置上游`);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to create branch';
+const message = err instanceof Error ? err.message : '创建分支失败';
       toast.error(message);
       throw err;
     }
@@ -1010,11 +1010,11 @@ export const GitView: React.FC = () => {
 
     try {
       await git.renameBranch(currentDirectory, oldName, newName);
-      toast.success(`Renamed branch ${oldName} to ${newName}`);
+toast.success(`已将分支 ${oldName} 重命名为 ${newName}`);
       await refreshStatusAndBranches();
       await refreshLog();
     } catch (err) {
-      const message =
+const message = err instanceof Error ? err.message : `重命名分支 ${oldName} 失败`;
         err instanceof Error ? err.message : `Failed to rename branch ${oldName} to ${newName}`;
       toast.error(message);
     }
@@ -1030,11 +1030,11 @@ export const GitView: React.FC = () => {
 
     try {
       await git.checkoutBranch(currentDirectory, normalized);
-      toast.success(`Checked out ${normalized}`);
+toast.success(`已切换到 ${normalized}`);
       await refreshStatusAndBranches();
       await refreshLog();
     } catch (err) {
-      const message =
+const message = err instanceof Error ? err.message : `切换到 ${normalized} 失败`;
         err instanceof Error ? err.message : `Failed to checkout ${normalized}`;
       toast.error(message);
     }
@@ -1621,16 +1621,16 @@ export const GitView: React.FC = () => {
     try {
       if (conflictOperation === 'merge') {
         await git.abortMerge(currentDirectory);
-        toast.success('Merge aborted');
+toast.success('已取消合并');
       } else {
         await git.abortRebase(currentDirectory);
-        toast.success('Rebase aborted');
+toast.success('已取消变基');
       }
       clearConflictState();
       await refreshStatusAndBranches();
       await refreshLog();
     } catch (err) {
-      const message = err instanceof Error ? err.message : `Failed to abort ${conflictOperation}`;
+const message = err instanceof Error ? err.message : `取消${conflictOperation}失败`;
       toast.error(message);
     }
   }, [currentDirectory, git, conflictOperation, refreshStatusAndBranches, refreshLog, clearConflictState]);
@@ -1659,10 +1659,10 @@ export const GitView: React.FC = () => {
           setConflictOperation('merge');
           setConflictDialogOpen(true);
           persistConflictState(currentDirectory, result.conflictFiles ?? [], 'merge');
-          toast.error('Merge conflicts detected');
+toast.error('检测到合并冲突');
         } else {
           clearConflictState();
-          toast.success('Merge completed');
+toast.success('合并完成');
           await refreshStatusAndBranches();
           await refreshLog();
         }
@@ -1673,16 +1673,16 @@ export const GitView: React.FC = () => {
           setConflictOperation('rebase');
           setConflictDialogOpen(true);
           persistConflictState(currentDirectory, result.conflictFiles ?? [], 'rebase');
-          toast.error('Rebase conflicts detected');
+toast.error('检测到变基冲突');
         } else {
           clearConflictState();
-          toast.success('Rebase step completed');
+toast.success('变基步骤完成');
           await refreshStatusAndBranches();
           await refreshLog();
         }
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to continue operation';
+const message = err instanceof Error ? err.message : '继续操作失败';
       toast.error(message);
     }
   }, [currentDirectory, git, status, refreshStatusAndBranches, refreshLog, persistConflictState, clearConflictState]);
@@ -1694,16 +1694,16 @@ export const GitView: React.FC = () => {
       const isMerge = !!status?.mergeInProgress?.head;
       if (isMerge) {
         await git.abortMerge(currentDirectory);
-        toast.success('Merge aborted');
+toast.success('已取消合并');
       } else {
         await git.abortRebase(currentDirectory);
-        toast.success('Rebase aborted');
+toast.success('已取消变基');
       }
       clearConflictState();
       await refreshStatusAndBranches();
       await refreshLog();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to abort operation';
+const message = err instanceof Error ? err.message : '取消操作失败';
       toast.error(message);
     }
   }, [currentDirectory, git, status, refreshStatusAndBranches, refreshLog, clearConflictState]);
@@ -1781,13 +1781,13 @@ export const GitView: React.FC = () => {
         if (restoreAfter && operationSucceeded) {
           try {
             await git.stashPop(currentDirectory);
-            toast.success('Stashed changes restored');
+toast.success('暂存的更改已恢复');
           } catch (popErr) {
-            const popMessage = popErr instanceof Error ? popErr.message : 'Failed to restore stashed changes';
+const popMessage = popErr instanceof Error ? popErr.message : '恢复暂存的更改失败';
             toast.error(popMessage);
           }
         } else if (restoreAfter && hasConflict) {
-          toast.info('Stashed changes will need to be restored manually after resolving conflicts');
+toast.info('解决冲突后需要手动恢复暂存的更改');
         }
 
         await refreshStatusAndBranches();
@@ -2077,12 +2077,12 @@ export const GitView: React.FC = () => {
           </DialogHeader>
           <Command className="h-[420px]">
             <CommandInput
-              placeholder="Search gitmojis..."
+placeholder="搜索 gitmoji..."
               value={gitmojiSearch}
               onValueChange={setGitmojiSearch}
             />
             <CommandList>
-              <CommandEmpty>No gitmojis found.</CommandEmpty>
+<CommandEmpty>未找到 gitmoji。</CommandEmpty>
               <CommandGroup>
                 {(gitmojiEmojis.length === 0
                   ? []

@@ -99,7 +99,7 @@ const CommandTextarea: React.FC<CommandTextareaProps> = ({ value, onChange }) =>
         : parseShellCommand(trimmed);
       setText(lines.join('\n'));
       onChange(lines);
-      toast.success(`Pasted ${lines.length} argument${lines.length !== 1 ? 's' : ''}`);
+      toast.success(`已粘贴 ${lines.length} 个参数`);
     } catch {
       toast.error('Cannot read clipboard');
     }
@@ -117,7 +117,7 @@ const CommandTextarea: React.FC<CommandTextareaProps> = ({ value, onChange }) =>
           title="Paste full command from clipboard and auto-split"
         >
           <RiClipboardLine className="h-3 w-3" />
-          Paste command
+          粘贴命令
         </Button>
       </div>
 
@@ -148,7 +148,7 @@ const CommandTextarea: React.FC<CommandTextareaProps> = ({ value, onChange }) =>
       {value.length > 0 && (
         <details className="group">
           <summary className="typography-micro text-muted-foreground/60 cursor-pointer select-none hover:text-muted-foreground">
-            Preview ({value.length} args)
+            预览（{value.length} 个参数）
           </summary>
           <div className="mt-1 rounded-md bg-[var(--surface-elevated)] px-3 py-2 overflow-x-auto">
             <code className="typography-micro text-foreground/80 whitespace-pre">
@@ -223,7 +223,7 @@ const EnvEditor: React.FC<EnvEditorProps> = ({ value, onChange }) => {
         if (key) parsed.push({ key, value: val });
       }
       if (parsed.length === 0) {
-        toast.error('No KEY=VALUE pairs found in clipboard');
+        toast.error('剪贴板中未找到 KEY=VALUE 配对');
         return;
       }
       // Merge: update existing keys, append new ones
@@ -234,9 +234,9 @@ const EnvEditor: React.FC<EnvEditorProps> = ({ value, onChange }) => {
         else merged.push(p);
       }
       onChange(merged);
-      toast.success(`Imported ${parsed.length} variable${parsed.length !== 1 ? 's' : ''}`);
+      toast.success(`已导入 ${parsed.length} 个变量`);
     } catch {
-      toast.error('Cannot read clipboard');
+      toast.error('无法读取剪贴板');
     }
   };
 
@@ -259,7 +259,7 @@ const EnvEditor: React.FC<EnvEditorProps> = ({ value, onChange }) => {
           title="Paste KEY=VALUE lines from clipboard"
         >
           <RiClipboardLine className="h-3 w-3" />
-          Paste .env
+          粘贴 .env
         </Button>
       </div>
 
@@ -316,12 +316,12 @@ const EnvEditor: React.FC<EnvEditorProps> = ({ value, onChange }) => {
         type="button"
       >
         <RiAddLine className="h-3.5 w-3.5" />
-        Add variable
+        添加变量
       </Button>
 
       {hasSensitiveValues && (
         <p className="typography-micro text-muted-foreground/60">
-          ⚠ Values are stored as plain text in opencode.json
+          ⚠ 变量以明文形式存储在 opencode.json 中
         </p>
       )}
     </div>
@@ -332,10 +332,10 @@ const EnvEditor: React.FC<EnvEditorProps> = ({ value, onChange }) => {
 // Status badge
 // ─────────────────────────────────────────────────────────────
 const STATUS_LABEL: Record<string, string> = {
-  connected: 'Connected',
-  failed: 'Failed',
-  needs_auth: 'Needs auth',
-  needs_client_registration: 'Needs registration',
+  connected: '已连接',
+  failed: '失败',
+  needs_auth: '需要认证',
+  needs_client_registration: '需要注册',
 };
 
 const StatusBadge: React.FC<{ status: string | undefined; enabled: boolean }> = ({ status, enabled }) => {
@@ -440,15 +440,15 @@ export const McpPage: React.FC = () => {
 
   const handleSave = async () => {
     const name = isNewServer ? draftName.trim() : selectedMcpName ?? '';
-    if (!name) { toast.error('Name is required'); return; }
+    if (!name) { toast.error('名称为必填项'); return; }
     if (isNewServer && mcpServers.some((s) => s.name === name)) {
-      toast.error('A server with this name already exists'); return;
+      toast.error('已存在同名服务器'); return;
     }
     if (mcpType === 'local' && command.filter(Boolean).length === 0) {
-      toast.error('Command cannot be empty for a local server'); return;
+      toast.error('本地服务器的命令不能为空'); return;
     }
     if (mcpType === 'remote' && !url.trim()) {
-      toast.error('URL cannot be empty for a remote server'); return;
+      toast.error('远程服务器的 URL 不能为空'); return;
     }
 
     const draft: McpDraft = { name, scope: draftScope, type: mcpType, command, url, environment: envEntries, enabled };
@@ -457,12 +457,12 @@ export const McpPage: React.FC = () => {
       const success = isNewServer ? await createMcp(draft) : await updateMcp(name, draft);
       if (success) {
         if (isNewServer) { setMcpDraft(null); setSelectedMcp(name); }
-        toast.success(isNewServer ? 'MCP server created. OpenCode reloading…' : 'Saved. OpenCode reloading…');
+        toast.success(isNewServer ? 'MCP 服务器已创建。OpenCode 正在重新加载…' : '已保存。OpenCode 正在重新加载…');
       } else {
-        toast.error('Failed to save');
+        toast.error('保存失败');
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : '发生错误');
     } finally {
       setIsSaving(false);
     }
@@ -472,8 +472,8 @@ export const McpPage: React.FC = () => {
     if (!selectedMcpName) return;
     setIsDeleting(true);
     const ok = await deleteMcp(selectedMcpName);
-    if (ok) { toast.success(`"${selectedMcpName}" deleted`); setShowDeleteConfirm(false); }
-    else toast.error('Failed to delete');
+    if (ok) { toast.success(`"${selectedMcpName}" 已删除`); setShowDeleteConfirm(false); }
+    else toast.error('删除失败');
     setIsDeleting(false);
   };
 
@@ -484,14 +484,14 @@ export const McpPage: React.FC = () => {
       const isConnected = mcpStatus[selectedMcpName]?.status === 'connected';
       if (isConnected) {
         await disconnectMcp(selectedMcpName, currentDirectory);
-        toast.success('Disconnected');
+        toast.success('已断开连接');
       } else {
         await connectMcp(selectedMcpName, currentDirectory);
-        toast.success('Connected');
+        toast.success('已连接');
       }
       await refreshStatus({ directory: currentDirectory, silent: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Connection failed');
+      toast.error(err instanceof Error ? err.message : '连接失败');
     } finally {
       setIsConnecting(false);
     }
@@ -503,8 +503,8 @@ export const McpPage: React.FC = () => {
       <div className="flex h-full items-center justify-center">
         <div className="text-center text-muted-foreground">
           <RiPlugLine className="mx-auto mb-3 h-12 w-12 opacity-50" />
-          <p className="typography-body">Select an MCP server from the sidebar</p>
-          <p className="typography-meta mt-1 opacity-75">or add a new one</p>
+          <p className="typography-body">从侧边栏选择 MCP 服务器</p>
+          <p className="typography-meta mt-1 opacity-75">或添加一个新的</p>
         </div>
       </div>
     );
@@ -521,7 +521,7 @@ export const McpPage: React.FC = () => {
         <div className="mb-4">
           <div className="min-w-0">
             {isNewServer ? (
-              <h2 className="typography-ui-header font-semibold text-foreground truncate">New MCP Server</h2>
+              <h2 className="typography-ui-header font-semibold text-foreground truncate">新建 MCP 服务器</h2>
             ) : (
               <div className="flex items-center gap-2 min-w-0">
                 <h2 className="typography-ui-header font-semibold text-foreground truncate">{selectedMcpName}</h2>
@@ -530,7 +530,7 @@ export const McpPage: React.FC = () => {
             )}
             <div className="flex items-center gap-2 mt-0.5">
               <p className="typography-meta text-muted-foreground truncate">
-                {isNewServer ? 'Configure a new MCP server' : `${mcpType === 'local' ? 'Local · stdio' : 'Remote · SSE'} transport`}
+                {isNewServer ? '配置新的 MCP 服务器' : `${mcpType === 'local' ? '本地 · stdio' : '远程 · SSE'} 传输`}
               </p>
               {!isNewServer && (
                 <Button
@@ -540,7 +540,7 @@ export const McpPage: React.FC = () => {
                   onClick={handleToggleConnect}
                   disabled={isConnecting || !enabled}
                 >
-                  {isConnecting ? 'Working...' : isConnected ? 'Disconnect' : 'Connect'}
+                  {isConnecting ? '工作中...' : isConnected ? '断开连接' : '连接'}
                 </Button>
               )}
             </div>
@@ -550,7 +550,7 @@ export const McpPage: React.FC = () => {
         {/* Server Identity */}
         <div className="mb-8">
           <div className="mb-1 px-1">
-            <h3 className="typography-ui-header font-medium text-foreground">Server</h3>
+            <h3 className="typography-ui-header font-medium text-foreground">服务器</h3>
           </div>
 
           <section className="px-2 pb-2 pt-0 space-y-0">
@@ -558,7 +558,7 @@ export const McpPage: React.FC = () => {
             {isNewServer && (
               <div className="flex flex-col gap-2 py-1.5 sm:flex-row sm:items-center sm:gap-8">
                 <div className="flex min-w-0 flex-col sm:w-56 shrink-0">
-                  <span className="typography-ui-label text-foreground">Server Name</span>
+                  <span className="typography-ui-label text-foreground">服务器名称</span>
                 </div>
                 <div className="flex min-w-0 flex-1 items-center gap-2 sm:w-fit sm:flex-initial">
                   <Input
@@ -576,13 +576,13 @@ export const McpPage: React.FC = () => {
                       <SelectItem value="user">
                         <div className="flex items-center gap-2">
                           <RiUser3Line className="h-3.5 w-3.5" />
-                          <span>User</span>
+                          <span>用户</span>
                         </div>
                       </SelectItem>
                       <SelectItem value="project">
                         <div className="flex items-center gap-2">
                           <RiFolderLine className="h-3.5 w-3.5" />
-                          <span>Project</span>
+                          <span>项目</span>
                         </div>
                       </SelectItem>
                     </SelectContent>
@@ -609,12 +609,12 @@ export const McpPage: React.FC = () => {
                 onChange={setEnabled}
                 ariaLabel="Enable server"
               />
-              <span className="typography-ui-label text-foreground">Enable Server</span>
+              <span className="typography-ui-label text-foreground">启用服务器</span>
             </div>
 
             <div className="pb-1.5 pt-0.5">
               <div className="flex min-w-0 flex-col gap-1.5">
-                <span className="typography-ui-label text-foreground">Transport Mode</span>
+                <span className="typography-ui-label text-foreground">传输模式</span>
                 <div className="flex flex-wrap items-center gap-1">
                   <Button
                     variant="outline"
@@ -651,11 +651,11 @@ export const McpPage: React.FC = () => {
 
         {/* Connection */}
         <div className="mb-8">
-          <div className="mb-1 px-1">
-            <h3 className="typography-ui-header font-medium text-foreground">
-              {mcpType === 'local' ? 'Command' : 'Server URL'}
-            </h3>
-          </div>
+              <div className="mb-1 px-1">
+                <h3 className="typography-ui-header font-medium text-foreground">
+                  {mcpType === 'local' ? '命令' : '服务器 URL'}
+                </h3>
+              </div>
 
           <section className="px-2 pb-2 pt-0">
             {mcpType === 'local' ? (
@@ -673,16 +673,16 @@ export const McpPage: React.FC = () => {
 
         {/* Environment Variables */}
         <div className="mb-2">
-          <div className="mb-1 px-1">
-            <h3 className="typography-ui-header font-medium text-foreground">
-              Environment Variables
-              {envEntries.length > 0 && (
-                <span className="ml-1.5 typography-micro text-muted-foreground font-normal">
-                  ({envEntries.length})
-                </span>
-              )}
-            </h3>
-          </div>
+              <div className="mb-1 px-1">
+                <h3 className="typography-ui-header font-medium text-foreground">
+                  环境变量
+                  {envEntries.length > 0 && (
+                    <span className="ml-1.5 typography-micro text-muted-foreground font-normal">
+                      ({envEntries.length})
+                    </span>
+                  )}
+                </h3>
+              </div>
 
           <section className="px-2 pb-2 pt-0">
             <EnvEditor value={envEntries} onChange={setEnvEntries} />
@@ -697,7 +697,7 @@ export const McpPage: React.FC = () => {
             size="xs"
             className="!font-normal"
           >
-            {isSaving ? 'Saving...' : isNewServer ? 'Create' : 'Save Changes'}
+            {isSaving ? '保存中...' : isNewServer ? '创建' : '保存更改'}
           </Button>
           {!isNewServer && (
             <Button
@@ -706,7 +706,7 @@ export const McpPage: React.FC = () => {
               className="!font-normal text-[var(--status-error)] hover:text-[var(--status-error)]"
               onClick={() => setShowDeleteConfirm(true)}
             >
-              Delete
+              删除
             </Button>
           )}
         </div>
@@ -719,10 +719,10 @@ export const McpPage: React.FC = () => {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete "{selectedMcpName}"?</DialogTitle>
+            <DialogTitle>删除 "{selectedMcpName}"？</DialogTitle>
             <DialogDescription>
-              This removes the server from <code className="text-foreground">opencode.json</code>.
-              OpenCode will need to reload.
+              这将从 <code className="text-foreground">opencode.json</code> 中移除服务器。
+              OpenCode 需要重新加载。
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -732,10 +732,10 @@ export const McpPage: React.FC = () => {
               disabled={isDeleting}
               className="text-foreground hover:bg-interactive-hover hover:text-foreground"
             >
-              Cancel
+              取消
             </Button>
             <Button size="sm" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting…' : 'Delete'}
+              {isDeleting ? '删除中…' : '删除'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -131,6 +131,29 @@ export type DirectorySwitchResult = {
 const normalizeFsPath = (path: string): string => path.replace(/\\/g, "/");
 const FS_LIST_CACHE_TTL_MS = 400;
 
+/**
+ * Get desktop runtime secret from window injection.
+ * Returns undefined if not in desktop mode or secret not available.
+ */
+const getDesktopSecret = (): string | undefined => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+  return (window as typeof window & { __OPENCHAMBER_SECRET__?: string }).__OPENCHAMBER_SECRET__;
+};
+
+/**
+ * Build fetch headers with desktop secret if available.
+ * Only adds the secret header when running in desktop mode with a valid secret.
+ */
+const buildFetchHeaders = (baseHeaders: Record<string, string> = {}): Record<string, string> => {
+  const secret = getDesktopSecret();
+  if (secret) {
+    return { ...baseHeaders, 'X-OpenChamber-Secret': secret };
+  }
+  return baseHeaders;
+};
+
 const getDesktopFilesApi = (): FilesAPI | null => {
   if (typeof window === "undefined") {
     return null;
@@ -445,9 +468,7 @@ class OpencodeService {
 
       const response = await fetch(url.toString(), {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
+        headers: buildFetchHeaders({ Accept: "application/json" }),
       });
 
       if (!response.ok) {
@@ -740,10 +761,7 @@ class OpencodeService {
     try {
       response = await fetch(url.toString(), {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
-        },
+        headers: buildFetchHeaders({ 'content-type': 'application/json', accept: 'application/json' }),
         body: JSON.stringify({
           model: {
             providerID: params.providerID,
@@ -822,10 +840,7 @@ class OpencodeService {
 
     const response = await fetch(url.toString(), {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        accept: 'application/json',
-      },
+      headers: buildFetchHeaders({ 'content-type': 'application/json', accept: 'application/json' }),
       body: JSON.stringify(payload),
     });
 
@@ -908,9 +923,7 @@ class OpencodeService {
 
       const response = await fetch(url.toString(), {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
+        headers: buildFetchHeaders({ Accept: "application/json" }),
       });
 
       if (!response.ok) {
@@ -949,9 +962,7 @@ class OpencodeService {
       // Web server endpoint - use relative path that works with both dev and prod
       const response = await fetch('/api/session-activity', {
         method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
+        headers: buildFetchHeaders({ Accept: 'application/json' }),
       });
 
       if (!response.ok) {
@@ -1133,9 +1144,7 @@ class OpencodeService {
 
     const response = await fetch(url, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: buildFetchHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(config)
     });
 
@@ -1858,9 +1867,7 @@ class OpencodeService {
       // In a real implementation, this would call an API endpoint to read the file
       const response = await fetch(`${this.baseUrl}/files/read`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: buildFetchHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           path,
           directory: this.currentDirectory
@@ -1884,9 +1891,7 @@ class OpencodeService {
       const targetDir = directory || this.currentDirectory || '/';
       const response = await fetch(`${this.baseUrl}/files/list`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: buildFetchHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ directory: targetDir })
       });
 
@@ -2017,9 +2022,7 @@ class OpencodeService {
 
     const response = await fetch(`${this.baseUrl}/fs/mkdir`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: buildFetchHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(payload),
     });
 
@@ -2081,7 +2084,9 @@ class OpencodeService {
         params.set('respectGitignore', 'true');
       }
       const query = params.toString();
-      const response = await fetch(`${this.baseUrl}/fs/list${query ? `?${query}` : ''}`);
+      const response = await fetch(`${this.baseUrl}/fs/list${query ? `?${query}` : ''}`, {
+        headers: buildFetchHeaders(),
+      });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         const message = typeof error.error === 'string' ? error.error : 'Failed to list directory';
@@ -2171,9 +2176,7 @@ class OpencodeService {
     try {
       const response = await fetch(`${this.baseUrl}/fs/home`, {
         method: 'GET',
-        headers: {
-          Accept: 'application/json'
-        }
+        headers: buildFetchHeaders({ Accept: 'application/json' })
       });
 
       if (!response.ok) {
@@ -2208,9 +2211,7 @@ class OpencodeService {
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: buildFetchHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ path: directoryPath })
       });
 
@@ -2235,7 +2236,7 @@ class OpencodeService {
         path: directoryPath
       };
     } catch (error) {
-      console.warn('Failed to update OpenCode working directory:', error);
+      console.warn('[OpencodeClient] Failed to update OpenCode working directory:', error);
       throw error;
     }
   }

@@ -374,9 +374,9 @@ export const FileMentionAutocomplete = React.forwardRef<FileMentionHandle, FileM
           <div className="px-2 pt-2 pb-1 border-b border-border/60">
             <div className="flex items-center gap-1 rounded-lg bg-[var(--surface-elevated)] p-1">
               {([
-                { id: 'commands' as const, label: 'Commands' },
-                { id: 'agents' as const, label: 'Agents' },
-                { id: 'files' as const, label: 'Files' },
+                { id: 'commands' as const, label: '命令' },
+                { id: 'agents' as const, label: '代理' },
+                { id: 'files' as const, label: '文件' },
               ]).map((tab) => (
                 <button
                   key={tab.id}
@@ -441,7 +441,7 @@ export const FileMentionAutocomplete = React.forwardRef<FileMentionHandle, FileM
             })}
             {visibleAgents.length === 2 && normalizedSearchQuery.length === 0 && agents.length > 2 && (
               <div className="px-3 py-1 typography-meta text-muted-foreground">
-                Type to search more agents
+                输入以搜索更多代理
               </div>
             )}
             {visibleAgents.length > 0 && (recentFiles.length > 0 || files.length > 0) && (
@@ -555,14 +555,14 @@ export const FileMentionAutocomplete = React.forwardRef<FileMentionHandle, FileM
             })}
             {files.length === 0 && recentFiles.length === 0 && visibleAgents.length === 0 && (
               <div className="px-3 py-2 typography-ui-label text-muted-foreground">
-                No matches found
+                未找到匹配项
               </div>
             )}
           </div>
         )}
         </ScrollableOverlay>
         <div className="px-3 pt-1 pb-1.5 border-t typography-meta text-muted-foreground">
-        ↑↓ navigate • Enter select • Esc close
+        ↑↓ 导航 • Enter 选择 • Esc 关闭
       </div>
     </div>
   );

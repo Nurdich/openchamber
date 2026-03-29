@@ -19,8 +19,8 @@ const variantConfig: Record<
     ReasoningVariant,
     { label: string; Icon: IconComponent }
 > = {
-    thinking: { label: 'Thinking', Icon: RiBrainAi3Line },
-    justification: { label: 'Justification', Icon: RiChatAi3Line },
+    thinking: { label: '思考中', Icon: RiBrainAi3Line },
+    justification: { label: '说明', Icon: RiChatAi3Line },
 };
 
 const cleanReasoningText = (text: string): string => {

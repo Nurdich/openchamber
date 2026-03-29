@@ -249,7 +249,7 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
   if (!projectPath) {
     return (
       <p className="typography-meta text-muted-foreground">
-        Select a project to manage worktrees.
+        选择一个项目来管理 worktrees。
       </p>
     );
   }
@@ -257,7 +257,7 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
   if (isGitRepoLocal === false) {
     return (
       <p className="typography-meta text-muted-foreground">
-        Worktree settings are only available for Git repositories.
+        Worktree 设置仅适用于 Git 仓库。
       </p>
     );
   }
@@ -268,13 +268,14 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
       <div className="space-y-2">
         <div className="mb-1 px-1">
           <div className="flex items-center gap-2">
-            <h3 className="typography-ui-header font-normal text-foreground">Setup commands</h3>
+            <h3 className="typography-ui-header font-normal text-foreground">设置命令</h3>
             <Tooltip delayDuration={1000}>
               <TooltipTrigger asChild>
                 <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
               </TooltipTrigger>
               <TooltipContent sideOffset={8} className="max-w-xs">
-                Run automatically inside the new worktree directory when a worktree is created.
+                在创建 worktree 时自动在新 worktree 目录中运行。
+                使用 <code className="font-mono text-xs bg-sidebar-accent/50 px-1 rounded">$ROOT_PROJECT_PATH</code> 表示项目根目录。
                 Use <code className="font-mono text-xs bg-sidebar-accent/50 px-1 rounded">$ROOT_PROJECT_PATH</code> for the project root.
               </TooltipContent>
             </Tooltip>
@@ -282,7 +283,7 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
         </div>
 
         {isLoadingCommands ? (
-          <p className="typography-meta text-muted-foreground px-1">Loading...</p>
+          <p className="typography-meta text-muted-foreground px-1">加载中...</p>
         ) : (
           <div className="space-y-2 px-1">
             {setupCommands.map((command, index) => (
@@ -291,7 +292,7 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
                   value={command}
                   onChange={(e) => handleSetupCommandChange(index, e.target.value)}
                   onBlur={handleCommandBlur}
-                  placeholder="e.g., bun install"
+                  placeholder="例如: bun install"
                   className="h-7 w-[30rem] max-w-full font-mono text-xs"
                 />
                   <button
@@ -300,7 +301,7 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
                     handleRemoveCommand(index);
                     }}
                     className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                    aria-label="Remove command"
+                    aria-label="删除命令"
                   >
                   <RiCloseLine className="h-4 w-4" />
                 </button>
@@ -314,7 +315,7 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
               onClick={handleAddCommand}
             >
               <RiAddLine className="h-3.5 w-3.5" />
-              Add command
+              添加命令
             </Button>
           </div>
         )}
@@ -324,23 +325,23 @@ export const WorktreeSectionContent: React.FC<WorktreeSectionContentProps> = ({ 
       <div className="space-y-2 border-t border-border/40 pt-4">
         <div className="mb-1 px-1">
           <div className="flex items-center gap-2">
-            <h3 className="typography-ui-header font-normal text-foreground">Existing worktrees</h3>
+            <h3 className="typography-ui-header font-normal text-foreground">现有 worktrees</h3>
             <Tooltip delayDuration={1000}>
               <TooltipTrigger asChild>
                 <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
               </TooltipTrigger>
               <TooltipContent sideOffset={8} className="max-w-xs">
-                Worktrees live outside the repo (OpenCode-managed). Deleting a worktree also removes linked sessions.
+                Worktree 存在于仓库外部（由 OpenCode 管理）。删除 worktree 也会删除关联的会话。
               </TooltipContent>
             </Tooltip>
           </div>
         </div>
 
         {isLoadingWorktrees ? (
-          <p className="typography-meta text-muted-foreground px-1">Loading worktrees...</p>
+          <p className="typography-meta text-muted-foreground px-1">加载 worktrees...</p>
         ) : availableWorktrees.length === 0 ? (
           <p className="typography-meta text-muted-foreground/70 px-1">
-            No worktrees found for this project
+            未找到此项目的 worktrees
           </p>
         ) : (
           <div className="space-y-1 px-1 max-w-[32.5rem]">

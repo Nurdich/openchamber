@@ -108,10 +108,10 @@ export const ProjectsPage: React.FC = () => {
       const uploadResult = await uploadProjectIcon(selectedProject.id, pendingUploadIconFile);
       setIsUploadingIcon(false);
       if (!uploadResult.ok) {
-        toast.error(uploadResult.error || 'Failed to upload project icon');
+        toast.error(uploadResult.error || '上传项目图标失败');
         return;
       }
-      toast.success('Project icon updated');
+      toast.success('项目图标已更新');
       clearPendingUploadIcon();
       setPendingRemoveImageIcon(false);
     }
@@ -123,10 +123,10 @@ export const ProjectsPage: React.FC = () => {
       const removeResult = await removeProjectIcon(selectedProject.id);
       setIsRemovingCustomIcon(false);
       if (!removeResult.ok) {
-        toast.error(removeResult.error || 'Failed to remove project icon');
+        toast.error(removeResult.error || '移除项目图标失败');
         return;
       }
-      toast.success('Project icon removed');
+      toast.success('项目图标已移除');
       setPendingRemoveImageIcon(false);
       setIconBackground(null);
     }
@@ -220,14 +220,14 @@ export const ProjectsPage: React.FC = () => {
     void discoverProjectIcon(selectedProject.id)
       .then((result) => {
         if (!result.ok) {
-          toast.error(result.error || 'Failed to discover project icon');
+          toast.error(result.error || '发现项目图标失败');
           return;
         }
         if (result.skipped) {
-          toast.success('Custom icon already set for this project');
+          toast.success('该项目已设置自定义图标');
           return;
         }
-        toast.success('Project icon discovered');
+          toast.success('已发现项目图标');
       })
       .finally(() => {
         setIsDiscoveringIcon(false);
@@ -238,7 +238,7 @@ export const ProjectsPage: React.FC = () => {
     return (
       <ScrollableOverlay keyboardAvoid outerClassName="h-full" className="w-full">
         <div className="mx-auto w-full max-w-4xl p-3 sm:p-6 sm:pt-8">
-          <p className="typography-meta text-muted-foreground">No projects available.</p>
+          <p className="typography-meta text-muted-foreground">暂无可用项目。</p>
         </div>
       </ScrollableOverlay>
     );
@@ -251,7 +251,7 @@ export const ProjectsPage: React.FC = () => {
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <h2 className="typography-ui-header font-semibold text-foreground truncate">
-              {selectedProject.label ?? 'Project Settings'}
+              {selectedProject.label ?? '项目设置'}
             </h2>
             <p className="typography-meta text-muted-foreground truncate" title={selectedProject.path}>
               {selectedProject.path}
@@ -266,13 +266,13 @@ export const ProjectsPage: React.FC = () => {
             {/* Name */}
             <div className="py-1.5">
               <div className="flex min-w-0 flex-col">
-                <span className="typography-ui-label text-foreground">Project Name</span>
+                <span className="typography-ui-label text-foreground">项目名称</span>
               </div>
               <div className="mt-1.5 flex min-w-0 items-center gap-2">
                 <Input 
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
-                  placeholder="Project name" 
+                  placeholder="项目名称"
                   className="h-7 min-w-0 w-full sm:max-w-[19rem]" 
                 />
               </div>
@@ -281,7 +281,7 @@ export const ProjectsPage: React.FC = () => {
             {/* Color */}
             <div className="py-1.5">
               <div className="flex min-w-0 flex-col">
-                <span className="typography-ui-label text-foreground">Accent Color</span>
+                <span className="typography-ui-label text-foreground">强调色</span>
               </div>
               <div className="mt-1.5 flex flex-wrap items-center gap-2">
                 <button
@@ -293,7 +293,7 @@ export const ProjectsPage: React.FC = () => {
                       ? 'border-2 border-foreground bg-[var(--primary-base)]/10'
                       : 'border-border/40 hover:border-border hover:bg-[var(--surface-muted)]'
                   )}
-                  title="None"
+                  title="无"
                 >
                   <RiCloseLine className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -318,7 +318,7 @@ export const ProjectsPage: React.FC = () => {
             {/* Icon */}
             <div className="py-1.5">
               <div className="flex min-w-0 flex-col">
-                <span className="typography-ui-label text-foreground">Project Icon</span>
+                <span className="typography-ui-label text-foreground">项目图标</span>
               </div>
               <input
                 ref={fileInputRef}
@@ -341,7 +341,7 @@ export const ProjectsPage: React.FC = () => {
                       ? 'border-2 border-foreground bg-[var(--primary-base)]/10'
                       : 'border-border/40 hover:border-border hover:bg-[var(--surface-muted)]'
                   )}
-                  title="None"
+                  title="无"
                 >
                   <RiCloseLine className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -367,7 +367,7 @@ export const ProjectsPage: React.FC = () => {
               </div>
               {effectiveHasImageIcon && iconPreviewUrl && (
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="typography-meta text-muted-foreground">Preview</span>
+                  <span className="typography-meta text-muted-foreground">预览</span>
                   <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border/60 bg-[var(--surface-elevated)] p-1">
                     <span
                       className="inline-flex h-4 w-4 items-center justify-center overflow-hidden rounded-[2px]"
@@ -391,7 +391,7 @@ export const ProjectsPage: React.FC = () => {
                     value={iconBackground ?? '#000000'}
                     onChange={(event) => setIconBackground(event.target.value)}
                     className="h-7 w-9 cursor-pointer rounded border border-border bg-transparent p-1"
-                    aria-label="Project icon background color"
+                    aria-label="项目图标背景颜色"
                   />
                   <Input
                     value={iconBackground ?? ''}
@@ -405,8 +405,8 @@ export const ProjectsPage: React.FC = () => {
                     variant="outline"
                     onClick={() => setIconBackground(null)}
                     className="h-7 w-7 p-0"
-                    aria-label="Clear icon background"
-                    title="Clear background"
+                    aria-label="清除图标背景"
+                    title="清除背景"
                     disabled={!iconBackground}
                   >
                     <RiCloseLine className="h-3.5 w-3.5" />
@@ -422,7 +422,7 @@ export const ProjectsPage: React.FC = () => {
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploadingIcon}
                     >
-                      {isUploadingIcon ? 'Uploading...' : 'Upload Icon'}
+                      {isUploadingIcon ? '上传中...' : '上传图标'}
                     </Button>
                     <Button
                       size="xs"
@@ -431,7 +431,7 @@ export const ProjectsPage: React.FC = () => {
                       onClick={() => void handleDiscoverIcon()}
                       disabled={isDiscoveringIcon}
                     >
-                      {isDiscoveringIcon ? 'Discovering...' : 'Discover Favicon'}
+                      {isDiscoveringIcon ? '识别中...' : '发现 Favicon'}
                     </Button>
                   </>
                 )}
@@ -443,7 +443,7 @@ export const ProjectsPage: React.FC = () => {
                     onClick={() => void handleRemoveImageIcon()}
                     disabled={isRemovingCustomIcon}
                   >
-                    {isRemovingCustomIcon ? 'Removing...' : 'Remove Project Icon'}
+                    {isRemovingCustomIcon ? '移除中...' : '移除项目图标'}
                   </Button>
                 )}
                 {pendingRemoveImageIcon && (
@@ -454,7 +454,7 @@ export const ProjectsPage: React.FC = () => {
                     onClick={() => setPendingRemoveImageIcon(false)}
                     disabled={isRemovingCustomIcon}
                   >
-                    Undo Remove
+                    撤销移除
                   </Button>
                 )}
               </div>
@@ -469,7 +469,7 @@ export const ProjectsPage: React.FC = () => {
               size="xs"
               className="!font-normal"
             >
-              Save Changes
+              保存更改
             </Button>
           </div>
         </div>
@@ -485,7 +485,7 @@ export const ProjectsPage: React.FC = () => {
         <div className="mb-8">
           <div className="mb-1 px-1">
             <h3 className="typography-ui-header font-medium text-foreground">
-              Worktree
+              工作树
             </h3>
           </div>
           <section className="px-2 pb-2 pt-0">

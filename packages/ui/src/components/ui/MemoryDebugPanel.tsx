@@ -85,22 +85,22 @@ export const MemoryDebugPanel: React.FC<MemoryDebugPanelProps> = ({ onClose }) =
         {}
         <div className="typography-meta space-y-1 border-t pt-2">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Viewport Window:</span>
-            <span>{getBackgroundTrimLimit()} messages</span>
+            <span className="text-muted-foreground">视窗消息数：</span>
+            <span>{getBackgroundTrimLimit()} 条消息</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Zombie Timeout:</span>
-            <span>{MEMORY_LIMITS.ZOMBIE_TIMEOUT / 1000 / 60} minutes</span>
+            <span className="text-muted-foreground">僵尸超时：</span>
+            <span>{MEMORY_LIMITS.ZOMBIE_TIMEOUT / 1000 / 60} 分钟</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">GitHub Total Requests:</span>
+            <span className="text-muted-foreground">GitHub 请求总数：</span>
             <span>{totalGitHubRequests}</span>
           </div>
         </div>
 
         {}
         <div className="border-t pt-2">
-          <div className="typography-meta font-semibold mb-1">Sessions in Memory:</div>
+          <div className="typography-meta font-semibold mb-1">内存中的会话：</div>
           <ScrollableOverlay outerClassName="max-h-48" className="space-y-1 pr-1">
             {sessionStats.map(stat => (
               <div

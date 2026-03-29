@@ -17,10 +17,10 @@ interface SettingsPageLayoutProps {
  *
  * @example
  * <SettingsPageLayout>
- *   <SettingsSection title="General">
+ *   <SettingsSection title="通用">
  *     <SomeSettingsForm />
  *   </SettingsSection>
- *   <SettingsSection title="Advanced" divider>
+ *   <SettingsSection title="高级" divider>
  *     <OtherSettingsForm />
  *   </SettingsSection>
  * </SettingsPageLayout>

@@ -97,8 +97,8 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
       if (isDesktop) {
         const accessResult = await requestAccess(targetPath);
         if (!accessResult.success) {
-          toast.error('Unable to access directory', {
-            description: accessResult.error || 'Desktop denied directory access.',
+          toast.error('无法访问目录', {
+            description: accessResult.error || '桌面端拒绝访问目录。',
           });
           return;
         }
@@ -107,8 +107,8 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
 
         const startResult = await startAccessing(resolvedPath);
         if (!startResult.success) {
-          toast.error('Failed to open directory', {
-            description: startResult.error || 'Desktop could not grant file access.',
+          toast.error('打开目录失败', {
+            description: startResult.error || '桌面端无法授予文件访问权限。',
           });
           return;
         }
@@ -116,16 +116,16 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
 
       const added = addProject(resolvedPath, { id: projectId });
       if (!added) {
-        toast.error('Failed to add project', {
-          description: 'Please select a valid directory path.',
+        toast.error('添加项目失败', {
+          description: '请选择有效的目录路径。',
         });
         return;
       }
 
       handleClose();
     } catch (error) {
-      toast.error('Failed to select directory', {
-        description: error instanceof Error ? error.message : 'Unknown error occurred.',
+      toast.error('选择目录失败', {
+        description: error instanceof Error ? error.message : '发生未知错误。',
       });
     } finally {
       setIsConfirming(false);
@@ -215,16 +215,16 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
       ) : (
         <RiCheckboxBlankLine className="h-4 w-4" />
       )}
-      Show hidden
+      显示隐藏文件
     </button>
   );
 
   const dialogHeader = (
     <DialogHeader className="flex-shrink-0 px-4 pb-2 pt-[calc(var(--oc-safe-area-top,0px)+0.5rem)] sm:px-0 sm:pb-3 sm:pt-0">
-      <DialogTitle>Add project directory</DialogTitle>
+      <DialogTitle>添加项目目录</DialogTitle>
       <div className="hidden sm:flex sm:items-center sm:justify-between sm:gap-4">
         <DialogDescription className="flex-1">
-          Choose a folder to add as a project.
+          选择要添加为项目的文件夹。
         </DialogDescription>
         {showHiddenToggle}
       </div>
@@ -237,7 +237,7 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
         value={pathInputValue}
         onChange={handlePathInputChange}
         onKeyDown={handlePathInputKeyDown}
-        placeholder="Enter path or select from tree..."
+        placeholder="输入路径或从树中选择..."
         className="font-mono typography-meta"
         spellCheck={false}
         autoComplete="off"
@@ -311,14 +311,14 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
         disabled={isConfirming}
         className="flex-1 sm:flex-none sm:w-auto"
       >
-        Cancel
+        取消
       </Button>
       <Button
         onClick={handleConfirm}
         disabled={isConfirming || !hasUserSelection || (!pendingPath && !pathInputValue.trim())}
         className="flex-1 sm:flex-none sm:w-auto sm:min-w-[140px]"
       >
-        {isConfirming ? 'Adding...' : 'Add Project'}
+        {isConfirming ? '添加中...' : '添加项目'}
       </Button>
     </>
   );
@@ -328,7 +328,7 @@ export const DirectoryExplorerDialog: React.FC<DirectoryExplorerDialogProps> = (
       <MobileOverlayPanel
         open={open}
         onClose={() => onOpenChange(false)}
-        title="Add project directory"
+        title="添加项目目录"
         className="max-w-full"
         contentMaxHeightClassName="max-h-[min(70vh,520px)] h-[min(70vh,520px)]"
         footer={<div className="flex flex-row gap-2">{renderActionButtons()}</div>}

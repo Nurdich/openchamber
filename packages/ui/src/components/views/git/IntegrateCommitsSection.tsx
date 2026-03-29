@@ -243,7 +243,7 @@ Important:
 
     // Use current session - set pending input text and synthetic parts
     if (!currentSessionId) {
-      toast.error('No active session', { description: 'Open a chat session first or start a new session.' });
+      toast.error('没有活动的会话', { description: '请先打开一个聊天会话或开始一个新会话。' });
       return;
     }
 
@@ -258,14 +258,14 @@ Important:
   const handleMove = React.useCallback(async () => {
     if (ui.kind !== 'ready') return;
     if (ui.plan.commits.length === 0) {
-      toast.message('No commits to move');
+      toast.message('没有要移动的提交');
       return;
     }
     setUi({ kind: 'running', plan: ui.plan });
     try {
       const result = await integrateWorktreeCommits(ui.plan);
       if (result.kind === 'success') {
-        toast.success('Commits moved', {
+        toast.success('提交已移动', {
           description: `${result.moved} commit${result.moved === 1 ? '' : 's'} into ${ui.plan.targetBranch}`,
         });
         const next = await computeIntegratePlan(ui.plan);
@@ -274,7 +274,7 @@ Important:
         return;
       }
       if (result.kind === 'conflict') {
-        toast.error('Cherry-pick conflict', { description: 'Resolve conflicts, then continue.' });
+        toast.error('Cherry-pick 冲突', { description: '请解决冲突后继续。' });
         setUi({ kind: 'conflict', state: result.state, details: result.details });
         if (conflictStorageKey && typeof window !== 'undefined') {
           window.localStorage.setItem(conflictStorageKey, JSON.stringify(result.state));
@@ -282,7 +282,7 @@ Important:
       }
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Failed to move commits', { description: message });
+      toast.error('移动提交失败', { description: message });
       const next = await computeIntegratePlan({ repoRoot, sourceBranch, targetBranch }).catch(() => null);
       if (next) setUi({ kind: 'ready', plan: next });
       else setUi({ kind: 'idle' });
@@ -293,7 +293,7 @@ Important:
     if (ui.kind !== 'conflict') return;
     try {
       await abortIntegrate(ui.state);
-      toast.message('Cherry-pick aborted');
+      toast.message('Cherry-pick 已中止');
       if (conflictStorageKey && typeof window !== 'undefined') {
         window.localStorage.removeItem(conflictStorageKey);
       }
@@ -309,7 +309,7 @@ Important:
     try {
       const result = await continueIntegrate(ui.state);
       if (result.kind === 'success') {
-        toast.success('Cherry-pick finished');
+        toast.success('Cherry-pick 完成');
         const next = await computeIntegratePlan({ repoRoot, sourceBranch, targetBranch }).catch(() => null);
         if (next) setUi({ kind: 'ready', plan: next });
         else setUi({ kind: 'idle' });
@@ -327,7 +327,7 @@ Important:
       }
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      toast.error('Cherry-pick continue failed', { description: message });
+      toast.error('Cherry-pick 继续失败', { description: message });
     }
   }, [ui, repoRoot, sourceBranch, targetBranch, onRefresh, conflictStorageKey]);
 

@@ -88,7 +88,7 @@ export const VSCodeLayout: React.FC = () => {
     if (!currentSessionId) {
       return null;
     }
-    return sessions.find((session) => session.id === currentSessionId)?.title || 'Session';
+    return sessions.find((session) => session.id === currentSessionId)?.title || '会话';
   }, [currentSessionId, sessions]);
   const newSessionDraftOpen = useSessionStore((state) => Boolean(state.newSessionDraft?.open));
   const isSyncingMessages = useSessionStore((state) => state.isSyncing);
@@ -371,7 +371,7 @@ export const VSCodeLayout: React.FC = () => {
         // Editor mode: just chat, no sidebar
         <div className="flex flex-col h-full">
           <VSCodeHeader
-            title={sessions.find((session) => session.id === currentSessionId)?.title || 'Chat'}
+            title={sessions.find((session) => session.id === currentSessionId)?.title || '对话'}
             showMcp
             showContextUsage
           />
@@ -406,8 +406,8 @@ export const VSCodeLayout: React.FC = () => {
           <div className="flex-1 flex flex-col min-w-0">
             <VSCodeHeader
               title={newSessionDraftOpen && !currentSessionId
-                ? 'New session'
-                : sessions.find((session) => session.id === currentSessionId)?.title || 'Chat'}
+                ? '新建会话'
+                : sessions.find((session) => session.id === currentSessionId)?.title || '对话'}
               showMcp
               showContextUsage
             />
@@ -440,8 +440,8 @@ export const VSCodeLayout: React.FC = () => {
           <div className={cn('flex flex-col h-full', currentView !== 'chat' && 'hidden')}>
             <VSCodeHeader
               title={newSessionDraftOpen && !currentSessionId
-                ? 'New session'
-                : sessions.find((session) => session.id === currentSessionId)?.title || 'Chat'}
+                ? '新建会话'
+                : sessions.find((session) => session.id === currentSessionId)?.title || '对话'}
               showBack
               onBack={handleBackToSessions}
               showMcp

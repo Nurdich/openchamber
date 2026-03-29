@@ -164,8 +164,8 @@ const SettingsHome: React.FC<{ onOpen: (slug: SettingsPageSlug) => void }> = ({ 
     <div className="h-full overflow-auto">
       <div className="mx-auto w-full max-w-3xl px-6 py-6 space-y-6">
         <div className="space-y-1">
-          <h1 className="typography-ui-header font-semibold text-foreground">Settings</h1>
-          <p className="typography-ui text-muted-foreground">Jump to common pages.</p>
+<h1 className="typography-ui-header font-semibold text-foreground">设置</h1>
+<p className="typography-ui text-muted-foreground">跳转到常用页面。</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -177,8 +177,8 @@ const SettingsHome: React.FC<{ onOpen: (slug: SettingsPageSlug) => void }> = ({ 
               'hover:bg-[var(--interactive-hover)] transition-colors'
             )}
           >
-            <div className="typography-ui-label text-foreground">Providers</div>
-            <div className="typography-micro text-muted-foreground/70">Connect models + credentials</div>
+<div className="typography-ui-label text-foreground">提供商</div>
+<div className="typography-micro text-muted-foreground/70">连接模型和凭证</div>
           </button>
 
           <button
@@ -189,8 +189,8 @@ const SettingsHome: React.FC<{ onOpen: (slug: SettingsPageSlug) => void }> = ({ 
               'hover:bg-[var(--interactive-hover)] transition-colors'
             )}
           >
-            <div className="typography-ui-label text-foreground">Agents</div>
-            <div className="typography-micro text-muted-foreground/70">Prompts, tools, permissions</div>
+<div className="typography-ui-label text-foreground">智能体</div>
+<div className="typography-micro text-muted-foreground/70">提示词、工具、权限</div>
           </button>
 
           <button
@@ -201,8 +201,8 @@ const SettingsHome: React.FC<{ onOpen: (slug: SettingsPageSlug) => void }> = ({ 
               'hover:bg-[var(--interactive-hover)] transition-colors'
             )}
           >
-            <div className="typography-ui-label text-foreground">Skills Catalog</div>
-            <div className="typography-micro text-muted-foreground/70">Install skills from catalogs</div>
+<div className="typography-ui-label text-foreground">技能目录</div>
+<div className="typography-micro text-muted-foreground/70">从目录安装技能</div>
           </button>
 
           <button
@@ -213,8 +213,8 @@ const SettingsHome: React.FC<{ onOpen: (slug: SettingsPageSlug) => void }> = ({ 
               'hover:bg-[var(--interactive-hover)] transition-colors'
             )}
           >
-            <div className="typography-ui-label text-foreground">MCP</div>
-            <div className="typography-micro text-muted-foreground/70">Configure MCP servers + connections</div>
+<div className="typography-ui-label text-foreground">MCP</div>
+<div className="typography-micro text-muted-foreground/70">配置 MCP 服务器和连接</div>
           </button>
 
           <button
@@ -225,8 +225,8 @@ const SettingsHome: React.FC<{ onOpen: (slug: SettingsPageSlug) => void }> = ({ 
               'hover:bg-[var(--interactive-hover)] transition-colors'
             )}
           >
-            <div className="typography-ui-label text-foreground">Usage</div>
-            <div className="typography-micro text-muted-foreground/70">Quota + spend visibility</div>
+<div className="typography-ui-label text-foreground">使用量</div>
+<div className="typography-micro text-muted-foreground/70">配额和消费可见性</div>
           </button>
         </div>
       </div>
@@ -379,8 +379,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
     return (
       <div className="flex h-full items-center justify-center px-6">
         <div className="max-w-md text-center">
-          <div className="typography-ui-header font-semibold text-foreground">Not available</div>
-          <p className="typography-ui text-muted-foreground mt-1">This settings page is not available in this runtime.</p>
+<div className="typography-ui-header font-semibold text-foreground">不可用</div>
+<p className="typography-ui text-muted-foreground mt-1">此设置页面在此运行时不可用。</p>
         </div>
       </div>
     );
@@ -555,14 +555,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
                       'text-sm font-semibold text-sidebar-foreground/90',
                       'hover:text-sidebar-foreground hover:bg-interactive-hover',
                     )}
-                    onClick={() => void reloadOpenCodeConfiguration({ message: 'Restarting OpenCode…', mode: 'projects', scopes: ['all'] })}
+onClick={() => void reloadOpenCodeConfiguration({ message: '正在重启 OpenCode…', mode: 'projects', scopes: ['all'] })}
                   >
                     <RiRestartLine className="h-4 w-4 shrink-0" />
-                    <span>Reload OpenCode</span>
+<span>重新加载 OpenCode</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  Restart OpenCode and reload its configuration.
+ 重启 OpenCode 并重新加载配置。
                 </TooltipContent>
               </Tooltip>
             )}
@@ -655,7 +655,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
           <button
             type="button"
             onClick={showBackButton ? handleBack : onClose}
-            aria-label={showBackButton ? 'Back to Settings' : 'Close settings'}
+aria-label={showBackButton ? "返回设置" : "关闭设置"}
             className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-interactive-hover/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <RiArrowLeftSLine className="h-5 w-5" />
@@ -663,15 +663,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
 
           <div className="min-w-0 flex-1 typography-ui-label font-medium text-foreground truncate">
             {mobileStage === 'nav'
-              ? 'Settings'
-              : (activePageMeta?.title ?? 'Settings')}
+              ? "设置"
+              : (activePageMeta?.title ?? "设置")}
           </div>
 
           {mobileStage === 'page-content' && activePageMeta?.kind === 'split' && (
             <button
               type="button"
               onClick={handleOpenPageSidebar}
-              aria-label="Open section list"
+aria-label="打开分区列表"
               className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-interactive-hover/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <RiListUnordered className="h-5 w-5" />
@@ -682,8 +682,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close settings"
-              title={`Close Settings (${shortcutKey}+,)`}
+aria-label="关闭设置"
+title={`关闭设置 (${shortcutKey}+,)`}
               className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-interactive-hover/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <RiCloseLine className="h-5 w-5" />
@@ -697,7 +697,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
               <button
                 type="button"
                 onClick={handleBack}
-                aria-label="Back"
+aria-label="返回"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-interactive-hover/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <RiArrowLeftSLine className="h-5 w-5" />
@@ -710,8 +710,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close settings"
-            title={`Close Settings (${shortcutKey}+,)`}
+aria-label="关闭设置"
+title={`关闭设置 (${shortcutKey}+,)`}
             className="inline-flex h-7 w-7 items-center justify-center rounded-md p-0.5 text-muted-foreground hover:text-foreground hover:bg-interactive-hover/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <RiCloseLine className="h-5 w-5" />
@@ -751,7 +751,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
                   onPointerDown={handlePointerDown}
                   role="separator"
                   aria-orientation="vertical"
-                  aria-label="Resize settings navigation"
+aria-label="调整设置导航宽度"
                 />
               )}
               <ErrorBoundary>

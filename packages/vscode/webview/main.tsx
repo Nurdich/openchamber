@@ -128,6 +128,9 @@ let uiMounted = false;
 let bootstrapProvidersReady = false;
 let bootstrapAgentsReady = false;
 let bootstrapFailed = false;
+// Timeout handle: if connected but data never arrives, unblock the UI after 20 s.
+let bootstrapTimeoutId: ReturnType<typeof setTimeout> | null = null;
+const BOOTSTRAP_TIMEOUT_MS = 20_000;
 
 const recordBootstrapFetch = (pathname: string, ok: boolean) => {
   if (!pathname.startsWith('/api/')) return;
@@ -153,14 +156,32 @@ const maybeHideLoadingOverlay = () => {
 
   if (connectionStatus === 'connected') {
     if (bootstrapFailed) {
+      if (bootstrapTimeoutId !== null) {
+        clearTimeout(bootstrapTimeoutId);
+        bootstrapTimeoutId = null;
+      }
       setLoadingStatusText('OpenCode connected, but initial data load failed.', 'error');
       fadeOutLoadingScreen();
       return;
     }
 
     if (bootstrapProvidersReady && bootstrapAgentsReady) {
+      if (bootstrapTimeoutId !== null) {
+        clearTimeout(bootstrapTimeoutId);
+        bootstrapTimeoutId = null;
+      }
       fadeOutLoadingScreen();
       return;
+    }
+
+    // Data not yet ready. Arm the fallback timeout on first entry so that a
+    // permanently-stuck proxy request cannot hold the loading screen forever.
+    if (bootstrapTimeoutId === null) {
+      bootstrapTimeoutId = setTimeout(() => {
+        bootstrapTimeoutId = null;
+        setLoadingStatusText('OpenCode connected, but initial data load timed out.', 'error');
+        fadeOutLoadingScreen();
+      }, BOOTSTRAP_TIMEOUT_MS);
     }
 
     const providersText = bootstrapProvidersReady ? '✓ Providers' : '… Providers';
@@ -170,6 +191,10 @@ const maybeHideLoadingOverlay = () => {
   }
 
   if (connectionStatus === 'error') {
+    if (bootstrapTimeoutId !== null) {
+      clearTimeout(bootstrapTimeoutId);
+      bootstrapTimeoutId = null;
+    }
     const error = window.__OPENCHAMBER_CONNECTION__?.error;
     setLoadingStatusText(error || 'Connection error', 'error');
     fadeOutLoadingScreen();
@@ -177,6 +202,10 @@ const maybeHideLoadingOverlay = () => {
   }
 
   if (connectionStatus === 'disconnected') {
+    if (bootstrapTimeoutId !== null) {
+      clearTimeout(bootstrapTimeoutId);
+      bootstrapTimeoutId = null;
+    }
     setLoadingStatusText('Disconnected', 'error');
     fadeOutLoadingScreen();
     return;

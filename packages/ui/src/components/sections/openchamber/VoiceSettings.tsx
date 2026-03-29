@@ -325,7 +325,7 @@ export const VoiceSettings: React.FC = () => {
             <div className="mb-8">
                 <div className="mb-1 px-1">
                     <h3 className="typography-ui-header font-medium text-foreground">
-                        Voice Setup
+                        语音设置
                     </h3>
                 </div>
 
@@ -339,8 +339,8 @@ export const VoiceSettings: React.FC = () => {
                         onClick={() => setVoiceModeEnabled(!voiceModeEnabled)}
                         onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setVoiceModeEnabled(!voiceModeEnabled); } }}
                     >
-                        <Checkbox checked={voiceModeEnabled} onChange={setVoiceModeEnabled} ariaLabel="Enable voice mode" />
-                        <span className="typography-ui-label text-foreground">Enable Voice Mode</span>
+                        <Checkbox checked={voiceModeEnabled} onChange={setVoiceModeEnabled} ariaLabel="启用语音模式" />
+                        <span className="typography-ui-label text-foreground">启用语音模式</span>
                     </div>
 
                     {voiceModeEnabled && (
@@ -348,16 +348,16 @@ export const VoiceSettings: React.FC = () => {
                             <div className="pb-1.5 pt-0.5">
                                 <div className="flex min-w-0 flex-col gap-1.5">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="typography-ui-label text-foreground">Provider</span>
+                                        <span className="typography-ui-label text-foreground">语音提供商</span>
                                         <Tooltip delayDuration={1000}>
                                             <TooltipTrigger asChild>
                                                 <RiInformationLine className="h-3.5 w-3.5 text-muted-foreground/60 cursor-help" />
                                             </TooltipTrigger>
                                             <TooltipContent sideOffset={8} className="max-w-xs">
                                                 <ul className="space-y-1">
-                                                    <li><strong>Browser:</strong> Free, offline, limited mobile support.</li>
-                                                    <li><strong>OpenAI:</strong> High quality, mobile ready, needs API key.</li>
-                                                    <li><strong>Say:</strong> macOS native. Fast, free, offline.</li>
+                                                    <li><strong>浏览器:</strong> 免费、离线，移动端支持有限。</li>
+                                                    <li><strong>OpenAI:</strong> 高质量，移动端就绪，需要 API 密钥。</li>
+                                                    <li><strong>Say:</strong> macOS 原生。快速、免费、离线。</li>
                                                 </ul>
                                             </TooltipContent>
                                         </Tooltip>
@@ -374,7 +374,7 @@ export const VoiceSettings: React.FC = () => {
                                                     : 'text-foreground'
                                             )}
                                         >
-                                            Browser
+                                            浏览器
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -413,10 +413,10 @@ export const VoiceSettings: React.FC = () => {
                             {voiceProvider === 'openai' && (
                                 <div className="py-1.5">
                                     <span className={cn("typography-ui-label text-foreground", !isOpenAIAvailable && "text-[var(--status-error)]")}>
-                                        API Key
+                                        API 密钥
                                     </span>
                                     <span className={cn("typography-meta ml-2", !isOpenAIAvailable ? "text-[var(--status-error)]/80" : "text-muted-foreground")}>
-                                        {isOpenAIAvailable && !openaiApiKey ? 'Using key from configuration' : !isOpenAIAvailable ? 'OpenAI TTS requires an API key' : 'Provide your OpenAI key'}
+                                        {isOpenAIAvailable && !openaiApiKey ? '使用配置中的密钥' : !isOpenAIAvailable ? 'OpenAI TTS 需要 API 密钥' : '请提供您的 OpenAI 密钥'}
                                     </span>
                                     <div className="relative mt-1.5 max-w-xs">
                                         <input
@@ -441,13 +441,13 @@ export const VoiceSettings: React.FC = () => {
 
                             {/* Voice Selection */}
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Voice</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">语音</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     {voiceProvider === 'openai' && isOpenAIAvailable && (
                                         <>
                                             <Select value={openaiVoice} onValueChange={setOpenaiVoice}>
                                                 <SelectTrigger className="w-fit">
-                                                    <SelectValue placeholder="Select voice" />
+                                                    <SelectValue placeholder="选择语音" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {OPENAI_VOICE_OPTIONS.map((v) => (
@@ -455,7 +455,7 @@ export const VoiceSettings: React.FC = () => {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <Button size="xs" variant="ghost" onClick={previewOpenAIVoice} title="Preview">
+                                            <Button size="xs" variant="ghost" onClick={previewOpenAIVoice} title="预览">
                                                 {isOpenAIPreviewPlaying ? <RiStopLine className="w-3.5 h-3.5" /> : <RiPlayLine className="w-3.5 h-3.5" />}
                                             </Button>
                                         </>
@@ -465,7 +465,7 @@ export const VoiceSettings: React.FC = () => {
                                         <>
                                             <Select value={sayVoice} onValueChange={setSayVoice}>
                                                 <SelectTrigger className="w-fit">
-                                                    <SelectValue placeholder="Select voice" />
+                                                    <SelectValue placeholder="选择语音" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {sayVoices.map((v) => (
@@ -473,7 +473,7 @@ export const VoiceSettings: React.FC = () => {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <Button size="xs" variant="ghost" onClick={previewVoice} title="Preview">
+                                            <Button size="xs" variant="ghost" onClick={previewVoice} title="预览">
                                                 {isPreviewPlaying ? <RiStopLine className="w-3.5 h-3.5" /> : <RiPlayLine className="w-3.5 h-3.5" />}
                                             </Button>
                                         </>
@@ -483,16 +483,16 @@ export const VoiceSettings: React.FC = () => {
                                         <>
                                             <Select value={browserVoice || '__auto__'} onValueChange={(value) => setBrowserVoice(value === '__auto__' ? '' : value)}>
                                                 <SelectTrigger className="w-fit max-w-[200px]">
-                                                    <SelectValue placeholder="Auto" />
+                                                    <SelectValue placeholder="自动" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="__auto__">Auto</SelectItem>
+                                                    <SelectItem value="__auto__">自动</SelectItem>
                                                     {filteredBrowserVoices.map((v) => (
                                                         <SelectItem key={v.name} value={v.name}>{v.name} ({v.lang})</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <Button size="xs" variant="ghost" onClick={previewBrowserVoice} title="Preview">
+                                            <Button size="xs" variant="ghost" onClick={previewBrowserVoice} title="预览">
                                                 {isBrowserPreviewPlaying ? <RiStopLine className="w-3.5 h-3.5" /> : <RiPlayLine className="w-3.5 h-3.5" />}
                                             </Button>
                                         </>
@@ -500,27 +500,27 @@ export const VoiceSettings: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Speech Rate */}
+                            {/* 语速 */}
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Speech Rate</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">语速</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     {!isMobile && <input type="range" min={0.5} max={2} step={0.1} value={speechRate} onChange={(e) => setSpeechRate(Number(e.target.value))} disabled={!isSupported} className={sliderClass} />}
                                     <NumberInput value={speechRate} onValueChange={setSpeechRate} min={0.5} max={2} step={0.1} className="w-16 tabular-nums" />
                                 </div>
                             </div>
 
-                            {/* Speech Pitch */}
+                            {/* 音调 */}
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Speech Pitch</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">音调</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     {!isMobile && <input type="range" min={0.5} max={2} step={0.1} value={speechPitch} onChange={(e) => setSpeechPitch(Number(e.target.value))} disabled={!isSupported} className={sliderClass} />}
                                     <NumberInput value={speechPitch} onValueChange={setSpeechPitch} min={0.5} max={2} step={0.1} className="w-16 tabular-nums" />
                                 </div>
                             </div>
 
-                            {/* Speech Volume */}
+                            {/* 音量 */}
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Speech Volume</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">音量</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     {!isMobile && <input type="range" min={0} max={1} step={0.1} value={speechVolume} onChange={(e) => setSpeechVolume(Number(e.target.value))} disabled={!isSupported} className={sliderClass} />}
                                     {isMobile ? (
@@ -535,11 +535,11 @@ export const VoiceSettings: React.FC = () => {
 
                             {/* Language */}
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Language</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">识别语言</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     <Select value={language} onValueChange={setLanguage} disabled={!isSupported}>
                                         <SelectTrigger className="w-fit">
-                                            <SelectValue placeholder="Select language" />
+                                            <SelectValue placeholder="选择语言" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {LANGUAGE_OPTIONS.map((lang) => (
@@ -558,7 +558,7 @@ export const VoiceSettings: React.FC = () => {
             <div className="mb-8">
                 <div className="mb-1 px-1">
                     <h3 className="typography-ui-header font-medium text-foreground">
-                        Playback & Summarization
+                        播放与摘要
                     </h3>
                 </div>
 
@@ -572,7 +572,7 @@ export const VoiceSettings: React.FC = () => {
                         onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setShowMessageTTSButtons(!showMessageTTSButtons); } }}
                     >
                         <Checkbox checked={showMessageTTSButtons} onChange={setShowMessageTTSButtons} ariaLabel="Message read aloud button" />
-                        <span className="typography-ui-label text-foreground">Message Read Aloud Button</span>
+                        <span className="typography-ui-label text-foreground">消息朗读按钮</span>
                     </div>
 
                     <div
@@ -584,7 +584,7 @@ export const VoiceSettings: React.FC = () => {
                         onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setSummarizeMessageTTS(!summarizeMessageTTS); } }}
                     >
                         <Checkbox checked={summarizeMessageTTS} onChange={setSummarizeMessageTTS} ariaLabel="Summarize before playback" />
-                        <span className="typography-ui-label text-foreground">Summarize Before Playback</span>
+                        <span className="typography-ui-label text-foreground">播放前摘要</span>
                     </div>
 
                     {voiceModeEnabled && (
@@ -597,14 +597,14 @@ export const VoiceSettings: React.FC = () => {
                             onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setSummarizeVoiceConversation(!summarizeVoiceConversation); } }}
                         >
                             <Checkbox checked={summarizeVoiceConversation} onChange={setSummarizeVoiceConversation} ariaLabel="Summarize voice mode responses" />
-                            <span className="typography-ui-label text-foreground">Summarize Voice Mode Responses</span>
+                            <span className="typography-ui-label text-foreground">摘要语音模式回复</span>
                         </div>
                     )}
 
                     {(summarizeMessageTTS || summarizeVoiceConversation) && (
                         <>
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Summarization Threshold</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">摘要触发阈值</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     {!isMobile && <input type="range" min={50} max={2000} step={50} value={summarizeCharacterThreshold} onChange={(e) => setSummarizeCharacterThreshold(Number(e.target.value))} className={sliderClass} />}
                                     <NumberInput value={summarizeCharacterThreshold} onValueChange={setSummarizeCharacterThreshold} min={50} max={2000} step={50} className="w-16 tabular-nums" />
@@ -612,7 +612,7 @@ export const VoiceSettings: React.FC = () => {
                             </div>
 
                             <div className="flex items-center gap-8 py-1.5">
-                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">Summary Max Length</span>
+                                <span className="typography-ui-label text-foreground sm:w-56 shrink-0">摘要最大长度</span>
                                 <div className="flex items-center gap-2 w-fit">
                                     {!isMobile && <input type="range" min={50} max={2000} step={50} value={summarizeMaxLength} onChange={(e) => setSummarizeMaxLength(Number(e.target.value))} className={sliderClass} />}
                                     <NumberInput value={summarizeMaxLength} onValueChange={setSummarizeMaxLength} min={50} max={2000} step={50} className="w-16 tabular-nums" />
@@ -625,7 +625,7 @@ export const VoiceSettings: React.FC = () => {
                 {voiceModeEnabled && isSupported && (
                     <div className="mt-2 px-2">
                         <p className="typography-meta text-muted-foreground">
-                            Press <kbd className="px-1 py-0.5 mx-0.5 rounded border border-[var(--interactive-border)] bg-background typography-mono text-[10px]">Shift</kbd> + <kbd className="px-1 py-0.5 mx-0.5 rounded border border-[var(--interactive-border)] bg-background typography-mono text-[10px]">Click</kbd> on the mic button to toggle continuous mode
+                            在麦克风按钮上按 <kbd className="px-1 py-0.5 mx-0.5 rounded border border-[var(--interactive-border)] bg-background typography-mono text-[10px]">Shift</kbd> + <kbd className="px-1 py-0.5 mx-0.5 rounded border border-[var(--interactive-border)] bg-background typography-mono text-[10px]">Click</kbd> 切换连续模式
                         </p>
                     </div>
                 )}

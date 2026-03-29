@@ -157,16 +157,16 @@ export const UnifiedControlsDrawer: React.FC<UnifiedControlsDrawerProps> = ({
     };
 
     return (
-        <MobileOverlayPanel open={open} onClose={onClose} title="Controls">
+            <MobileOverlayPanel open={open} onClose={onClose} title="控制面板">
             <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-2">
                     <div className="typography-meta font-semibold uppercase tracking-wide text-muted-foreground">
-                        Model
+                        模型
                     </div>
                     <div className="rounded-xl border border-border/40 overflow-hidden">
                         {recentModels.length === 0 && !hasCurrentInRecents && (
                             <div className="px-3 py-2 typography-meta text-muted-foreground">
-                                No recent models
+                                暂无最近模型
                             </div>
                         )}
                         {recentModels.map(({ providerID, modelID, model }) => {
@@ -205,7 +205,7 @@ export const UnifiedControlsDrawer: React.FC<UnifiedControlsDrawerProps> = ({
                             type="button"
                             onClick={onOpenModel}
                             className="flex min-h-[44px] w-full items-center justify-center border-t border-border/30 px-3 py-2 typography-meta font-medium text-muted-foreground"
-                            aria-label="More models"
+                            aria-label="更多模型"
                         >
                             ...
                         </button>
@@ -215,7 +215,7 @@ export const UnifiedControlsDrawer: React.FC<UnifiedControlsDrawerProps> = ({
                 {hasEffort && (
                     <div className="flex flex-col gap-2">
                         <div className="typography-meta font-semibold uppercase tracking-wide text-muted-foreground">
-                            Effort
+                            努力程度
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {quickEfforts.map((variant) => {
@@ -242,7 +242,7 @@ export const UnifiedControlsDrawer: React.FC<UnifiedControlsDrawerProps> = ({
                                     type="button"
                                     onClick={onOpenEffort}
                                     className="inline-flex items-center rounded-full border border-border/40 px-2.5 py-1 typography-meta font-medium text-muted-foreground hover:bg-interactive-hover/50"
-                                    aria-label="More effort options"
+                                    aria-label="更多努力选项"
                                 >
                                     ...
                                 </button>

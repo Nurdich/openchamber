@@ -158,15 +158,15 @@ export const InstallSkillDialog: React.FC<InstallSkillDialogProps> = ({ open, on
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md" keyboardAvoid>
           <DialogHeader>
-            <DialogTitle>Install skill</DialogTitle>
+            <DialogTitle>安装技能</DialogTitle>
             <DialogDescription>
-              Install <span className="font-semibold text-foreground">{item.skillName}</span> into one of four target locations.
+              将 <span className="font-semibold text-foreground">{item.skillName}</span> 安装到以下目标位置之一。
             </DialogDescription>
           </DialogHeader>
 
           <div className="mt-2 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="typography-ui-label text-foreground">Destination</span>
+                <span className="typography-ui-label text-foreground">目标位置</span>
               <Select
                 value={locationValueFrom(scope, targetSource)}
                 onValueChange={(v) => {
@@ -199,9 +199,9 @@ export const InstallSkillDialog: React.FC<InstallSkillDialogProps> = ({ open, on
 
             {scope === 'project' && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="typography-ui-label text-foreground">Project</span>
+                <span className="typography-ui-label text-foreground">项目</span>
                 {projects.length === 0 ? (
-                  <span className="typography-meta text-muted-foreground">No projects available</span>
+                  <span className="typography-meta text-muted-foreground">暂无可用项目</span>
                 ) : (
                   <Select
                     value={resolvedTargetProjectId ?? ''}
@@ -209,7 +209,7 @@ export const InstallSkillDialog: React.FC<InstallSkillDialogProps> = ({ open, on
                     disabled={projects.length === 1}
                   >
                     <SelectTrigger className="w-fit">
-                      <SelectValue placeholder="Choose project" />
+                      <SelectValue placeholder="选择项目" />
                     </SelectTrigger>
                     <SelectContent align="start">
                       {projects.map((p) => (
@@ -236,7 +236,7 @@ export const InstallSkillDialog: React.FC<InstallSkillDialogProps> = ({ open, on
               variant="ghost"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              取消
             </Button>
             <Button
               size="sm"
@@ -252,7 +252,7 @@ export const InstallSkillDialog: React.FC<InstallSkillDialogProps> = ({ open, on
                 })
               }
             >
-              {isInstalling ? 'Installing...' : 'Install'}
+              {isInstalling ? '安装中...' : '安装'}
             </Button>
           </DialogFooter>
         </DialogContent>

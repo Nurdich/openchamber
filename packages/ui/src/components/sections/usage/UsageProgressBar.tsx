@@ -45,7 +45,7 @@ export const UsageProgressBar: React.FC<UsageProgressBarProps> = ({
         <div
           className="absolute top-0 h-full w-0.5 bg-foreground"
           style={{ left: `${markerClamped}%` }}
-          title={`Expected usage if spread evenly: ${Math.round(markerClamped)}% of quota`}
+title={`预期使用量（均匀分布）：${Math.round(markerClamped)}% 的配额`}
           aria-hidden="true"
         />
       )}

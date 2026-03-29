@@ -36,13 +36,13 @@ const QueuedMessageChip = memo(({ message, sessionId, onEdit }: QueuedMessageChi
                 className="h-4 w-4 flex-shrink-0 text-muted-foreground" 
             />
             <span className="text-muted-foreground flex-shrink-0">
-                Queued
+                待发送
                 {attachmentCount > 0 && (
-                    <span className="ml-1">+{attachmentCount} file{attachmentCount > 1 ? 's' : ''}</span>
+                    <span className="ml-1">+{attachmentCount} 个文件</span>
                 )}
             </span>
             <span className="text-foreground truncate">
-                {firstLine || '(empty)'}
+                {firstLine || '（空）'}
             </span>
             <span
                 onClick={(e) => {
@@ -50,7 +50,7 @@ const QueuedMessageChip = memo(({ message, sessionId, onEdit }: QueuedMessageChi
                     removeFromQueue(sessionId, message.id);
                 }}
                 className="flex items-center justify-center h-6 w-6 flex-shrink-0 hover:bg-[var(--interactive-hover)] rounded-full transition-colors cursor-pointer"
-                aria-label="Remove from queue"
+                aria-label="从队列中移除"
             >
                 <RiCloseLine className="h-4 w-4 text-muted-foreground" />
             </span>

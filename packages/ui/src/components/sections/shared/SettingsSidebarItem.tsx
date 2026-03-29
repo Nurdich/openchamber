@@ -49,8 +49,8 @@ interface SettingsSidebarItemProps {
  *   onSelect={() => setSelectedId(agent.id)}
  *   icon={<RiRobotLine className="h-4 w-4" />}
  *   actions={[
- *     { label: 'Duplicate', icon: RiFileCopyLine, onClick: handleDuplicate },
- *     { label: 'Delete', icon: RiDeleteBinLine, onClick: handleDelete, destructive: true },
+ *     { label: '复制', icon: RiFileCopyLine, onClick: handleDuplicate },
+ *     { label: '删除', icon: RiDeleteBinLine, onClick: handleDelete, destructive: true },
  *   ]}
  * />
  */

@@ -215,6 +215,26 @@ async function execGit(args: string[], cwd: string): Promise<{ stdout: string; s
     const normalizedCwd = normalizePath(cwd);
     const gitPath = gitApi?.git.path || 'git';
 
+    // On Windows the system code page is typically GBK (CP936) for Chinese locales.
+    // git writes error messages in the active code page, so stderr bytes are GBK-encoded.
+    // Node's default Buffer.toString() assumes UTF-8 and produces mojibake.
+    // We accumulate raw bytes and decode once at process close using TextDecoder,
+    // falling back to UTF-8 when GBK decoding is unavailable.
+    const isWindows = process.platform === 'win32';
+    const decodeBuffer = (chunks: Buffer[]): string => {
+      const buf = Buffer.concat(chunks);
+      if (!isWindows) {
+        return buf.toString('utf8');
+      }
+      try {
+        // 'gbk' is supported when Node is built with full ICU data.
+        return new TextDecoder('gbk').decode(buf);
+      } catch {
+        // Fallback: ICU not available; UTF-8 may produce mojibake but is better than crashing.
+        return buf.toString('utf8');
+      }
+    };
+
     buildGitEnv().then((env) => {
       const proc = spawn(gitPath, args, {
         cwd: normalizedCwd,
@@ -222,19 +242,23 @@ async function execGit(args: string[], cwd: string): Promise<{ stdout: string; s
         windowsHide: true,
       });
 
-      let stdout = '';
-      let stderr = '';
+      const stdoutChunks: Buffer[] = [];
+      const stderrChunks: Buffer[] = [];
 
-      proc.stdout?.on('data', (data) => {
-        stdout += data.toString();
+      proc.stdout?.on('data', (data: Buffer) => {
+        stdoutChunks.push(Buffer.isBuffer(data) ? data : Buffer.from(data));
       });
 
-      proc.stderr?.on('data', (data) => {
-        stderr += data.toString();
+      proc.stderr?.on('data', (data: Buffer) => {
+        stderrChunks.push(Buffer.isBuffer(data) ? data : Buffer.from(data));
       });
 
       proc.on('close', (exitCode) => {
-        resolve({ stdout, stderr, exitCode: exitCode ?? 0 });
+        resolve({
+          stdout: decodeBuffer(stdoutChunks),
+          stderr: decodeBuffer(stderrChunks),
+          exitCode: exitCode ?? 0,
+        });
       });
 
       proc.on('error', (error) => {

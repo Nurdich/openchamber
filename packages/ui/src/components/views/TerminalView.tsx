@@ -287,7 +287,7 @@ export const TerminalView: React.FC = () => {
                             case 'reconnecting': {
                                 const attempt = event.attempt ?? 0;
                                 const maxAttempts = event.maxAttempts ?? 3;
-                                setConnectionError(`Reconnecting (${attempt}/${maxAttempts})...`);
+setConnectionError(`正在重连 (${attempt}/${maxAttempts})...`);
                                 setIsFatalError(false);
                                 break;
                             }
@@ -1011,7 +1011,7 @@ export const TerminalView: React.FC = () => {
                                                     e.stopPropagation();
                                                     handleCloseTab(tab.id);
                                                 }}
-                                                title="Close tab"
+title="关闭标签页"
                                             >
                                                 {isMobile ? <span aria-hidden>×</span> : <RiCloseLine size={12} />}
                                             </button>
@@ -1026,7 +1026,7 @@ export const TerminalView: React.FC = () => {
                                         'ml-1 flex items-center justify-center rounded-md border border-[var(--interactive-border)] bg-transparent text-[var(--surface-muted-foreground)] hover:bg-[var(--interactive-hover)] hover:text-[var(--surface-foreground)]',
                                         isMobile ? '!min-h-0 !min-w-0 h-8 w-8' : 'h-6.5 w-6.5'
                                     )}
-                                    title="New tab"
+title="新建标签页"
                                 >
                                     <RiAddLine size={isMobile ? 18 : 16} />
                                 </button>
@@ -1084,10 +1084,10 @@ export const TerminalView: React.FC = () => {
                                 className="h-6 px-2 py-0 text-xs"
                                 onClick={handleHardRestart}
                                 disabled={isRestarting}
-                                title="Force kill and create fresh session"
+title="强制终止并创建新会话"
                                 type="button"
                             >
-                                Hard Restart
+强制重启
                             </Button>
                         )}
                     </div>

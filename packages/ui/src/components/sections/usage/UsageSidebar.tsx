@@ -79,9 +79,9 @@ export const UsageSidebar: React.FC<UsageSidebarProps> = ({ onItemSelect }) => {
   return (
     <div className={cn('flex h-full flex-col', bgClass)}>
       <div className="border-b px-3 pt-4 pb-3">
-        <h2 className="text-base font-semibold text-foreground mb-3">Usage</h2>
+<h2 className="text-base font-semibold text-foreground mb-3">使用量</h2>
         <div className="flex items-center justify-between gap-2">
-          <span className="typography-meta text-muted-foreground">Total {QUOTA_PROVIDERS.length}</span>
+<span className="typography-meta text-muted-foreground">共计 {QUOTA_PROVIDERS.length}</span>
           <div className="flex items-center gap-2">
             <Tooltip delayDuration={700}>
               <TooltipTrigger asChild>
@@ -89,12 +89,12 @@ export const UsageSidebar: React.FC<UsageSidebarProps> = ({ onItemSelect }) => {
                   <Checkbox
                     checked={usageAutoRefresh}
                     onChange={handleUsageAutoRefreshChange}
-                    ariaLabel="Toggle auto refresh"
+ariaLabel="切换自动刷新"
                   />
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                Auto-refresh usage data at set interval
+                  自动按设定间隔数据
               </TooltipContent>
             </Tooltip>
             <Select
@@ -103,7 +103,7 @@ export const UsageSidebar: React.FC<UsageSidebarProps> = ({ onItemSelect }) => {
               disabled={!usageAutoRefresh}
             >
               <SelectTrigger className="w-fit">
-                <SelectValue placeholder="Interval" />
+<SelectValue placeholder="刷新间隔" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="30000">30s</SelectItem>
@@ -115,8 +115,7 @@ export const UsageSidebar: React.FC<UsageSidebarProps> = ({ onItemSelect }) => {
               variant="ghost"
               className="h-7 w-7 px-0 text-muted-foreground"
               onClick={() => fetchAllQuotas()}
-              aria-label="Refresh usage"
-              title="Refresh usage"
+              title="刷新使用量"
               disabled={isLoading}
             >
               <RiRefreshLine className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
@@ -124,14 +123,15 @@ export const UsageSidebar: React.FC<UsageSidebarProps> = ({ onItemSelect }) => {
           </div>
         </div>
         <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="typography-micro text-muted-foreground">Display</span>
+<span className="typography-micro text-muted-foreground">显示</span>
           <Select value={usageDisplayMode} onValueChange={handleUsageDisplayModeChange}>
             <SelectTrigger className="w-fit">
-              <SelectValue placeholder="Display mode" />
+<SelectValue placeholder="显示模式" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="usage">Usage</SelectItem>
-              <SelectItem value="remaining">Quota remaining</SelectItem>
+<SelectItem value="usage">使用量</SelectItem>
+              <SelectItem value="remaining">剩余配额</SelectItem>
+QN:              <SelectItem value="remaining">剩余配额</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -175,7 +175,7 @@ export const UsageSidebar: React.FC<UsageSidebarProps> = ({ onItemSelect }) => {
                   {provider.name}
                 </span>
               {!configured && (
-                <span className="typography-micro text-muted-foreground/60 flex-shrink-0">Not set</span>
+<span className="typography-micro text-muted-foreground/60 flex-shrink-0">未设置</span>
               )}
             </button>
           </div>

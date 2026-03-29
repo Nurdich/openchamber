@@ -34,21 +34,21 @@ export const ProjectsSidebar: React.FC<{ onItemSelect?: () => void }> = ({ onIte
         if (result.success && result.path) {
           const added = addProject(result.path, { id: result.projectId });
           if (!added) {
-            toast.error('Failed to add project', {
-              description: 'Please select a valid directory.',
+            toast.error('添加项目失败', {
+              description: '请选择一个有效的目录。',
             });
             return;
           }
           setSelectedId(added.id);
         } else if (result.error && result.error !== 'Directory selection cancelled') {
-          toast.error('Failed to select directory', {
+          toast.error('选择目录失败', {
             description: result.error,
           });
         }
       })
       .catch((error) => {
         console.error('Failed to select directory:', error);
-        toast.error('Failed to select directory');
+      toast.error('选择目录失败');
       });
   }, [addProject, setSelectedId, tauriIpcAvailable]);
 
@@ -70,9 +70,9 @@ export const ProjectsSidebar: React.FC<{ onItemSelect?: () => void }> = ({ onIte
       variant="background"
       header={
         <div className={cn('border-b px-3', 'pt-4 pb-3')}>
-          <h2 className="text-base font-semibold text-foreground mb-3">Projects</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3">项目</h2>
           <div className="flex items-center justify-between gap-2">
-            <span className="typography-meta text-muted-foreground">Total {projects.length}</span>
+            <span className="typography-meta text-muted-foreground">共 {projects.length} 个</span>
             {!isVSCode && (
               <Button
                 type="button"
@@ -80,7 +80,7 @@ export const ProjectsSidebar: React.FC<{ onItemSelect?: () => void }> = ({ onIte
                 size="icon"
                 className="h-7 w-7 -my-1 text-muted-foreground"
                 onClick={handleAddProject}
-                aria-label="Add project"
+                aria-label="添加项目"
               >
                 <RiAddLine className="size-4" />
               </Button>

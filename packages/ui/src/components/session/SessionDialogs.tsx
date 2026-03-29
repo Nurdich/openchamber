@@ -140,8 +140,8 @@ export const SessionDialogs: React.FC = () => {
             requestAccess('')
                 .then(async (result) => {
                     if (!result.success || !result.path) {
-                        if (result.error && result.error !== 'Directory selection cancelled') {
-                            toast.error('Failed to select directory', {
+                        if (result.error && result.error !== '目录选择已取消') {
+                            toast.error('选择目录失败', {
                                 description: result.error,
                             });
                         }
@@ -150,22 +150,22 @@ export const SessionDialogs: React.FC = () => {
 
                     const accessResult = await startAccessing(result.path);
                     if (!accessResult.success) {
-                        toast.error('Failed to open directory', {
-                            description: accessResult.error || 'Desktop could not grant file access.',
+                        toast.error('打开目录失败', {
+                            description: accessResult.error || '桌面端无法授予文件访问权限。',
                         });
                         return;
                     }
 
                     const added = addProject(result.path, { id: result.projectId });
                     if (!added) {
-                        toast.error('Failed to add project', {
-                            description: 'Please select a valid directory path.',
+                        toast.error('添加项目失败', {
+                            description: '请选择有效的目录路径。',
                         });
                     }
                 })
                 .catch((error) => {
-                    console.error('Desktop: Error selecting directory:', error);
-                    toast.error('Failed to select directory');
+                    console.error('桌面端选择目录错误:', error);
+                    toast.error('选择目录失败');
                 });
             return;
         }
@@ -208,9 +208,9 @@ export const SessionDialogs: React.FC = () => {
             const target = payload.sessions[0];
             const success = await deleteSession(target.id);
             if (success) {
-                toast.success('Session deleted');
+                toast.success('会话已删除');
             } else {
-                toast.error('Failed to delete session');
+                toast.error('删除会话失败');
             }
             return;
         }
@@ -231,7 +231,7 @@ export const SessionDialogs: React.FC = () => {
 
         if (failedIds.length > 0) {
             toast.error(`Failed to delete ${failedIds.length} session${failedIds.length === 1 ? '' : 's'}`, {
-                description: renderToastDescription('Please try again in a moment.'),
+                description: renderToastDescription('请稍后重试。'),
             });
         }
     }, [deleteSession, deleteSessions]);
@@ -313,7 +313,7 @@ export const SessionDialogs: React.FC = () => {
                     }
                 })
             ).catch((error) => {
-                console.warn('Failed to inspect worktree status before deletion:', error);
+                console.warn('删除前检查工作树状态失败:', error);
             });
 
             if (cancelled) {
@@ -389,7 +389,7 @@ export const SessionDialogs: React.FC = () => {
             );
             return true;
         } catch (error) {
-            toast.error('Failed to remove worktree', {
+            toast.error('移除工作树失败', {
                 description: renderToastDescription(error instanceof Error ? error.message : 'Please try again.'),
             });
             return false;
@@ -414,8 +414,8 @@ export const SessionDialogs: React.FC = () => {
                     return;
                 }
                 const shouldRemoveRemote = deleteDialogShouldRemoveRemote && canRemoveRemoteBranches;
-                const archiveNote = shouldRemoveRemote ? 'Worktree and remote branch removed.' : 'Worktree removed.';
-                toast.success('Worktree removed', {
+                const archiveNote = shouldRemoveRemote ? '工作树和远程分支已移除。' : '工作树已移除。';
+                toast.success('工作树已移除', {
                     description: renderToastDescription(archiveNote),
                 });
                 closeDeleteDialog();
@@ -435,16 +435,16 @@ export const SessionDialogs: React.FC = () => {
                         deleteLocalBranch,
                     });
                 if (!success) {
-                    toast.error(isWorktreeDelete ? 'Failed to archive session' : 'Failed to delete session');
+                    toast.error(isWorktreeDelete ? '归档会话失败' : '删除会话失败');
                     setIsProcessingDelete(false);
                     return;
                 }
                 const archiveNote = !isWorktreeDelete && shouldArchive
                     ? removeRemoteBranch
-                        ? 'Worktree and remote branch removed.'
-                        : 'Attached worktree archived.'
+                        ? '工作树和远程分支已移除。'
+                        : '附随的工作树已归档。'
                     : undefined;
-                toast.success(isWorktreeDelete ? 'Session archived' : 'Session deleted', {
+                toast.success(isWorktreeDelete ? '会话已归档' : '会话已删除', {
                     description: renderToastDescription(archiveNote),
                     action: {
                         label: 'OK',
@@ -481,8 +481,8 @@ export const SessionDialogs: React.FC = () => {
                 if (deletedIds.length > 0) {
                     const archiveNote = !isWorktreeDelete && shouldArchive
                         ? removeRemoteBranch
-                            ? 'Archived worktrees and removed remote branches.'
-                            : 'Attached worktrees archived.'
+                            ? '已归档工作树并移除远程分支。'
+                            : '附随的工作树已归档。'
                         : undefined;
                     const successDescription =
                         failedIds.length > 0
@@ -491,7 +491,7 @@ export const SessionDialogs: React.FC = () => {
                                 ? `Removed all sessions from ${deleteDialog.dateLabel}.`
                                 : undefined;
                     const combinedDescription = [successDescription, archiveNote].filter(Boolean).join(' ');
-                    toast.success(`${isWorktreeDelete ? 'Archived' : 'Deleted'} ${deletedIds.length} session${deletedIds.length === 1 ? '' : 's'}`, {
+                    toast.success(`${isWorktreeDelete ? '已归档' : '已删除'} ${deletedIds.length} session${deletedIds.length === 1 ? '' : 's'}`, {
                         description: renderToastDescription(combinedDescription || undefined),
                         action: {
                             label: 'OK',
@@ -502,7 +502,7 @@ export const SessionDialogs: React.FC = () => {
 
                 if (failedIds.length > 0) {
                     toast.error(`Failed to ${isWorktreeDelete ? 'archive' : 'delete'} ${failedIds.length} session${failedIds.length === 1 ? '' : 's'}`, {
-                        description: renderToastDescription('Please try again in a moment.'),
+                        description: renderToastDescription('请稍后重试。'),
                     });
                     if (deletedIds.length === 0) {
                         setIsProcessingDelete(false);
@@ -542,9 +542,9 @@ export const SessionDialogs: React.FC = () => {
     const deleteDialogDescription = deleteDialog
         ? deleteDialog.mode === 'worktree'
             ? deleteDialog.sessions.length === 0
-                ? 'This removes the selected worktree.'
-                : `This removes the selected worktree and archives ${deleteDialog.sessions.length === 1 ? '1 linked session' : `${deleteDialog.sessions.length} linked sessions`}.`
-            : `This action permanently removes ${deleteDialog.sessions.length === 1 ? '1 session' : `${deleteDialog.sessions.length} sessions`}${deleteDialog.dateLabel ? ` from ${deleteDialog.dateLabel}` : ''
+                ? '这将删除所选的工作树。'
+                : `This removes the selected worktree and archives ${deleteDialog.sessions.length === 1 ? '1 个关联会话' : `${deleteDialog.sessions.length} linked sessions`}.`
+            : `This action permanently removes ${deleteDialog.sessions.length === 1 ? '1 个会话' : `${deleteDialog.sessions.length} sessions`}${deleteDialog.dateLabel ? ` from ${deleteDialog.dateLabel}` : ''
             }.`
         : '';
 
@@ -557,7 +557,7 @@ export const SessionDialogs: React.FC = () => {
                     {isWorktreeDelete && (
                         <div className="flex items-center gap-2">
                             <span className="typography-meta font-medium text-foreground">
-                                {deleteDialog.sessions.length === 1 ? 'Linked session' : 'Linked sessions'}
+                                {deleteDialog.sessions.length === 1 ? '关联会话' : '关联会话'}
                             </span>
                             <span className="typography-micro text-muted-foreground/70">
                                 {deleteDialog.sessions.length}
@@ -578,7 +578,7 @@ export const SessionDialogs: React.FC = () => {
                                     •
                                 </span>
                                 <span className="truncate">
-                                    {session.title || 'Untitled Session'}
+                                    {session.title || '无标题会话'}
                                 </span>
                             </li>
                         ))}
@@ -599,13 +599,13 @@ export const SessionDialogs: React.FC = () => {
                 <div className="space-y-2 rounded-lg bg-muted/30 p-3">
                     <div className="flex items-center gap-2">
                         <RiGitBranchLine className="h-4 w-4 text-muted-foreground" />
-                        <span className="typography-meta font-medium text-foreground">Worktree</span>
+                        <span className="typography-meta font-medium text-foreground">工作树</span>
                         {targetWorktree?.label ? (
                             <span className="typography-micro text-muted-foreground/70">{targetWorktree.label}</span>
                         ) : null}
                     </div>
                     <p className="typography-micro text-muted-foreground/80 break-all">
-                        {targetWorktree ? formatPathForDisplay(targetWorktree.path, homeDirectory) : 'Worktree path unavailable.'}
+                        {targetWorktree ? formatPathForDisplay(targetWorktree.path, homeDirectory) : '工作树路径不可用。'}
                     </p>
                     {hasDirtyWorktrees && (
                         <p className="typography-micro text-status-warning">Uncommitted changes will be discarded.</p>
@@ -689,7 +689,7 @@ export const SessionDialogs: React.FC = () => {
                     Cancel
                 </Button>
                 <Button variant="destructive" onClick={handleConfirmDelete} disabled={isProcessingDelete}>
-                    {isProcessingDelete ? 'Deleting…' : 'Delete worktree'}
+                    {isProcessingDelete ? '删除中…' : '删除工作树'}
                 </Button>
             </div>
         </div>
@@ -710,20 +710,20 @@ export const SessionDialogs: React.FC = () => {
                 </Button>
                 <Button variant="destructive" onClick={handleConfirmDelete} disabled={isProcessingDelete}>
                     {isProcessingDelete
-                        ? 'Deleting…'
+                        ? '删除中…'
                         : deleteDialog?.sessions.length === 1
-                            ? 'Delete session'
-                            : 'Delete sessions'}
+                            ? '删除会话'
+                            : '删除会话'}
                 </Button>
             </div>
         </div>
     );
 
     const deleteDialogTitle = isWorktreeDelete
-        ? 'Delete worktree'
+        ? '删除工作树'
         : deleteDialog?.sessions.length === 1
-            ? 'Delete session'
-            : 'Delete sessions';
+            ? '删除会话'
+            : '删除会话';
 
     return (
         <>

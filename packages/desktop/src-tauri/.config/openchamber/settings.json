@@ -1,0 +1,37 @@
+{
+  "desktopHosts": [
+    {
+      "id": "94846d8e-107a-456b-9b1e-e7b9322d2fc4",
+      "label": "新建 SSH 实例",
+      "url": "http://127.0.0.1:3232"
+    }
+  ],
+  "desktopSshInstances": [
+    {
+      "auth": {
+        "openchamberPassword": null,
+        "sshPassword": null
+      },
+      "connectionTimeoutSec": 60,
+      "id": "94846d8e-107a-456b-9b1e-e7b9322d2fc4",
+      "localForward": {
+        "bindHost": "127.0.0.1",
+        "preferredLocalPort": 3232
+      },
+      "nickname": "新建 SSH 实例",
+      "portForwards": [],
+      "remoteOpenchamber": {
+        "installMethod": "bun",
+        "keepRunning": true,
+        "mode": "managed",
+        "preferredPort": 3232,
+        "uploadBundleOverSsh": false
+      },
+      "sshCommand": "ssh root@43.103.2.130",
+      "sshParsed": {
+        "args": [],
+        "destination": "root@43.103.2.130"
+      }
+    }
+  ]
+}

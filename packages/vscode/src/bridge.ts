@@ -1527,6 +1527,9 @@ export async function handleBridgeMessage(message: BridgeRequest, ctx?: BridgeCo
           const response = await fetch(targetUrl, {
             method: normalizedMethod,
             headers: requestHeaders,
+            // 30-second hard cap so a slow/unresponsive OpenCode server cannot
+            // leave the bridge promise pending indefinitely.
+            signal: AbortSignal.timeout(30_000),
             body:
               typeof bodyBase64 === 'string' && bodyBase64.length > 0 && normalizedMethod !== 'GET' && normalizedMethod !== 'HEAD'
                 ? Buffer.from(bodyBase64, 'base64')
@@ -1542,11 +1545,14 @@ export async function handleBridgeMessage(message: BridgeRequest, ctx?: BridgeCo
 
           return { id, type, success: true, data };
         } catch (error) {
+          const isTimeout = error instanceof DOMException && error.name === 'TimeoutError';
           const body = JSON.stringify({
-            error: error instanceof Error ? error.message : 'Failed to reach OpenCode API',
+            error: isTimeout
+              ? 'OpenCode API request timed out'
+              : error instanceof Error ? error.message : 'Failed to reach OpenCode API',
           });
           const data: ApiProxyResponsePayload = {
-            status: 502,
+            status: isTimeout ? 504 : 502,
             headers: { 'content-type': 'application/json' },
             bodyBase64: base64EncodeUtf8(body),
           };

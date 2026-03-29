@@ -155,7 +155,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
         await startAccessing(accessResult.path);
         onSelectPath(accessResult.path);
       } else {
-        console.error('Failed to get directory access:', accessResult.error);
+        console.error('获取目录访问权限失败:', accessResult.error);
 
         onSelectPath(path);
       }
@@ -188,7 +188,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
           return;
         }
       } catch (error) {
-        console.warn('Failed to resolve filesystem home directory:', error);
+        console.warn('解析文件系统主目录失败:', error);
       }
 
       try {
@@ -197,7 +197,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
           return;
         }
       } catch (error) {
-        console.warn('Failed to resolve home directory from system info:', error);
+        console.warn('从系统信息解析主目录失败:', error);
       }
     };
 
@@ -237,7 +237,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
           applyPinned(parsed);
         }
       } catch (error) {
-        console.warn('Failed to load pinned directories from local storage:', error);
+        console.warn('从本地存储加载固定目录失败:', error);
       }
     };
 
@@ -260,7 +260,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
 
         applyPinned(pinned);
       } catch (error) {
-        console.warn('Failed to load pinned directories:', error);
+        console.warn('加载固定目录失败:', error);
       }
     };
 
@@ -594,7 +594,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       setCreatingInPath(null);
       setNewDirName('');
     } catch (error) {
-      console.error('Failed to create directory:', error);
+      console.error('创建目录失败:', error);
 
     }
   };
@@ -678,7 +678,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
             isMobile ? "p-1.5" : "p-1",
             alwaysShowActions ? "opacity-60" : "opacity-0 group-hover:opacity-100"
           )}
-          title="Create new directory"
+          title="创建新目录"
         >
           <RiAddLine className={cn("text-muted-foreground", isMobile ? "h-3.5 w-3.5" : "h-3 w-3")} />
         </button>
@@ -693,7 +693,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
             isMobile ? "p-1.5" : "p-1",
             alwaysShowActions ? "opacity-60" : "opacity-0 group-hover:opacity-100"
           )}
-          title={isPinned ? "Unpin directory" : "Pin directory"}
+          title={isPinned ? "取消固定目录" : "固定目录"}
         >
           {isPinned ? (
             <RiPushpin2Line className={cn("text-primary", isMobile ? "h-3.5 w-3.5" : "h-3 w-3")} />
@@ -745,7 +745,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                     }}
                     onBlur={createDirectory}
                     className="h-6 typography-meta flex-1 selection:bg-interactive-selection selection:text-interactive-selection-foreground"
-                    placeholder="new_directory"
+                    placeholder="新目录"
                   />
                   <button
                     onClick={(e) => {
@@ -754,7 +754,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                       createDirectory();
                     }}
                     className="p-1 hover:bg-interactive-hover rounded"
-                    title="Create directory"
+                    title="创建目录"
                   >
                     <RiCheckLine className="h-3 w-3 text-green-600" />
                   </button>
@@ -765,7 +765,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                       cancelCreatingDirectory();
                     }}
                     className="p-1 hover:bg-interactive-hover rounded"
-                    title="Cancel"
+                    title="取消"
                   >
                     <RiCloseLine className="h-3 w-3 text-muted-foreground" />
                   </button>
@@ -834,7 +834,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                   }}
                   onBlur={createDirectory}
                   className="h-6 typography-meta flex-1 selection:bg-interactive-selection selection:text-interactive-selection-foreground"
-                  placeholder="new_directory"
+                  placeholder="新目录"
                 />
                 <button
                   onClick={(e) => {
@@ -843,7 +843,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                     createDirectory();
                   }}
                   className="p-1 hover:bg-interactive-hover rounded"
-                  title="Create directory"
+                  title="创建目录"
                 >
                   <RiCheckLine className="h-3 w-3 text-green-600" />
                 </button>
@@ -854,7 +854,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
                     cancelCreatingDirectory();
                   }}
                   className="p-1 hover:bg-interactive-hover rounded"
-                  title="Cancel"
+                  title="取消"
                 >
                   <RiCloseLine className="h-3 w-3 text-muted-foreground" />
                 </button>
@@ -919,7 +919,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
               "hover:bg-interactive-hover rounded-md transition-opacity",
               isMobile ? "p-1.5 opacity-60" : "p-1 opacity-0 group-hover:opacity-100"
             )}
-            title="Unpin directory"
+            title="取消固定目录"
           >
             <RiPushpin2Line className={cn("text-primary", isMobile ? "h-3.5 w-3.5" : "h-3.5 w-3.5")} />
           </button>
@@ -956,7 +956,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
             togglePin(path);
           }}
           className="p-1 opacity-0 group-hover:opacity-100 hover:bg-interactive-hover rounded transition-opacity"
-          title="Unpin directory"
+          title="取消固定目录"
         >
           <RiPushpin2Line className="h-3 w-3 text-primary" />
         </button>
@@ -1044,7 +1044,7 @@ export const DirectoryTree: React.FC<DirectoryTreeProps> = ({
             'w-full h-8 px-2.5 justify-between items-center rounded-lg border border-transparent bg-sidebar-accent/40 text-foreground/90 hover:bg-sidebar-accent/60 typography-meta',
             triggerClassName
           )}
-          aria-label="Select working directory"
+          aria-label="选择工作目录"
         >
           <span className="flex items-center gap-1.5 min-w-0 flex-1">
             <RiFolder6Line className="h-3 w-3 flex-shrink-0 text-muted-foreground" />

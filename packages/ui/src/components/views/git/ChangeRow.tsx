@@ -16,12 +16,12 @@ type ChangeDescriptor = {
 };
 
 const CHANGE_DESCRIPTORS: Record<string, ChangeDescriptor> = {
-  '?': { code: '?', color: 'var(--status-info)', description: 'Untracked file' },
-  A: { code: 'A', color: 'var(--status-success)', description: 'New file' },
-  D: { code: 'D', color: 'var(--status-error)', description: 'Deleted file' },
-  R: { code: 'R', color: 'var(--status-info)', description: 'Renamed file' },
-  C: { code: 'C', color: 'var(--status-info)', description: 'Copied file' },
-  M: { code: 'M', color: 'var(--status-warning)', description: 'Modified file' },
+  '?': { code: '?', color: 'var(--status-info)', description: '未跟踪文件' },
+  A: { code: 'A', color: 'var(--status-success)', description: '新文件' },
+  D: { code: 'D', color: 'var(--status-error)', description: '已删除文件' },
+  R: { code: 'R', color: 'var(--status-info)', description: '重命名文件' },
+  C: { code: 'C', color: 'var(--status-info)', description: '复制文件' },
+  M: { code: 'M', color: 'var(--status-warning)', description: '修改文件' },
 };
 
 const DEFAULT_DESCRIPTOR = CHANGE_DESCRIPTORS.M;
@@ -110,7 +110,7 @@ export const ChangeRow = React.memo<ChangeRowProps>(function ChangeRow({
           type="button"
           onClick={handleToggleClick}
           aria-pressed={checked}
-          aria-label={`Select ${file.path}`}
+          aria-label={`选择 ${file.path}`}
           className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           {checked ? (
@@ -167,7 +167,7 @@ export const ChangeRow = React.memo<ChangeRowProps>(function ChangeRow({
               onClick={handleRevertClick}
               disabled={isReverting}
               className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label={`Revert changes for ${file.path}`}
+              aria-label={`还原 ${file.path} 的更改`}
             >
               {isReverting ? (
                 <RiLoader4Line className="size-3.5 animate-spin" />
@@ -176,7 +176,7 @@ export const ChangeRow = React.memo<ChangeRowProps>(function ChangeRow({
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent sideOffset={8}>Revert changes</TooltipContent>
+          <TooltipContent sideOffset={8}>还原更改</TooltipContent>
         </Tooltip>
     </div>
   );

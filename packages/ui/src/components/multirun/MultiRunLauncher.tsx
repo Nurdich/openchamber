@@ -341,6 +341,11 @@ export const MultiRunLauncher: React.FC<MultiRunLauncherProps> = ({
            useSessionStore.getState().setCurrentSession(result.firstSessionId);
          }
 
+         if (result.failures && result.failures.length > 0) {
+           const failedLabels = result.failures.map((f) => `${f.providerID}/${f.modelID}`).join('、');
+           toast.error(`以下模型创建失败（已重试）：${failedLabels}`);
+         }
+
          // Close launcher
          onCreated?.();
        }
